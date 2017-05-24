@@ -1,0 +1,129 @@
+000-127,Reserved (see entries under Parameter Table Version 2) ,,,
+128,Probability anomaly of temperature ,% ,PAOT
+129,Probability anomaly of precipitation ,% ,PAOP
+130,Probability of Wetting Rain, exceeding 0.10" in a given time period ,%,CWR
+131,Rain fraction of total liquid water ,non-dim ,FRAIN
+132,Ice fraction of total condensate ,non-dim ,FICE
+133,Rime Factor ,non-dim ,RIME
+134,Convective cloud efficiency ,non-dim ,CUEFI
+135,Total condensate ,kg/kg ,TCOND
+136,Total column-integrated cloud water ,kg/m2 ,TCOLW
+137,Total column-integrated cloud ice ,kg/m2 ,TCOLI
+138,Total column-integrated rain ,kg/m2 ,TCOLR
+139,Total column-integrated snow ,kg/m2 ,TCOLS
+140,Total column-integrated condensate ,kg/m2 ,TCOLC
+141,Pressure of level from which parcel was lifted ,Pa ,PLPL
+142,Height of level from which parcel was lifted ,m ,HLPL
+143,Cloud Emissivity,Fraction 0-1 ,CEMS
+144,Cloud Optical Depth,non-dim ,COPD
+145,Effective Particle size ,Microns ,PSIZ
+146,Total Water Cloud ,%,TCWAT
+147,Total Ice Cloud,%,TCICE
+148,Wind difference,m/s,WDIF
+149,Wave Steepness,non-dim,WSTP
+150,Probability of Temperature being above normal,%,PTAN
+151,Probability of Temperature being near normal ,%,PTNN
+152,Probability of Temperature being below normal ,%,PTBN
+153,Probability of Precipitation being above normal ,%,PPAN
+154,Probability of Precipitation being near normal ,%,PPNN
+155,Probability of Precipitation being below normal ,%,PPBN
+156,Particulate matter (coarse),µg/m3,PMTC
+157,Particulate matter (fine) ,µg/m3 ,PMTF
+158,Analysis error of temperature ,K,AETMP
+159,Analysis error of dew point,%,AEDPT
+160,Analysis error of specific humidity  ,kg/kg,AESPH
+161,Analysis error of u-wind  ,m/s,AEUWD
+162,Analysis error of v-wind  ,m/s,AEVWD
+163,Particulate matter (fine) ,log10(µg/m3) ,LPMTF
+164,Integrated column particulate matter (fine) ,log10(µg/m3) ,LIPMF
+165,Derived radar reflectivity backscatter from rain ,mm6/m3,REFZR
+166,Derived radar reflectivity backscatter from ice ,mm6/m3 ,REFZI
+167,Derived radar reflectivity backscatter from parameterized convection ,mm6/m3 ,REFZC
+168,Total column-integrated supercooled liquid water ,kg/m2 ,TCLSW
+169,Total column-integrated melting ice ,kg/m2 ,TCOLM
+170,Ellrod Index ,non-dim ,ELRDI
+171,Seconds prior to initial reference time (defined in octects 18-20) ,sec ,TSEC
+172,Seconds after initial reference time (defined in octets 18-20),sec,TSECA
+173,Number of samples/observations ,non-dim ,NUM
+174,Analysis error of pressure ,Pa,AEPRS
+175,Icing severity ,non-dim,ICSEV
+176,Icing probability ,non-dim,ICPRB
+177,Low-level aviation interest ,non-dim ,LAVNI
+178,High-level aviation interest ,non-dim ,HAVNI
+179,Flight Category (See note 7 below),non-dim,FLGHT
+180,Ozone concentration ,PPB ,OZCON
+181,Categorical ozone concentration ,non-dim ,OZCAT
+182,Vertical eddy diffusivity heat exchange (Kh),m2/s,VEDH
+183,Sigma level value,non-dim,SIGV
+184,Ensemble Weight,non-dim,EWGT
+185,Confidence indicator - Ceiling (See note 8 below),non-dim ,CICEL
+186,Confidence indicator - Visibility (See note 8 below),non-dim ,CIVIS
+187,Confidence indicator - Flight Category (See note 8 below),non-dim ,CIFLT
+188,Latitude of V wind component of velocity ,deg,LAVV
+189,Longitude of V wind component of velocity ,deg,LOVV
+190,Scatterometer estimated U wind component,m/s,USCT
+191,Scatterometer estimated V wind component ,m/s,VSCT
+192,Latitude of U wind component of velocity,deg,LAUV
+193,Longitude of U wind component of velocity,deg,LOUV
+194,Tropical Cyclone Heat Potential ,J/m2K ,TCHP
+195,Geometric Depth Below Sea Surface,m,DBSS
+196,Ocean Dynamic Height Anomaly,dynamic m,ODHA
+197,Ocean Heat Content,J/m2,OHC
+198,Sea Surface Height Relative to Geoid,m,SSHG
+199,Salt Flux,kg/m2s,SLTFL
+200,UV-B downward solar flux,W/m2,DUVB
+201,Clear sky UV-B downward solar flux ,W/m2 ,CDUVB
+202,Total downward heat flux at surface (downward is positive),W/m2 ,THFLX
+203,U velocity variance,m2/s2 ,UVAR
+204,V velocity variance,m2/s2,VVAR
+205,UV Velocity Cross Correlation,m2/s2 ,UVVCC
+206,Meteorological Correlation Length Scale ,m,MCLS
+207,Latitude of pressure point,deg,LAPP
+208,Longitude of pressure point,deg,LOPP
+209,Reserved for local use ,,
+210,Observed radar reflectivity,dbZ,REFO
+211,Derived radar reflectivity ,dbZ,REFD
+212,Maximum/Composite radar reflectivity ,dbZ,REFC
+213,Simulated Brightness Temperature for GOES12, Channel 2,K,SBT122
+214,Simulated Brightness Temperature for GOES12, Channel 3 ,K,SBT123
+215,Simulated Brightness Temperature for GOES12, Channel 4,K,SBT124
+216,Simulated Brightness Temperature for GOES12, Channel 6,K,SBT126
+217 ,Minimum Relative Humidity,%,MINRH
+218,Maximum Relative Humidity,%,MAXRH
+219,Ceiling,m,CEIL
+220,Planetary boundary layer Regime,,PBLREG
+221,Simulated Brightness Counts for GOES12, Channel 3 ,Byte,SBC123
+222,Simulated Brightness Counts for GOES12, Channel 4,Byte,SBC124
+223,Rain Precipitation Rate,kg/m2/s,RPRATE
+224,Snow Precipitation Rate,kg/m2/s,SPRATE
+225,Freezing Rain Precipitation Rate,kg/m2/s,FPRATE
+226,Ice Pellets Precipitation Rate,kg/m2/s,IPRATE
+227,Updraft Helicity,m2/s2,UPHL
+228,Storm Surge,m,SURGE
+229,Extra Tropical Storm Surge,m,ETSRG
+230,Relative Humidity with Respect to Precipitable Water,%,RHPW
+231,Ozone Daily Max from 1-hour Average ,ppbV,OZMAX1
+232,Ozone Daily Max from 8-hour Average ,ppbV,OZMAX8
+233,PM 2.5 Daily Max from 1-hour Average ,μg/m3 ,PDMAX1
+234,PM 2.5 Daily Max from 24-hour Average ,μg/m3 ,PDMX24
+235,Hourly Maximum of Simulated Reflectivity at 1 km AGL ,dbZ ,MAXREF
+236,Hourly Maximum of Updraft Helicity over layer 2km to 5 km AGL ,m2/s2,MXUPHL
+237,Hourly Maximum of Upward Vertical Velocity in the lowest 400hPa ,m/s,MAXUVV
+238,Hourly Maximum of Downward Vertical Velocity in the lowest 400hPa ,m/s,MAXDVV
+239,Hourly Maximum of Column Vertical Integrated Graupel ,kg/m2,MAXVIG
+240,Radar Echo Top (18.3 DBZ) ,m,RETOP
+241,Ventilation Rate ,m2/s,VRATE
+242,20% Tropical Cyclone Storm Surge Exceedance,m,TCSRG20
+243,30% Tropical Cyclone Storm Surge Exceedance,m,TCSRG30
+244,40% Tropical Cyclone Storm Surge Exceedance,m,TCSRG40
+245,50% Tropical Cyclone Storm Surge Exceedance,m,TCSRG50
+246,60% Tropical Cyclone Storm Surge Exceedance,m,TCSRG60
+247,70% Tropical Cyclone Storm Surge Exceedance,m,TCSRG70
+248,80% Tropical Cyclone Storm Surge Exceedance,m,TCSRG80
+249,90% Tropical Cyclone Storm Surge Exceedance,m,TCSRG90
+250,Haines Index,,HINDEX
+251,Difference Between 2 States In Total Energy Norm ,J/kg,DIFTEN
+252,Pseudo-Precipitation ,kg/m2,PSPCP
+253,U Component of Hourly Maximum 10m Wind Speed ,m/s,MAXUW
+254,V Component of Hourly Maximum 10m Wind Speed ,m/s,MAXVW
+255,Missing
