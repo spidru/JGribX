@@ -1,0 +1,104 @@
+144 ,Volumetric soil moisture (frozen + liquid) ,fraction ,SOILW
+145,Potential latent heat flux (potential evaporation) ,W/m2 ,PEVPR
+146,Vegetation canopy temperature ,K ,VEGT
+147,Bare soil surface skin temperature ,K  ,BARET
+148,Average surface skin temperature  ,K  ,AVSFT
+149,Effective radiative skin temperature ,K ,RADT
+150,Surface water storage  ,kg/m2  ,SSTOR
+151,Liquid soil moisture content (non-frozen)  ,kg/m2  ,LSOIL
+152,Open water evaporation (standing water) ,W/m2  ,EWATR
+153,Number concentration for rain particles ,,NCRAIN
+154,Land Surface Precipitation Accumulation (LSPA) ,kg/m2 ,LSPA
+155,Ground Heat Flux ,W/m2  ,GFLUX
+156,Convective inhibition (CIN) ,J/kg ,CIN
+157,Convective available potential energy (CAPE) ,J/kg ,CAPE
+158,Turbulent Kinetic Energy ,J/kg ,TKE
+159,Maximum snow albedo  ,% ,MXSALB
+160,Liquid volumetric soil moisture (non-frozen) ,fraction ,SOILL
+161,Frozen precipitation (e.g. snowfall) ,kg/m2 ,ASNOW
+162,Liquid precipitation (rainfall) ,kg/m2  ,ARAIN
+163,Groundwater recharge ,kg/m2 ,GWREC
+164,Flood plain recharge ,kg/m2 ,QREC
+165,Snow temperature, depth-avg  ,K  ,SNOWT
+166,Visible beam downward solar flux  ,W/m2  ,VBDSF
+167,Visible diffuse downward solar flux  ,W/m2 ,VDDSF
+168,Near IR beam downward solar flux  ,W/m2  ,NBDSF
+169,Near IR diffuse downward solar flux ,W/m2 ,NDDSF
+170,Snow-free albedo ,%  ,SNFALB
+171,Number of soil layers in root zone,non-dim ,
+172,Momentum flux  ,N/m2 ,M FLX
+173,Reserved for future use ,,
+174,Reserved for future use ,,
+175,Reserved for future use ,,
+176,Latitude (-90 to +90)  ,deg  ,NLAT
+177,East longitude (0-360)  ,deg  ,ELON
+178,Field Capacity (soil moisture)  ,fraction ,FLDCAP
+179,Aerodynamic conductance  ,m/s  ,ACOND
+180,Snow age  ,s  ,SNOAG 
+181,Canopy conductance  ,m/s  ,CCOND 
+182,Leaf area index (0-9)  ,non-dim  ,LAI 
+183,Roughness length for heat  ,m  ,SFCRH 
+184,Snow albedo (over snow cover area only) ,% ,SALBD 
+185-186,Reserved for future use ,,
+187,Normalized Difference Vegetation Index (NDVI)  ,non-dim  ,NDVI 
+188,Canopy drip  ,kg/m2 ,DRIP 
+189,Visible, Black Sky Albedo,%,VBSALB
+190,Visible, White Sky Albedo,%,VWSALB
+191,Near IR, Black Sky Albedo,%,NBSALB
+192,Near IR, White Sky Albedo,%,NWSALB
+193 ,Freezing Rain ,kg/m2 ,FRZR
+194 ,Frozen Rain ,kg/m2 ,FROZR
+195 ,Total Snow ,kg/m2 ,TSNOW
+196 ,Model Terrain Height ,m ,MTERH
+197,Reserved for future use ,,
+198,Sublimation (evaporation from snow) ,W/m2  ,SBSNO 
+199,Direct evaporation from bare soil  ,W/m2  ,EVBS 
+200,Canopy water evaporation  ,W/m2 ,EVCW 
+201 ,Virtual Temperature Based Convective Inhibition ,J/Kg ,VTCIN
+202 ,Virtual Temperature Based Convective Available Potential Energy ,J/Kg ,VTCAPE
+203,Minimal stomatal resistance  ,s/m  ,RSMIN 
+204,Downward shortwave radiation flux  ,W/m2 ,DSWRF 
+205,Downward longwave radiation flux  ,W/m2 ,DLWRF 
+206 ,Vertically Integrated Liquid ,kg m-2 ,VIL
+207,Moisture availability  ,%  ,MSTAV 
+208,Exchange coefficient  ,(kg/m3)(m/s) ,SFEXC 
+209,Reserved for future use ,,
+210,Transpiration  ,W/m2 ,TRANS 
+211,Upward short wave radiation flux  ,W/m2 ,USWRF 
+212,Upward long wave radiation flux  ,W/m2 ,ULWRF 
+213-218,Reserved for future use ,,
+219,Wilting point  ,fraction ,WILT 
+220,Field Capacity  ,fraction  ,FLDCP 
+221,Planetary boundary layer height ,m ,HPBL
+222,Surface slope type  ,Index ,SLTYP 
+223,Plant canopy surface water  ,kg/m2  ,CNWAT 
+224,Soil type  ,Index (0-9)  ,SOTYP 
+225,Vegetation type  ,Index (0-13)  ,VGTYP 
+226,Blackadar's mixing length scale  ,m  ,BMIXL 
+227,Asymptotic mixing length scale ,m  ,AMIXL 
+228,Potential evaporation  ,kg/m2 ,PEVAP 
+229,Snow phase-change heat flux  ,W/m2 ,SNOHF 
+230,Transpiration stress-onset (soil moisture) ,fraction ,SMREF 
+231,Direct evaporation cease (soil moisture)  ,fraction ,SMDRY 
+232-233,Reserved for future use ,,
+234,Subsurface runoff (baseflow)  ,kg/m2 ,BGRUN 
+235,Surface runoff (non-infiltrating)  ,kg/m2 ,SSRUN 
+236-237,Reserved for future use ,,
+238,Snow cover  ,%  ,SNOWC 
+239,Snow temperature  ,K  ,SNOT 
+240,Soil porosity  ,fraction ,POROS 
+241,Simulated Brightness Temperature for GOES11, Channel 2,K,SBT112
+242,Simulated Brightness Temperature for GOES11, Channel 3 ,K,SBT113
+243,Simulated Brightness Temperature for GOES11, Channel 4,K,SBT114
+244,Simulated Brightness Temperature for GOES11, Channel 5,K,SBT115
+245,Reserved for future use ,,
+246,Solar parameter in canopy conductance  ,fraction  ,RCS 
+247,Temperature parameter in canopy conductance  ,fraction  ,RCT 
+248,Humidity parameter in canopy conductance  ,fraction ,RCQ 
+249,Soil moisture parameter in canopy conductance  ,fraction  ,RCSOL 
+250,Reserved for future use ,,
+251,Reserved for future use ,,
+252,Surface drag coefficient  ,non-dim  ,CD 
+253,Surface friction velocity  ,m/s  ,FRICV 
+254,Richardson number  ,non-dim ,RI
+255,Missing  ,,
