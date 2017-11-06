@@ -1,35 +1,18 @@
-/**
- * ===============================================================================
- * $Id: Bytes2Number.java,v 1.4 2006/07/31 11:55:20 frv_peg Exp $
- * ===============================================================================
- * JGRIB library  
- *  
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *  
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+/*
+ * ============================================================================
+ * JGribX
+ * ============================================================================
+ * Written by Andrew Spiteri <andrew.spiteri@um.edu.mt>
+ * Adapted from JGRIB: http://jgrib.sourceforge.net/
  * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * 
- * Authors:
- * See AUTHORS file
- * ===============================================================================
+ * Licensed under MIT: https://github.com/spidru/JGribX/blob/master/LICENSE
+ * ============================================================================
  */
-
-/**
- * Bytes2Number.java  1.0  01/01/2001
- *
- * (C) Benjamin Stark
- */
-
 package mt.edu.um.cf2.jgribx;
+
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.Arrays;
 
 
 /**
@@ -42,7 +25,96 @@ package mt.edu.um.cf2.jgribx;
 
 public class Bytes2Number
 {
-	
+    /**
+     * Integer (Sign & Magnitude)
+     */
+    public static final int INT_SM = 1;
+    /**
+     * Integer (Two's Complement)
+     */
+    public static final int INT_TC = 2;
+    
+    public static final int FLOAT_IBM = 0;
+    public static final int FLOAT_IEEE754 = 1;
+    
+    public static int bytesToUint(byte b)
+    {
+        byte[] bytes = new byte[1];
+        bytes[0] = b;
+        return bytesToUint(bytes);
+    }
+    
+    public static int bytesToUint(byte[] bytes)
+    {
+        int nBytes = bytes.length;
+        if (nBytes > Integer.BYTES)
+            throw new IllegalArgumentException("nBytes cannot be larger than 4");
+        int value = 0;
+        
+        for (int i=0; i<nBytes; i++)
+        {
+            value |= ((bytes[i] & 0xFF) << ((nBytes - i - 1))*8);
+        }
+        return value;
+    }
+    
+    public static long bytesToLong(byte[] bytes)
+    {
+        int nBytes = bytes.length;
+        if (nBytes > Long.BYTES)
+            throw new IllegalArgumentException("nBytes cannot be larger than " + Long.BYTES + " bytes");
+        int value = 0;
+        
+        for (int i=0; i<nBytes; i++)
+        {
+            value |= ((bytes[i] & 0xFF) << ((nBytes - i - 1))*8);
+        }
+        return value;
+    }
+    
+    public static int bytesToInt(byte[] bytes, int mode)
+    {
+        boolean negative;
+        int value = 0;
+        int nBytes = bytes.length;
+        
+        if (mode == INT_SM)
+        {
+            negative = (bytes[0] & 0x80) == 0x80;
+            bytes[0] &= 0x7F;
+            value = bytesToUint(bytes);
+            if (negative) value *= -1;
+        }
+        else if (mode == INT_TC)
+        {
+            for (int i=0; i<nBytes; i++)
+            {
+                value |= (bytes[i] << ((nBytes - i - 1))*8);
+            }
+        }
+        
+        return value;
+    }
+    
+	/**
+	 * Convert an array of bytes into a floating point in the specified format.
+	 * @see https://en.wikipedia.org/wiki/IBM_Floating_Point_Architecture
+	 */
+    public static float bytesToFloat(byte[] bytes, int format)
+    {
+        switch (format)
+        {
+            case FLOAT_IBM:
+                int sign = (bytes[0] & 0x80) == 0x80 ? -1 : 1;
+                int exponent = (bytes[0] & 0x7F) - 64;
+                int mantissa = bytesToUint(Arrays.copyOfRange(bytes, 1, 4));
+                return (float) (sign * Math.pow(16.0, exponent - 6) * mantissa);
+            case FLOAT_IEEE754:
+                return ByteBuffer.wrap(bytes).order(ByteOrder.BIG_ENDIAN).getFloat();
+            default:
+                throw new IllegalArgumentException("Invalid format specified");
+        }
+    }
 	
    /**
     * Convert two bytes into a signed integer.
@@ -135,7 +207,10 @@ public class Bytes2Number
     */
    public static float float4(int a, int b, int c, int d)
    {
-
+       /*
+        byte test[] = {(byte)a, (byte) b, (byte) c, (byte) d};
+        return ByteBuffer.wrap(test).getFloat();
+        */  
       int sgn, mant, exp;
 
       mant = b << 16 | c << 8 | d;

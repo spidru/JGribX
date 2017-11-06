@@ -1,47 +1,27 @@
-/**
- * ===============================================================================
- * $Id: GribRecordIS.java,v 1.4 2006/07/25 13:46:23 frv_peg Exp $
- * ===============================================================================
- * JGRIB library  
- *  
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *  
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * 
- * Authors:
- * See AUTHORS file
- * ===============================================================================
- */
-
 /*
- * GribRecordIS.java  1.0  01/01/2001
- *
- * (C) Benjamin Stark
- *
- * Updated by Capt Richard D. Gonzalez 16 Sep 02
+ * ============================================================================
+ * JGribX
+ * ============================================================================
+ * Written by Andrew Spiteri <andrew.spiteri@um.edu.mt>
+ * Adapted from JGRIB: http://jgrib.sourceforge.net/
+ * 
+ * Licensed under MIT: https://github.com/spidru/JGribX/blob/master/LICENSE
+ * ============================================================================
  */
-
 package mt.edu.um.cf2.jgribx;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import mt.edu.um.cf2.jgribx.GribCodes.Discipline;
 
 
 /**
  * A class that represents the indicator section (IS) of a GRIB record.
  *
- * @author  Benjamin Stark
- * @author Richard D. Gonzalez - modified to indicate support of GRIB edition 1 only
- * @version 1.1
+ * 01/01/2001   Benjamin Stark          first version
+ * 16/09/2002   Richard D. Gonzalez     modified to indicate support of GRIB edition 1 only
+ * 24/05/2017   Andrew Spiteri          added support for GRIB2
  *
  */
 
@@ -51,67 +31,116 @@ public class GribRecordIS
    /**
     * Length in bytes of GRIB record.
     */
-   protected int length;
+   protected long recordLength;
 
    /**
     * Length in bytes of IS section.
-    * Section length differs between GRIB editions 1 and 2
-    * Currently only GRIB edition 1 supported - length is 8 octets/bytes.
+    * Section recordLength differs between GRIB editions 1 and 2
+ Currently only GRIB edition 1 supported - recordLength is 8 octets/bytes.
     */
-   protected int isLength;
+   protected int length;
 
    /**
     * Edition of GRIB specification used.
     */
    protected int edition;
+   
+   protected Discipline discipline;
 
+    /**
+     * Constructs a {@link GribRecordIS} object from a buffered input stream.
+     *
+     * @param in {@link BufferedInputStream} containing IS content
+     * @return 
+     * @throws NotSupportedException 
+     * @throws IOException           if stream can not be opened etc.
+     */
+    public static GribRecordIS readFromStream(GribInputStream in) throws NotSupportedException, IOException
+    {
+        GribRecordIS is = new GribRecordIS();
+        byte[] octets = new byte[16];
+        in.read(octets, 0, 8);
+        
+        String startCode = new String(Arrays.copyOfRange(octets, 0, 4));
+        if (!startCode.equals("GRIB"))
+        {
+            return null;
+        }
+      
+        // check GRIB edition number
+        is.edition = octets[7];
+        switch (is.edition)
+        {
+            case 1:
+                is.length = 8;
+                break;
+            case 2:
+                is.discipline = getDiscipline(octets[6]);
+                is.length = 16;
+                in.read(octets, 8, 8);
+                break;
+            default:
+                throw new NotSupportedException("GRIB edition " + is.edition +
+                " is not yet supported");
+        }
+      
+        // recordLength of GRIB record
+        if (is.edition == 1)
+            is.recordLength = Bytes2Number.bytesToLong(Arrays.copyOfRange(octets, 4, 7));
+        else if (is.edition == 2)
+            is.recordLength = Bytes2Number.bytesToLong(Arrays.copyOfRange(octets, 8, 16));
+        
+        return is;
+   }
+    
+    /**
+     * Get the discipline associated with the specified code.
+     * @param code the code value representing a particular discipline
+     * @return the associated {@link Discipline}
+     */
+    private static Discipline getDiscipline(int code)
+    {
+        switch (code)
+        {
+            case 0:
+                return Discipline.METEOROLOGICAL;
+            case 1:
+                return Discipline.HYDROLOGICAL;
+            case 2:
+                return Discipline.LAND_SURFACE;
+            case 3:
+            case 4:
+                return Discipline.SPACE;
+            case 10:
+                return Discipline.OCEANOGRAPHIC;
+            default:
+                return null;
+        }
+    }
 
-   // *** constructors *******************************************************
+    public Discipline getDiscipline()
+    {
+        return discipline;
+    }
 
    /**
-    * Constructs a <tt>GribRecordIS</tt> object from a bit input stream.
+    * Get the byte recordLength of this GRIB record.
     *
-    * @param in bit input stream with IS content
-    * @throws NotSupportedException 
-    * @throws IOException           if stream can not be opened etc.
+    * @return recordLength in bytes of GRIB record
     */
-   public GribRecordIS(BitInputStream in) throws NotSupportedException, IOException
+   public long getRecordLength()
    {
-
-      int[] data = in.readUI8(4);
-      // length of GRIB record
-      this.length = Bytes2Number.uint3(data[0], data[1], data[2]);
-
-      // edition of GRIB specification
-      this.edition = data[3];
-      if (edition == 1) {
-         this.isLength = 8;
-      }
-      else{
-         throw new NotSupportedException("GRIB edition " + edition +
-               " is not yet supported");
-      }
+      return this.recordLength;
    }
 
-
    /**
-    * Get the byte length of this GRIB record.
+    * Get the byte recordLength of the IS section.
     *
-    * @return length in bytes of GRIB record
+    * @return recordLength in bytes of IS section
     */
-   public int getGribLength()
+   public int getLength()
    {
       return this.length;
-   }
-
-   /**
-    * Get the byte length of the IS section.
-    *
-    * @return length in bytes of IS section
-    */
-   public int getISLength()
-   {
-      return this.isLength;
    }
 
    /**
@@ -130,12 +159,13 @@ public class GribRecordIS
     *
     * @return string representation of this IS
     */
+   @Override
    public String toString()
    {
 
       return "    IS section:" + '\n' +
             "        Grib Edition " + this.edition + '\n' +
-            "        length: " + this.length + " bytes";
+            "        length: " + this.recordLength + " bytes";
    }
 
 }

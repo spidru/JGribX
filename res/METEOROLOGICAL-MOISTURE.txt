@@ -1,0 +1,11 @@
+0	:	Specific Humidity	:	kg kg-1	:	SPFH
+1	:	Relative Humidity	:	%	:	RH
+2	:	Humidity Mixing Ratio	:	kg kg-1	:	MIXR
+3	:	Precipitable Water	:	kg m-2	:	PWAT
+4	:	Vapour Pressure	:	Pa	:	VAPP
+5	:	Saturation Deficit	:	Pa	:	SATD
+6	:	Evaporation	:	kg m-2	:	EVP
+7	:	Precipitation Rate	:	kg m-2 s-1	:	PRATE
+8	:	Total Precipitation	:	kg m-2	:	APCP
+9	:	Large-Scale Precipitation (non-convective)	:	kg m-2	:	NCPCP
+10	:	Convective Precipitation	:	kg m-2	:	ACPCP
