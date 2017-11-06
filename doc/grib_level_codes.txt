@@ -1,0 +1,6 @@
+GRIB Level Codes
+
+ISBL		Isobaric level
+MSL			Mean sea level
+
+...incomplete...
