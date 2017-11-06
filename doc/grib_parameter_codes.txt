@@ -1,0 +1,12 @@
+GRIB Parameter Codes
+
+DIST		Geometric height
+GP			Geopotential
+HGT			Geopotential height
+ICAHT		ICAO standard atmosphere reference height
+PRES		Pressure
+PRMSL		Pressure reduced to MSL
+PTEND		Pressure tendency
+PVORT		Potential vorticity
+
+...incomplete...
