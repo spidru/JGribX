@@ -56,6 +56,11 @@ public abstract class GribRecord
         return is;
     }
     
+    /**
+     * Returns the ID corresponding to the originating centre.
+     * @return the ID corresponding to the originating centre
+     */
+    public abstract int getCentreId();
     public abstract String getLevelCode();
     public abstract String getLevelDescription();
     
@@ -67,6 +72,12 @@ public abstract class GribRecord
     public abstract float[] getLevelValues();
     public abstract String getParameterCode();
     public abstract String getParameterDescription();
+    
+    /**
+     * Returns the ID corresponding to the generating process.
+     * @return the ID corresponding to the generating process
+     */
+    public abstract int getProcessId();
     public abstract Calendar getReferenceTime();
     public abstract double getValue(double latitude, double longitude);
 }

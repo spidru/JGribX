@@ -64,17 +64,8 @@ public class Grib2RecordPDS
      * Parameter Table Version number, currently 3 for international exchange.
      */
     private int table_version;
-
-    /**
-     * Identification of center e.g. 88 for Oslo
-     */
-    private int center_id;
-
-// rdg - added the following:
-    /**
-     * Identification of subcenter
-     */
-    private int subcenter_id;
+    
+    private int genProcessId;
     
     /**
      * Type of generating process
@@ -152,7 +143,7 @@ public class Grib2RecordPDS
                 int backgroundGeneratingProcessId = in.readUINT(1);
                 
                 /* [14] Analysis or forecast generating process identifier (see Code ON388 Table A) */
-                int genProcessId = in.readUINT(1);
+                genProcessId = in.readUINT(1);
                 
                 /* [15-16] Hours of observational data cutoff after reference time (see Note) */
                 int observationalHours = in.readUINT(2);
@@ -302,22 +293,6 @@ public class Grib2RecordPDS
     {
         return level.getLevelIdentifier();
     }
-    
-    /**
-     *
-     * @return center_id
-     */
-    public int getCenterId() {
-        return center_id;
-    }
-
-    /**
-     *
-     * @return subcenter_id
-     */
-    public int getSubcenterId() {
-        return subcenter_id;
-    }
 
     /**
      *
@@ -334,6 +309,11 @@ public class Grib2RecordPDS
      */
     public Grib2Parameter getParameter() {
         return this.parameter;
+    }
+    
+    public int getProcessId()
+    {
+        return genProcessId;
     }
 
     /**
@@ -376,8 +356,6 @@ public class Grib2RecordPDS
         }
 
         return "    PDS header:" + '\n'
-                + "        center: " + this.center_id + "\n"
-                + "        subcenter: " + this.subcenter_id + "\n"
                 + "        table: " + this.table_version + "\n"
                 + "        " + timeStr + " (dd.mm.yyyy hh:mm) \n";
     }
@@ -389,6 +367,7 @@ public class Grib2RecordPDS
      * @return true/false
      * @see java.lang.Object#equals(java.lang.Object)
      */
+    @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof Grib2RecordPDS)) {
             return false;
@@ -403,12 +382,6 @@ public class Grib2RecordPDS
             return false;
         }
         if (forecastTime != pds.forecastTime) {
-            return false;
-        }
-        if (center_id != pds.center_id) {
-            return false;
-        }
-        if (subcenter_id != pds.subcenter_id) {
             return false;
         }
         if (table_version != pds.table_version) {

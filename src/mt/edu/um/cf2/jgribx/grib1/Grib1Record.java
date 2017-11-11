@@ -130,6 +130,21 @@ public class Grib1Record extends GribRecord
 
     // *** public methods ******************************************************
     /**
+     * Get the bitmap section of this GRIB record.
+     *
+     * @return bitmap section object
+     */
+    public Grib1RecordBMS getBMS()
+    {
+       return this.bms;
+    }
+    
+    @Override
+    public int getCentreId()
+    {
+        return pds.getCentreId();
+    }
+    /**
      * Get the grid definition section of this GRIB record.
      *
      * @return grid definition section object
@@ -191,15 +206,15 @@ public class Grib1Record extends GribRecord
     {
        return this.pds;
     }
-
+    
     /**
-     * Get the bitmap section of this GRIB record.
-     *
-     * @return bitmap section object
+     * Returns the ID corresponding to the generating process.
+     * @return the ID corresponding to the generating process
      */
-    public Grib1RecordBMS getBMS()
+    @Override
+    public int getProcessId()
     {
-       return this.bms;
+        return pds.getProcessId();
     }
 
     /**

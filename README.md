@@ -8,23 +8,27 @@ The main objective of JGribX is to create an easy-to-use interface to extract da
 ```java
 /* Get the temperature at an isobaric level of 200 hPa above Valletta, Malta at 6th November 2017 14:00:00 */
 
-GribFile gribFile = new GribFile("filename.grb");	// typically .grb or .grb2 extension
+GribFile gribFile = new GribFile("filename.grb");   // typically .grb or .grb2 extension
 
-Calendar forecastDate = new GregorianCalendar(2017, 10, 6, 14, 0, 0);	// 6th November 2017 14:00:00
-String parameterCode = "TMP";	// parameter code for temperature
-String ltvid = "ISBL:200";		// LTVID (level type-value ID)
-double latitude = 35.8985;			// latitude at point of interest (Valletta, Malta)
-double longitude = 14.5133;		// longitude at point of interest (Valletta, Malta)
+Calendar forecastDate = new GregorianCalendar(2017, 10, 6, 14, 0, 0);   // 6th November 2017 14:00:00
+String parameterCode = "TMP";    // parameter code for temperature
+String ltvid = "ISBL:200";       // LTVID (level type-value ID)
+double latitude = 35.8985;       // latitude at point of interest
+double longitude = 14.5133;      // longitude at point of interest
 
 GribRecord record = gribFile.getRecord(forecastDate, parameterCode, ltvid);
 double value = record.getValue(latitude, longitude);
 ```
 
+Further examples of how to use JGribX can be found in the *test* folder.
+
 ## Improvements on JGrib
 Here is a shortlist of the major changes made since JGrib (version 7 beta):
+ * supports GRIB-2 files
  * supports grid definition values given as south latitude and west longitude
  * looks up parameter information from locally stored Grib Parameter Tables (GPT) (instead of a single hardcoded GPT)
- * supports GRIB-2 files
+ * validates each GRIB record
+ * can skip invalid GRIB records (showing the appropriate errors/warnings)
  
 ## Important Notes
 JGribX is still under active development and therefore contains a large amount of unsupported features and operations. These will be implemented gradually over time. If you would like certain features to be implemented, please open an issue containing all the relevant information.
@@ -32,5 +36,5 @@ JGribX is still under active development and therefore contains a large amount o
 ## Parameter Codes
 To uniquely identify and represent different parameters, each parameter has been given its own code. A list of parameter codes can be viewed [here](doc/grib_parameter_codes.txt).
 
-## Level Codes and LVIDs
-Similar to parameter codes, level codes are used to uniquely identify each level type and value(s). For example, an isobaric level is represented by the code **ISBL**. In addition, an isobaric level of 200 hPa is represented by the level type-value ID (LVID) **ISBL:200**. A list of level codes can be viewed [here](doc/grib_level_codes.txt).
+## Level Codes and LTVIDs
+Similar to parameter codes, level codes are used to uniquely identify each level type and value(s). For example, an isobaric level is represented by the code **ISBL**. In addition, an isobaric level of 200 hPa is represented by the level type-value ID (LTVID) **ISBL:200**. A list of level codes can be viewed [here](doc/grib_level_codes.txt).
