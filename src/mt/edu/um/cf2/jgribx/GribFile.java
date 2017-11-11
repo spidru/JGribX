@@ -131,6 +131,25 @@ public class GribFile
     }
     
     /**
+     * Returns the different originating centre IDs found in the GRIB file.
+     * @return the different originating centre IDs found in the GRIB file
+     */
+    public int[] getCentreIDs()
+    {
+        List<Integer> idList = new ArrayList();
+        for (GribRecord record : records)
+        {
+            int id = record.getCentreId();
+            if (!idList.contains(id))
+                idList.add(id);
+        }
+        int[] ids = new int[idList.size()];
+        for (int i = 0; i < idList.size(); i++)
+            ids[i] = idList.get(i);
+        return ids;
+    }
+    
+    /**
      * Returns a sorted list of different parameter codes present within the
      * GRIB file.
      * 
@@ -207,6 +226,25 @@ public class GribFile
             }
         }
         return idList;
+    }
+    
+    /**
+     * Returns the different generating process IDs found in the GRIB file.
+     * @return the different generating process IDs found in the GRIB file
+     */
+    public int[] getProcessIDs()
+    {
+        List<Integer> idList = new ArrayList();
+        for (GribRecord record : records)
+        {
+            int id = record.getProcessId();
+            if (!idList.contains(id))
+                idList.add(id);
+        }
+        int[] ids = new int[idList.size()];
+        for (int i = 0; i < idList.size(); i++)
+            ids[i] = idList.get(i);
+        return ids;
     }
         
     /**

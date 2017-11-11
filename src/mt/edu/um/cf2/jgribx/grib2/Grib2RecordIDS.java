@@ -94,6 +94,15 @@ public class Grib2RecordIDS
     }
     
     /**
+     * Returns the ID of the originating centre.
+     * @return 
+     */
+    public int getCentreId()
+    {
+        return origCentreId;
+    }
+    
+    /**
      * Returns the length of the {@link Grib2RecordIDS} instance.
      * @return the length of the IDS in bytes
      */

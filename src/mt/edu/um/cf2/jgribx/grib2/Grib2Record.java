@@ -100,6 +100,12 @@ public class Grib2Record extends GribRecord
     }
     
     @Override
+    public int getCentreId()
+    {
+        return ids.getCentreId();
+    }
+    
+    @Override
     public String getLevelCode()
     {
         if (pdsList.size() > 1)
@@ -145,6 +151,14 @@ public class Grib2Record extends GribRecord
         if (pdsList.size() > 1)
             Logger.println("Record contains multiple PDS's", Logger.WARNING);
         return pdsList.get(0).getParameterDescription();
+    }
+    
+    @Override
+    public int getProcessId()
+    {
+        if (pdsList.size() > 1)
+            Logger.println("Record contains multiple PDS's", Logger.WARNING);
+        return pdsList.get(0).getProcessId();
     }
     
     @Override

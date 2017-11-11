@@ -97,7 +97,7 @@ public class Grib1RecordPDS
     /**
      * Identification of center e.g. 88 for Oslo
      */
-    private int center_id;
+    private int centreId;
 
     /**
      * Identification of subcenter
@@ -105,9 +105,10 @@ public class Grib1RecordPDS
     private int subcenter_id;
 
     /**
-     * Identification of Generating Process
+     * Identification of Generating Process (i.e. the numerical model that 
+     * created the data).
      */
-    private int process_id;
+    private int processId;
 
     /**
      * rdg - moved the Parameter table information and functionality into a
@@ -170,10 +171,10 @@ public class Grib1RecordPDS
         table_version = Bytes2Number.bytesToUint(octets[3]);
         
         /* Originating Centre ID */
-        center_id = Bytes2Number.bytesToUint(octets[4]);
+        centreId = Bytes2Number.bytesToUint(octets[4]);
         
         /* Generating Process (See Table A) */
-        process_id = Bytes2Number.bytesToUint(octets[5]);
+        processId = Bytes2Number.bytesToUint(octets[5]);
         
         /* Grid Definition */
         grid_id = Bytes2Number.bytesToUint(octets[6]);
@@ -251,7 +252,7 @@ public class Grib1RecordPDS
             // Before getting parameter table values, must get the appropriate table for this center, subcenter (not yet implemented) and parameter table.
 //            parameter_table = GribPDSParamTable.getParameterTable(center_id, subcenter_id, table_version);
 //            parameter = parameter_table.getParameter(data[5]);
-            parameter = GribPDSParamTable.getParameterFromFile(center_id, subcenter_id, table_version, parameterId);
+            parameter = GribPDSParamTable.getParameterFromFile(centreId, subcenter_id, table_version, parameterId);
         }
 
         /* Level */
@@ -564,10 +565,10 @@ public class Grib1RecordPDS
 
     /**
      *
-     * @return center_id
+     * @return the ID of the originating centre
      */
-    public int getCenterId() {
-        return center_id;
+    public int getCentreId() {
+        return centreId;
     }
 
     /**
@@ -591,7 +592,7 @@ public class Grib1RecordPDS
      * @return process_id
      */
     public int getProcessId() {
-        return process_id;
+        return processId;
     }
 
     /**
@@ -712,7 +713,7 @@ public class Grib1RecordPDS
         }
 
         return "    PDS header:" + '\n'
-                + "        center: " + this.center_id + "\n"
+                + "        center: " + this.centreId + "\n"
                 + "        subcenter: " + this.subcenter_id + "\n"
                 + "        table: " + this.table_version + "\n"
                 + "        grid_id: " + this.grid_id + "\n"
@@ -746,7 +747,7 @@ public class Grib1RecordPDS
         if (forecastTime != pds.forecastTime) {
             return false;
         }
-        if (center_id != pds.center_id) {
+        if (centreId != pds.centreId) {
             return false;
         }
         if (subcenter_id != pds.subcenter_id) {
@@ -807,7 +808,7 @@ public class Grib1RecordPDS
         if (forecastTime2.getTime().getTime() > pds.forecastTime2.getTime().getTime()) {
             return -1;
         }
-        if (center_id > pds.center_id) {
+        if (centreId > pds.centreId) {
             return -1;
         }
         if (subcenter_id > pds.subcenter_id) {
