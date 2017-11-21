@@ -20,7 +20,7 @@ GribRecord record = gribFile.getRecord(forecastDate, parameterCode, ltvid);
 double value = record.getValue(latitude, longitude);
 ```
 
-Further examples of how to use JGribX can be found in the *test* folder.
+Further examples on how to use JGribX can be found [here](https://github.com/spidru/JGribX/tree/master/src/test).
 
 ## Improvements on JGrib
 Here is a shortlist of the major changes made since JGrib (version 7 beta):
@@ -28,7 +28,7 @@ Here is a shortlist of the major changes made since JGrib (version 7 beta):
  * supports grid definition values given as south latitude and west longitude
  * looks up parameter information from locally stored Grib Parameter Tables (GPT) (instead of a single hardcoded GPT)
  * validates each GRIB record
- * can skip invalid GRIB records (showing the appropriate errors/warnings)
+ * skips invalid/unsupported GRIB records (showing the appropriate errors/warnings)
  
 ## Important Notes
 JGribX is still under active development and therefore contains a large amount of unsupported features and operations. These will be implemented gradually over time. If you would like certain features to be implemented, please open an issue containing all the relevant information.
