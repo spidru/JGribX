@@ -18,6 +18,7 @@ import mt.edu.um.cf2.jgribx.grib2.Grib2RecordPDS;
 import static mt.edu.um.cf2.jgribx.Bytes2Number.FLOAT_IEEE754;
 import static mt.edu.um.cf2.jgribx.Bytes2Number.INT_SM;
 import mt.edu.um.cf2.jgribx.Logger;
+import mt.edu.um.cf2.jgribx.NotSupportedException;
 
 /**
  *
@@ -52,7 +53,7 @@ public class Grib2RecordDRS
     protected float refValue;
     protected int spatialDiffOrder;
     
-    public static Grib2RecordDRS readFromStream(GribInputStream in) throws IOException
+    public static Grib2RecordDRS readFromStream(GribInputStream in) throws IOException, NotSupportedException
     {
         Grib2RecordDRS drs = new Grib2RecordDRS();
         drs.length = in.readUINT(4);
@@ -63,10 +64,13 @@ public class Grib2RecordDRS
             return null;
         }
         drs.nDataPoints = in.readUINT(4);
-        DataRepresentation packingType = DataRepresentation.values()[in.readUINT(2)];
+        
+        /* [10-11] Data representation template number */
+        int packingType = in.readUINT(2);
         switch (packingType)
         {
-            case GridPointData_ComplexPackingAndSpatialDifferencing:
+            case 3:
+                /* Grid Point Data - Complex Packing and Spatial Differencing */
                 drs.refValue = in.readFloat(4, FLOAT_IEEE754);
                 drs.binaryScaleFactor = in.readINT(2, INT_SM);
                 drs.decimalScaleFactor = in.readINT(2, INT_SM);
@@ -86,23 +90,24 @@ public class Grib2RecordDRS
                 drs.spatialDiffOrder = in.readUINT(1);
                 drs.spatialDescriptorOctets = in.readUINT(1);
                 
-            // get missing value
-            switch (drs.missingValueManagement)
-            {
-                case 0:
-                    drs.missingValue = Float.NaN;
-                    break;
-                case 1:
-                    drs.missingValue = missing1;
-                    break;
-                case 2:
-                    drs.missingValue = missing2;  // FIXME not sure about this
-                    break;
-                default:
-                    break;
-            }
-        break;
-        default:
+                // get missing value
+                switch (drs.missingValueManagement)
+                {
+                    case 0:
+                        drs.missingValue = Float.NaN;
+                        break;
+                    case 1:
+                        drs.missingValue = missing1;
+                        break;
+                    case 2:
+                        drs.missingValue = missing2;  // FIXME not sure about this
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            default:
+                throw new NotSupportedException("Data Representation type "+packingType+" not supported");
         }
         return drs;
     }

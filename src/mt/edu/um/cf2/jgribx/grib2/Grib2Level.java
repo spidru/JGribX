@@ -26,93 +26,102 @@ public class Grib2Level
      * @param type  the type designator of the level
      * @param value the value associated with the specified level
      */
-    protected Grib2Level(int type, float value)
+    public Grib2Level()
     {
-        index = type;
-        switch (index)
+        this.units = "";
+    }
+    
+    public static Grib2Level getLevel(int type, float value)
+    {
+        Grib2Level level = new Grib2Level();
+        level.index = type;
+        switch (level.index)
         {
             case 1:
-                code = "SFC";
-                description = name = "ground or water surface";
+                level.code = "SFC";
+                level.description = level.name = "ground or water surface";
                 break;
             case 2:
-                code = "CBL";
-                description = name = "cloud base level";
+                level.code = "CBL";
+                level.description = level.name = "cloud base level";
                 break;
             case 3:
-                code = "CTL";
-                description = name = "level of cloud tops";
+                level.code = "CTL";
+                level.description = level.name = "level of cloud tops";
                 break;
             case 4:
-                description = name = "level of 0 degC isotherm";
-                code = "0DEG";
+                level.description = level.name = "level of 0 degC isotherm";
+                level.code = "0DEG";
                 break;
             case 5:
-                description = name = "level of adiabatic condensation lifted from the surface";
-                code = "ADCL";
+                level.code = "ADCL";
+                level.description = level.name = "level of adiabatic condensation lifted from the surface";
               break;
             case 6:
-                code = "MWSL";
-                description = name = "maximum wind level";
+                level.code = "MWSL";
+                level.description = level.name = "maximum wind level";
                 break;
             case 7:
-                code = "TRO";
-                description = name = "tropopause";
+                level.code = "TRO";
+                level.description = level.name = "tropopause";
                 break;
             case 100:
-                code = "ISBL";
-                name = "isobaric surface";
-                units = "hPa";
-                value1 = value / 100;
-                description = "pressure at " + (int) value1 + " " + units;
+                level.code = "ISBL";
+                level.name = "isobaric surface";
+                level.units = "hPa";
+                level.value1 = value / 100;
+                level.description = "pressure at " + (int) level.value1 + " " + level.units;
                 break;
             case 101:
-                code = "MSL";
-                description = name = "mean sea level";
+                level.code = "MSL";
+                level.description = level.name = "mean sea level";
                 break;
             case 102:
-                code = "GPML";
-                name = "specified altitude above MSL";
-                units = "m";
-                value1 = value;
-                description = value1 + " " + units + " above MSL";
+                level.code = "GPML";
+                level.name = "specified altitude above MSL";
+                level.units = "m";
+                level.value1 = value;
+                level.description = level.value1 + " " + level.units + " above MSL";
                 break;
             case 103:
-                code = "TGL";
-                name = "Specified height level above ground";
-                units = "m";
-                value1 = value;
-                description = (int) value1 + " " + units + " above ground";
+                level.code = "TGL";
+                level.name = "Specified height level above ground";
+                level.units = "m";
+                level.value1 = value;
+                level.description = (int) level.value1 + " " + level.units + " above ground";
                 break;
             case 106:
-                code = "DBLL";
-                description = "depth below land surface";
-                units = "m";
+                level.code = "DBLL";
+                level.description = "depth below land surface";
+                level.units = "m";
                 break;
             case 108:
-                code = "SPDL";
-                name = "level at specified pressure difference from ground to level";
-                units = "hPa";
-                value1 = value;
-                description = value1 + " " + units + " pressure difference from ground";
+                level.code = "SPDL";
+                level.name = "level at specified pressure difference from ground to level";
+                level.units = "hPa";
+                level.value1 = value;
+                level.description = level.value1 + " " + level.units + " pressure difference from ground";
             case 200:
-                code = "EATM";
-                description = name = "entire atmosphere (considered as a single layer)";
+                level.code = "EATM";
+                level.description = level.name = "entire atmosphere (considered as a single layer)";
                 break;
             case 204:
-                code = "HTFL";
-                description = name = "highest tropospheric freezing level";
+                level.code = "HTFL";
+                level.description = level.name = "highest tropospheric freezing level";
                 break;
             case 220:
-                code = "PBL";
-                description = "planetary boundary layer";
+                level.code = "PBL";
+                level.description = level.name = "planetary boundary layer";
                 break;
             default:
-                code = "???";
-                description = "unknown";
+                level = null;
+//                code = "???";
+//                level.description = "unknown";
+                break;
         }
+        return level;
     }
-
+    
     public String getCode()
     {
         return code;
@@ -131,6 +140,16 @@ public class Grib2Level
     public String getLevelIdentifier()
     {
         return code+":"+value1;
+    }
+    
+    public String getName()
+    {
+        return name;
+    }
+    
+    public String getUnits()
+    {
+        return units;
     }
     
     public float[] getValues()

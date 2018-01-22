@@ -2,8 +2,8 @@
 1	:	Virtual Temperature	:	K	:	VTMP
 2	:	Potential Temperature	:	K	:	POT
 3	:	Pseudo-Adiabatic Potential Temperature (or Equivalent Potential Temperature)	:	K	:	EPOT
-4	:	Maximum Temperature*	:	K	:	TMAX
-5	:	Minimum Temperature*	:	K	:	TMIN
+4	:	Maximum Temperature	:	K	:	TMAX
+5	:	Minimum Temperature	:	K	:	TMIN
 6	:	Dew Point Temperature	:	K	:	DPT
 7	:	Dew Point Depression (or Deficit)	:	K	:	DEPR
 8	:	Lapse Rate	:	K m-1	:	LAPR
@@ -19,7 +19,7 @@
 18	:	Snow Temperature (top of snow)	:	K	:	SNOT
 19	:	Turbulent Transfer Coefficient for Heat	:	Numeric	:	TTCHT
 20	:	Turbulent Diffusion Coefficient for Heat	:	m2s-1	:	TDCHT
-21	:	Apparent Temperature **	:	K	:	APTMP
+21	:	Apparent Temperature	:	K	:	APTMP
 22	:	Temperature Tendency due to Short-Wave Radiation	:	K s-1	:	TTSWR
 23	:	Temperature Tendency due to Long-Wave Radiation	:	K s-1	:	TTLWR
 24	:	Temperature Tendency due to Short-Wave Radiation, Clear Sky	:	K s-1	:	TTSWRCS
