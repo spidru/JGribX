@@ -12,6 +12,10 @@ package mt.edu.um.cf2.jgribx.grib2;
 
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
+import mt.edu.um.cf2.jgribx.GribCodes.Discipline;
 import mt.edu.um.cf2.jgribx.GribInputStream;
 import mt.edu.um.cf2.jgribx.GribRecordIS;
 import mt.edu.um.cf2.jgribx.Logger;
@@ -23,60 +27,35 @@ import mt.edu.um.cf2.jgribx.NotSupportedException;
 public class Grib2RecordPDS
 {
     /**
+     * The time at which the forecast applies.
+     */
+    private Calendar forecastTime;
+    
+    /**
      * Length in bytes of this PDS.
      */
     protected int length;
 
     /**
-     * The parameter in the form of {@link Grib2Parameter}
+     * The parameter in the form of {@link Grib2Parameter}.
      */
     protected Grib2Parameter parameter;
-
-    /**
-     * Model Run/Analysis/Reference time.
-     *
-     */
-    protected Calendar baseTime;
-
-    /**
-     * Forecast time. Also used as starting time when times represent a period
-     */
-    protected Calendar forecastTime;
-
-    /**
-     * Ending time when times represent a period
-     */
-    protected Calendar forecastTime2;
-
-    /**
-     * String used in building a string to represent the time(s) for this PDS
-     * See the decoder for octet 21 to get an understanding
-     */
-    protected String timeRange = null;
-
-    /**
-     * String used in building a string to represent the time(s) for this PDS
-     * See the decoder for octet 21 to get an understanding
-     */
-    protected String connector = null;
-
-    /**
-     * Parameter Table Version number, currently 3 for international exchange.
-     */
-    private int table_version;
     
+    /**
+     * Analysis or forecast generating process identified.
+     * <br>
+     * e.g. 81 (Analysis from GFS)
+     */
     private int genProcessId;
     
     /**
-     * Type of generating process
+     * Type of generating process.
+     * <br>
+     * e.g. 2 (Forecast)
      */
     private int genProcessType;
     
     private Grib2Level level;
-    
-//    private String levelDescription;
-    
-//    private float[] levelValues;
     
     private int nCoords;
     
@@ -89,19 +68,17 @@ public class Grib2RecordPDS
     
     private int templateId;
     
-    private String forecastTimeDesc;
-    
-    // *** constructors *******************************************************
     /**
      * Constructs a {@link GribRecordPDS} object from a bit input stream.
      *
      * @param in bit input stream with PDS content
-     * @param is
+     * @param discipline
+     * @param referenceTime
      *
      * @throws IOException if stream can not be opened etc.
      * @throws NotSupportedException
      */
-    public Grib2RecordPDS(GribInputStream in, GribRecordIS is) throws NotSupportedException, IOException
+    public Grib2RecordPDS(GribInputStream in, Discipline discipline, Calendar referenceTime) throws NotSupportedException, IOException
     {
         /* [1-4] Section Length */
         length = in.readUINT(4);
@@ -134,7 +111,7 @@ public class Grib2RecordPDS
                 if (!Grib2Parameter.isDefaultLoaded())
                     Grib2Parameter.loadDefaultParameters();
                 
-                parameter = Grib2Parameter.getParameter(is.getDiscipline(), paramCategory, paramNumber);
+                parameter = Grib2Parameter.getParameter(discipline, paramCategory, paramNumber);
                 
                 /* [12] Type of generating process */
                 genProcessType = in.readUINT(1);
@@ -142,7 +119,7 @@ public class Grib2RecordPDS
                 /* [13] Background generating process identifier (defined by originating centre) */
                 int backgroundGeneratingProcessId = in.readUINT(1);
                 
-                /* [14] Analysis or forecast generating process identifier (see Code ON388 Table A) */
+                /* [14] Analysis or forecast generating process identifier */
                 genProcessId = in.readUINT(1);
                 
                 /* [15-16] Hours of observational data cutoff after reference time (see Note) */
@@ -154,19 +131,62 @@ public class Grib2RecordPDS
                 /* [18] Indicator of unit of time range (see Code table 4.4) */
                 int timeRangeUnitIndicator = in.readUINT(1);
                 
-                /* [19-22] */
-                int forecastTime = in.readUINT(4);
+                /* [19-22] Forecast time in units defined in octet 18 */
+                int forecastTimeAhead = in.readUINT(4);
                 
+                forecastTime = (Calendar) referenceTime.clone();
                 switch (timeRangeUnitIndicator)
                 {
                     case 0:
-                        forecastTimeDesc = forecastTime + " minutes";
+                        // Minute
+                        forecastTime.add(Calendar.MINUTE, forecastTimeAhead);
                         break;
                     case 1:
-                        forecastTimeDesc = forecastTime + " hours";
+                        // Hour
+                        forecastTime.add(Calendar.HOUR_OF_DAY, forecastTimeAhead);
+                        break;
+                    case 2:
+                        // Day
+                        forecastTime.add(Calendar.DAY_OF_MONTH, forecastTimeAhead);
+                        break;
+                    case 3:
+                        // Month
+                        forecastTime.add(Calendar.MONTH, forecastTimeAhead);
+                        break;
+                    case 4:
+                        // Year
+                        forecastTime.add(Calendar.YEAR, forecastTimeAhead);
+                        break;
+                    case 5:
+                        // Decade
+                        forecastTime.add(Calendar.YEAR, forecastTimeAhead*10);
+                        break;
+                    case 6:
+                        // Normal (30 years)
+                        forecastTime.add(Calendar.YEAR, forecastTimeAhead*30);
+                        break;
+                    case 7:
+                        // Century
+                        forecastTime.add(Calendar.YEAR, forecastTimeAhead*100);
+                        break;
+                    case 10:
+                        // 3 Hours
+                        forecastTime.add(Calendar.HOUR_OF_DAY, forecastTimeAhead*3);
+                        break;
+                    case 11:
+                        // 6 Hours
+                        forecastTime.add(Calendar.HOUR_OF_DAY, forecastTimeAhead*6);
+                        break;
+                    case 12:
+                        // 12 Hours
+                        forecastTime.add(Calendar.HOUR_OF_DAY, forecastTimeAhead*12);
+                        break;
+                    case 13:
+                        // Second
+                        forecastTime.add(Calendar.SECOND, forecastTimeAhead);
                         break;
                     default:
-                        forecastTimeDesc = "Unknown";
+                        throw new NotSupportedException("Time range " + timeRangeUnitIndicator + " is not supported yet");
                 }
                 
                 /* [23] Type of first fixed surface (see Code table 4.5) */
@@ -192,7 +212,7 @@ public class Grib2RecordPDS
                 float level1Value = level1ScaledValue / (float) Math.pow(10, level1ScaleFactor);
                 float level2Value = level2ScaledValue / (float) Math.pow(10, level2ScaleFactor);
                 
-                level = new Grib2Level(level1Type, level1Value);
+                level = Grib2Level.getLevel(level1Type, level1Value);
                 
                 if (level2Type != 255)
                     Logger.println("Second surface is not yet supported", Logger.ERROR);
@@ -202,8 +222,17 @@ public class Grib2RecordPDS
                 
                 break;
             default:
-                Logger.println("Unsupported template number", Logger.ERROR);
+                throw new NotSupportedException("Unsupported template number");
         }        
+    }
+    
+    /**
+     * Returns the forecast time.
+     * @return 
+     */
+    public Calendar getForecastTime()
+    {
+        return forecastTime;
     }
     
     public String getGeneratingProcessType()
@@ -254,7 +283,7 @@ public class Grib2RecordPDS
         if (parameter == null)
             return "";
         else
-            return parameter.getName();
+            return parameter.getCode();
     }
     
     /**
@@ -271,7 +300,7 @@ public class Grib2RecordPDS
     
     public String getParameterUnits()
     {
-        return parameter.getUnit();
+        return parameter.getUnits();
     }
     
     public Grib2Level getLevel()
@@ -295,14 +324,6 @@ public class Grib2RecordPDS
     }
 
     /**
-     *
-     * @return table version
-     */
-    public int getTableVersion() {
-        return table_version;
-    }
-
-    /**
      * Get the parameter for this pds.
      *
      * @return date and time
@@ -323,41 +344,10 @@ public class Grib2RecordPDS
      */
     @Override
     public String toString() {
-        return headerToString()
-                + "        Abbrev: " + getParameterAbbrev() + "\n"
+        return "        Abbrev: " + getParameterAbbrev() + "\n"
                 + "        Description: " + getParameterDescription() + "\n"
                 + "        Units: " + getParameterUnits() + "\n"
-                + "        Type: " + getGeneratingProcessType() + "\n"
-                + "        table: " + this.table_version + "\n"
-                + "        table version: " + this.table_version + "\n";
-    }
-
-    /**
-     * Get a string representation of this Header information for this PDS.
-     *
-     * @return string representation of the Header for this PDS
-     */
-    public String headerToString() {
-        String time1 = this.forecastTime.get(Calendar.DAY_OF_MONTH) + "."
-                + (this.forecastTime.get(Calendar.MONTH) + 1) + "."
-                + this.forecastTime.get(Calendar.YEAR) + "  "
-                + this.forecastTime.get(Calendar.HOUR_OF_DAY) + ":"
-                + this.forecastTime.get(Calendar.MINUTE);
-        String time2 = this.forecastTime2.get(Calendar.DAY_OF_MONTH) + "."
-                + (this.forecastTime.get(Calendar.MONTH) + 1) + "."
-                + this.forecastTime.get(Calendar.YEAR) + "  "
-                + this.forecastTime.get(Calendar.HOUR_OF_DAY) + ":"
-                + this.forecastTime.get(Calendar.MINUTE);
-        String timeStr;
-        if (timeRange == null) {
-            timeStr = "time: " + time1;
-        } else {
-            timeStr = timeRange + time1 + connector + time2;
-        }
-
-        return "    PDS header:" + '\n'
-                + "        table: " + this.table_version + "\n"
-                + "        " + timeStr + " (dd.mm.yyyy hh:mm) \n";
+                + "        Type: " + getGeneratingProcessType() + "\n";
     }
 
     /**
@@ -378,15 +368,6 @@ public class Grib2RecordPDS
         }
         Grib2RecordPDS pds = (Grib2RecordPDS) obj;
 
-        if (baseTime != pds.baseTime) {
-            return false;
-        }
-        if (forecastTime != pds.forecastTime) {
-            return false;
-        }
-        if (table_version != pds.table_version) {
-            return false;
-        }
         if (length != pds.length) {
             return false;
         }

@@ -43,7 +43,7 @@ public class GribRecordIS
    /**
     * Edition of GRIB specification used.
     */
-   protected int edition;
+   private int edition;
    
    protected Discipline discipline;
 

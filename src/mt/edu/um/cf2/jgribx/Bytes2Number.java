@@ -96,10 +96,13 @@ public class Bytes2Number
         return value;
     }
     
-	/**
-	 * Convert an array of bytes into a floating point in the specified format.
-	 * @see https://en.wikipedia.org/wiki/IBM_Floating_Point_Architecture
-	 */
+    /**
+    * Convert an array of bytes into a floating point in the specified format.
+     * @param bytes
+     * @param format
+     * @return a single value as a single precision IEEE754 float
+     * @see https://en.wikipedia.org/wiki/IBM_Floating_Point_Architecture
+     */
     public static float bytesToFloat(byte[] bytes, int format)
     {
         switch (format)
@@ -219,7 +222,6 @@ public class Bytes2Number
       sgn = -(((a & 128) >> 6) - 1);
       exp = (a & 127) - 64;
 
-      // TODO Validate, that this method works always
       return (float) (sgn * Math.pow(16.0, exp - 6) * mant);
    }
 

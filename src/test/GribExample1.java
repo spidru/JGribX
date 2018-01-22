@@ -33,10 +33,49 @@ public class GribExample1
     {
         System.out.println("JGribX version " + JGribX.getVersion());
         Logger.setLoggingMode(Logger.LoggingMode.CONSOLE);
-        Logger.setLevel(Logger.WARNING);
+        Logger.setLevel(Logger.INFO);
         
-        String gribFilename = "test/gfsanl_3_20160324_0600_000.grb";
+        /**
+         * type: GRIB1 NCEP GFS
+         * issues:
+         *  - Table 3 level 220 is not implemented yet
+         *  - Unsupported Parameter 219 in Table 130
+         *  - Unsupported Parameter 220 in Table 130
+         *  - Unsupported Parameter 191 in Table 133
+         */
+//        String gribFilename = "test/gfsanl_3_20160324_0600_000.grb";
+
+        /**
+         * type: GRIB1 NCEP GFS
+         * issues:
+         *  - Table 3 level 220 is not implemented yet
+         *  - Unsupported Parameter 219 in Table 130
+         *  - Unsupported Parameter 220 in Table 130
+         *  - Unsupported Parameter 191 in Table 133
+         */
+//        String gribFilename = "test/gfs_3_20170101_0000_000.grb";
+
+        /**
+         * type: GRIB2 NCEP GFS
+         * issues:
+         *  - BMS bitmap not yet supported
+         *  - second surface not yet supported
+         */
 //        String gribFilename = "test/gfsanl_3_20170512_0000_000.grb2";
+        
+//        String gribFilename = "test/200601010000.pgbh06.gdas.20051226-20051231.grb2";
+        
+        /**
+         * type: GRIB2 NCEP GFS
+         * issues:
+         *  - Data Representation type 0 not supported
+         *  - Missing Value Management is not supported
+         *  - causes out of memory error
+         */
+//        String gribFilename = "test/gfs_4_20171112_0000_024.grb2";
+        String gribFilename = "test/cached.grb2";
+
+//        String gribFilename = "test/A_HWXE85ECEM210000_C_ECMF_20160721000000_24h_em_ws_850hPa_global_0p5deg_grib2.bin";     // testing files from ECMWF 
         
         // Prepare format for reference times
 //        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");

@@ -123,12 +123,12 @@ public class Grib2Parameter
         return desc;
     }
     
-    public String getName()
+    public String getCode()
     {
         return abbrev;
     }
     
-    public String getUnit()
+    public String getUnits()
     {
         return units;
     }

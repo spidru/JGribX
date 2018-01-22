@@ -11,9 +11,9 @@
 package mt.edu.um.cf2.jgribx.grib1;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 import mt.edu.um.cf2.jgribx.Bytes2Number;
 import mt.edu.um.cf2.jgribx.GribInputStream;
 import mt.edu.um.cf2.jgribx.Logger;
@@ -38,17 +38,17 @@ public class Grib1RecordPDS
     /**
      * ID of grid type.
      */
-    protected int grid_id;    // no pre-definied grids supported yet.
+    protected int gridId;    // no pre-definied grids supported yet.
 
     /**
      * True, if GDS exists.
      */
-    protected boolean gds_exists;
+    protected boolean gdsExists;
 
     /**
      * True, if BMS exists.
      */
-    protected boolean bms_exists;
+    protected boolean bmsExists;
 
     /**
      * The parameter as defined in the Parameter Table
@@ -92,7 +92,7 @@ public class Grib1RecordPDS
     /**
      * Parameter Table Version number, currently 3 for international exchange.
      */
-    private int table_version;
+    private int tableVersion;
 
     /**
      * Identification of center e.g. 88 for Oslo
@@ -102,7 +102,7 @@ public class Grib1RecordPDS
     /**
      * Identification of subcenter
      */
-    private int subcenter_id;
+    private int subcentreId;
 
     /**
      * Identification of Generating Process (i.e. the numerical model that 
@@ -115,35 +115,7 @@ public class Grib1RecordPDS
      * class. See GribPDSParamTable class for details.
      */
     private GribPDSParamTable parameter_table;
-    
-    /**
-     * Originating centre names FIXME incomplete
-     * <br>
-     * Source: <a href="http://www-lehre.informatik.uni-osnabrueck.de/~fbstark/diplom/docs/data/GRIB/index.html">http://www-lehre.informatik.uni-osnabrueck.de/~fbstark/diplom/docs/data/GRIB/index.html</a>
-     */
-    private final static String[] ORIGINATING_CENTRES = {"WMO Secretariat",
-        "Melbourne","Melbourne","Melbourne","Moscow","Moscow","Moscow",
-        "US National Weather Service, National Centers for Environmental Prediction (NCEP)",
-        "US National Weather Service Telecommunications Gateway (NWSTG)",
-        "US National Weather Service - Other","Cairo (RSMC/RAFC)","Cairo (RSMC/RAFC)",
-        "Dakar (RSMC/RAFC)","Dakar (RSMC/RAFC)","Nairobi (RSMC/RAFC)","Nairobi (RSMC/RAFC)",
-        "Reserved","Reserved","Tunis-Casablanca (RSMC)","Tunis-Casablanca (RSMC)",
-        "Las Palmas (RAFC)","Algiers (RSMC)","Reserved","Reserved","Pretoria (RSMC)",
-        "La Réunion (RSMC)","Khabarovsk (RSMC)","Khabarovsk (RSMC)","New Delhi (RSMC/RAFC)",
-        "New Delhi (RSMC/RAFC)","Novosibirsk (RSMC)","Novosibirsk (RSMC)","Tashkent (RSMC)",
-        "Jeddah (RSMC)","Tokyo (RSMC), Japan Meterological Agency","Tokyo (RSMC), Japan Meterological Agency",
-        "Bangkok","Ulan Bator","Beijing (RSMC)","Beijing (RSMC)","Seoul","Buenos Aires (RSMC/RAFC)",
-        "Buenos Aires (RSMC/RAFC)","Brasilia (RSMC/RAFC)","Brasilia (RSMC/RAFC)",
-        "Santiago","Brazilian Space Agency - INPE","Reserved","Reserved","Reserved","Reserved","Miami (RSMC/RAFC)",
-        "Miami (RSMC/RAFC), National Hurricane Center","Montreal (RSMC)","Montreal (RSMC)",
-        "San Francisco","Reserved","US Air Force - Air Force Global Weather Central",
-        "Fleet Numerical Meteorology and Oceanography Center, Monterey, CA, USA",
-        "The NOAA Forecast Systems Laboratory, Boulder, CO, USA",
-        "United States National Center for Atmospheric Research (NCAR)"
-        // REMAINING NAMES TO BE ADDED HERE
-    };
-    
-    // *** constructors *******************************************************
+        
     /**
      * Constructs a {@link GribRecordPDS} object from a bit input stream.
      *
@@ -154,96 +126,88 @@ public class Grib1RecordPDS
      */
     public Grib1RecordPDS(GribInputStream in) throws NotSupportedException, IOException
     {
-        int[] data;      // byte buffer
-        byte[] octets;
         int offset = 0;
-        int offset2 = 0;    
+        int offset2 = 0;
+        
+        // All defined times are in UTC
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 
-        /* Section Length */
-        octets = new byte[3];
-        in.read(octets);
-        length = Bytes2Number.bytesToUint(octets);
+        /* [1-3] Section Length */
+        length = in.readUINT(3);
         
-        octets = new byte[3+length];
-        int nBytesRead = in.read(octets, 3, length-3);
+        /* [4] Table Version */
+        tableVersion = in.readUINT(1);
         
-        /* Table Version */
-        table_version = Bytes2Number.bytesToUint(octets[3]);
+        /* [5] Originating Centre ID */
+        centreId = in.readUINT(1);
         
-        /* Originating Centre ID */
-        centreId = Bytes2Number.bytesToUint(octets[4]);
+        /* [6] Generating Process */
+        processId = in.readUINT(1);
         
-        /* Generating Process (See Table A) */
-        processId = Bytes2Number.bytesToUint(octets[5]);
+        /* [7] Grid Definition */
+        gridId = in.readUINT(1);
         
-        /* Grid Definition */
-        grid_id = Bytes2Number.bytesToUint(octets[6]);
+        /* [8] Flag (Presence of PDS and GDS) */
+        int flag = in.readUINT(1);
+        gdsExists = (flag & 128) == 128;
+        bmsExists = (flag & 64) == 64;
         
-        /* Flag (Presence of PDS and GDS) */
-        int flag = octets[7];
-        gds_exists = (flag & 128) == 128;
-        bms_exists = (flag & 64) == 64;
+        /* [9] Parameter Indicator */
+        int parameterId = in.readUINT(1);
         
-        /* Parameter */
-        int parameterId = Bytes2Number.bytesToUint(octets[8]);
+        /* [10] Level Type */
+        int levelType = in.readUINT(1);
         
-        /* Level Type */
-        int levelType = Bytes2Number.bytesToUint(octets[9]);
+        /* [11-12] Level Data (height, pressure, etc.) */
+        int levelData = in.readUINT(2);
         
-        /* Level Data (height, pressure, etc.) */
-        int levelData = Bytes2Number.bytesToUint(Arrays.copyOfRange(octets, 10, 12));
+        /* [13] Year of Century */
+        int centuryYear = in.readUINT(1);
         
-        /* Year of Century */
-        int centuryYear = octets[12];
+        /* [14] Month */
+        int month = in.readUINT(1);
         
-        /* Month */
-        int month = octets[13];
+        /* [15] Day */
+        int day = in.readUINT(1);
         
-        /* Day */
-        int day = octets[14];
+        /* [16] Hour */
+        int hour = in.readUINT(1);
         
-        /* Hour */
-        int hour = octets[15];
+        /* [17] Minute */
+        int minute = in.readUINT(1);
         
-        /* Minute */
-        int minute = octets[16];
+        /* [18] Time Unit */
+        int timeUnit = in.readUINT(1);
         
-        /* Time Unit */
-        int timeUnit = octets[17];
+        /* [19] Time Period P1 (time units) */
+        int p1 = in.readUINT(1);
         
-        /* Time Period P1 (time units) */
-        int p1 = octets[18];
+        /* [20] Time Period P2 (time units) */
+        int p2 = in.readUINT(1);
         
-        /* Time Period P2 (time units) */
-        int p2 = octets[19];
+        /* [21] Time Range */
+        int timeRangeId = in.readUINT(1);
         
-        /* Time Range */
-        int timeRangeId = octets[20];
-        
-        /* Number included in average */
-        int number = Bytes2Number.bytesToUint(Arrays.copyOfRange(octets, 21, 23));
+        /* [22-23] Number included in average */
+        int number = in.readUINT(2);
         
         /* Number missing from averages */
+        int numberMissing = in.readUINT(1);
         
-        /* Reference Time Century */
-        int century = Bytes2Number.bytesToUint(octets[24]);
+        /* [25] Reference Time Century */
+        int century = in.readUINT(1);
         
-        /* Originating Sub-centre ID */
-        subcenter_id = Bytes2Number.bytesToUint(octets[25]);
+        /* [26] Originating Sub-centre ID */
+        subcentreId = in.readUINT(1);
         
-        /* Decimal Scale Factor */
-//        this.decscale = Bytes2Number.int2(octets[26], octets[27]);
-        decscale = Bytes2Number.bytesToUint(Arrays.copyOfRange(octets, 26, 28));
-        if ((octets[26] & 0x80) == 0x80)
-        {
-            decscale *= -1;
-        }
+        /* [27-28] Decimal Scale Factor */
+        decscale = in.readINT(2, Bytes2Number.INT_SM);
         
-        ////////////////////////////////////////////////////////////////////////
-        // Data Processing
+        /*********************************************************************/
+        /* Data Processing */
 
         /* Parameter */
-        if (table_version == 255)
+        if (tableVersion == 255)
         {
             parameter_table = null;
             parameter = new Grib1Parameter(255, "missing", "missing parameter", "");
@@ -252,24 +216,19 @@ public class Grib1RecordPDS
             // Before getting parameter table values, must get the appropriate table for this center, subcenter (not yet implemented) and parameter table.
 //            parameter_table = GribPDSParamTable.getParameterTable(center_id, subcenter_id, table_version);
 //            parameter = parameter_table.getParameter(data[5]);
-            parameter = GribPDSParamTable.getParameterFromFile(centreId, subcenter_id, table_version, parameterId);
+//            parameter = GribPDSParamTable.getParameterFromFile(centreId, subcenter_id, table_version, parameterId);
+            parameter = Grib1Parameter.getParameter(tableVersion, parameterId, centreId);
         }
+        if (parameter == null)
+            throw new NotSupportedException("Unsupported Parameter "+ parameterId + " in Table " + tableVersion);
 
         /* Level */
 //      this.level = GribTables.getLevel(data[6], data[7], data[8]);
-        level = new Grib1Level(levelType, levelData);
+        level = Grib1Level.getLevel(levelType, levelData);
 
-        // octets 13-17 (base time of forecast)
+        // octets 13-17 (base time of forecast in UTC)
         baseTime = new GregorianCalendar(100 * (century - 1) + centuryYear,
                 month - 1, day, hour, minute);
-
-        // GMT timestamp: zone offset to GMT is 0
-        this.baseTime.set(Calendar.ZONE_OFFSET, 0);
-
-        // rdg - adjusted for DST - don't know if this affects everywhere or if
-        //       Calendar can figure out where DST is implemented. Still need to find out.
-        // GMT timestamp: DST offset to GMT is 0
-        this.baseTime.set(Calendar.DST_OFFSET, 0);
 
         // get info for forecast time
 
@@ -396,17 +355,6 @@ public class Grib1RecordPDS
                 month1 - 1, day1, hour1, minute1);
         this.forecastTime2 = new GregorianCalendar(year2 + 100 * (century - 1),
                 month2 - 1, day2, hour2, minute2);
-
-        // GMT timestamp: zone offset to GMT is 0
-        this.forecastTime.set(Calendar.ZONE_OFFSET, 0);
-        this.forecastTime2.set(Calendar.ZONE_OFFSET, 0);
-
-        // rdg - adjusted for DST - don't know if this affects everywhere or if
-        //       Calendar can figure out where DST is implemented. Find out at end of Oct.
-        // GMT timestamp: DST offset to GMT is 0
-        this.forecastTime.set(Calendar.DST_OFFSET, 0);
-        this.forecastTime2.set(Calendar.DST_OFFSET, 0);
-
     }
 
     /**
@@ -417,22 +365,6 @@ public class Grib1RecordPDS
 
         return length;
     }
-    
-    /**
-     * Returns the name of the originating centre corresponding to the specified centre ID number
-     * 
-     * @param centre_id
-     * @return 
-     */
-    public static String getOriginatingCentreName(int centre_id)
-    {
-        if (centre_id > 60)
-        {
-            Logger.println("Centre code name has not yet been added", Logger.ERROR);
-            return null;
-        }
-        return ORIGINATING_CENTRES[centre_id];
-    }
 
     /**
      * Check if GDS exists.
@@ -441,7 +373,7 @@ public class Grib1RecordPDS
      */
     public boolean gdsExists() {
 
-        return this.gds_exists;
+        return this.gdsExists;
     }
 
     /**
@@ -451,7 +383,7 @@ public class Grib1RecordPDS
      */
     public boolean bmsExists() {
 
-        return this.bms_exists;
+        return this.bmsExists;
     }
 
     /**
@@ -480,9 +412,12 @@ public class Grib1RecordPDS
      *
      * @return descritpion of parameter
      */
-    public String getParameterDescription() {
-
-        return this.parameter.getDescription();
+    public String getParameterDescription()
+    {
+        if (parameter == null)
+            return "";
+        else
+            return this.parameter.getDescription();
     }
 
     /**
@@ -492,7 +427,7 @@ public class Grib1RecordPDS
      */
     public String getParameterUnits() {
 
-        return this.parameter.getUnit();
+        return this.parameter.getUnits();
     }
 
     /**
@@ -576,7 +511,7 @@ public class Grib1RecordPDS
      * @return subcenter_id
      */
     public int getSubcenterId() {
-        return subcenter_id;
+        return subcentreId;
     }
 
     /**
@@ -584,7 +519,7 @@ public class Grib1RecordPDS
      * @return table version
      */
     public int getTableVersion() {
-        return table_version;
+        return tableVersion;
     }
 
     /**
@@ -606,11 +541,12 @@ public class Grib1RecordPDS
     }
 
     /**
-     * Get the base (analysis) time of the forecast in local time zone.
+     * Get the reference time (in UTC) of the forecast.
      *
      * @return date and time
      */
-    public Calendar getLocalBaseTime() {
+    public Calendar getReferenceTime()
+    {
         return this.baseTime;
     }
 
@@ -681,12 +617,12 @@ public class Grib1RecordPDS
                 + "        Type: " + this.getParameterAbbreviation() + "\n"
                 + "        Description: " + this.getParameterDescription() + "\n"
                 + "        Unit: " + this.getParameterUnits() + "\n"
-                + "        table version: " + this.table_version + "\n"
+                + "        table version: " + this.tableVersion + "\n"
                 + "        " + this.level
                 + // now formatted in GribPDSLevel
                 "        dec.scale: " + this.decscale
-                + (this.gds_exists ? "\n        GDS exists" : "")
-                + (this.bms_exists ? "\n        BMS exists" : "");
+                + (this.gdsExists ? "\n        GDS exists" : "")
+                + (this.bmsExists ? "\n        BMS exists" : "");
     }
 
     /**
@@ -714,9 +650,9 @@ public class Grib1RecordPDS
 
         return "    PDS header:" + '\n'
                 + "        center: " + this.centreId + "\n"
-                + "        subcenter: " + this.subcenter_id + "\n"
-                + "        table: " + this.table_version + "\n"
-                + "        grid_id: " + this.grid_id + "\n"
+                + "        subcenter: " + this.subcentreId + "\n"
+                + "        table: " + this.tableVersion + "\n"
+                + "        grid_id: " + this.gridId + "\n"
                 + "        " + timeStr + " (dd.mm.yyyy hh:mm) \n";
     }
 
@@ -738,7 +674,7 @@ public class Grib1RecordPDS
         }
         Grib1RecordPDS pds = (Grib1RecordPDS) obj;
 
-        if (grid_id != pds.grid_id) {
+        if (gridId != pds.gridId) {
             return false;
         }
         if (baseTime != pds.baseTime) {
@@ -750,10 +686,10 @@ public class Grib1RecordPDS
         if (centreId != pds.centreId) {
             return false;
         }
-        if (subcenter_id != pds.subcenter_id) {
+        if (subcentreId != pds.subcentreId) {
             return false;
         }
-        if (table_version != pds.table_version) {
+        if (tableVersion != pds.tableVersion) {
             return false;
         }
         if (decscale != pds.decscale) {
@@ -796,7 +732,7 @@ public class Grib1RecordPDS
 
         // not equal, so either less than or greater than.
         // check if pds is less; if not, then pds is greater
-        if (grid_id > pds.grid_id) {
+        if (gridId > pds.gridId) {
             return -1;
         }
         if (baseTime.getTime().getTime() > pds.baseTime.getTime().getTime()) {
@@ -811,10 +747,10 @@ public class Grib1RecordPDS
         if (centreId > pds.centreId) {
             return -1;
         }
-        if (subcenter_id > pds.subcenter_id) {
+        if (subcentreId > pds.subcentreId) {
             return -1;
         }
-        if (table_version > pds.table_version) {
+        if (tableVersion > pds.tableVersion) {
             return -1;
         }
         if (decscale > pds.decscale) {

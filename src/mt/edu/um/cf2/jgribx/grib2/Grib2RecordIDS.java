@@ -13,6 +13,7 @@ package mt.edu.um.cf2.jgribx.grib2;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 import mt.edu.um.cf2.jgribx.GribInputStream;
 import mt.edu.um.cf2.jgribx.Logger;
 
@@ -76,6 +77,7 @@ public class Grib2RecordIDS
         /* [19] Second */
         int second = in.readUINT(1);
         
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         ids.referenceTime = new GregorianCalendar(year, month-1, day, hour, minute, second);
         
         /* Data Production Status */
