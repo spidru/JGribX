@@ -15,12 +15,15 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,6 +39,9 @@ import java.util.regex.Pattern;
 
 public class GribFile
 {
+    private String filename;
+    private int nRecordsSkipped;
+    
     /**
      * List of GRIB records
      */
@@ -51,11 +57,12 @@ public class GribFile
     * @throws NotSupportedException if file contains features not yet supported
     * @throws NoValidGribException  if file is no valid GRIB file
     */
-   public GribFile(String filename) throws FileNotFoundException,
-         IOException, NotSupportedException, NoValidGribException
-   {
-      this(new FileInputStream(filename));
-   }
+    public GribFile(String filename) throws FileNotFoundException,
+        IOException, NotSupportedException, NoValidGribException
+    {
+        this(new FileInputStream(filename));
+        this.filename = filename;
+    }
 
    /**
     * Constructs a {@link GribFile} object from an input stream.
@@ -85,15 +92,12 @@ public class GribFile
     public GribFile(GribInputStream in) throws IOException,
           NotSupportedException, NoValidGribException
     {
-        Map gridMap = new HashMap();
-        List typeList = new ArrayList();
-        List descList = new ArrayList();
-        List lightRecList = new ArrayList();
-        
+        // Initialise fields
+        nRecordsSkipped = 0;
         records = new ArrayList();
 
         /**
-        * Initialize the Parameter Tables with the information in the parameter
+        * Initialise the Parameter Tables with the information in the parameter
         * table lookup file.  See GribPDSParamTable for details
         */
         //GribPDSParamTable.readParameterTableLookup(); done in static initializer
@@ -110,11 +114,11 @@ public class GribFile
             catch (NotSupportedException|NoValidGribException e)
             {
                 Logger.println("Skipping GRIB record "+count+" ("+e.getMessage()+")", Logger.WARNING);
+                nRecordsSkipped++;
                 GribRecordES.seekNext(in);
                 continue;
             }
-            GribRecordIS is = record.getIS();
-            
+
             Logger.println("GRIB Record "+count, Logger.INFO);
             Logger.println("\tReference Time: "+record.getReferenceTime().getTime().toString(), Logger.INFO);
             Logger.println("\tParameter: "+record.getParameterCode()+" ("+record.getParameterDescription()+")", Logger.INFO);
@@ -147,6 +151,57 @@ public class GribFile
         for (int i = 0; i < idList.size(); i++)
             ids[i] = idList.get(i);
         return ids;
+    }
+    
+    public int getEdition()
+    {
+        int edition = records.get(0).getIS().getGribEdition();
+        
+        // Check if GRIB file contains different editions
+        // TODO not sure if different editions within one file should be allowed
+        for (int i = 1; i < records.size(); i++)
+        {
+            if (records.get(i).getIS().getGribEdition() != edition)
+            {
+                Logger.println("GRIB file contains different editions", Logger.WARNING);
+                break;
+            }
+        }
+        
+        return edition;
+    }
+    
+    /**
+     * Returns the GRIB filename.
+     * @return the GRIB filename
+     */
+    public String getFilename()
+    {
+        return filename;
+    }
+    
+    public List<Calendar> getForecastTimes()
+    {
+        boolean matchFound;
+        List<Calendar> forecastTimeList = new ArrayList();
+        for (GribRecord record : records)
+        {
+            // Compare dates
+            matchFound = false;
+            for (Calendar forecastTime : forecastTimeList)
+            {
+                if (forecastTime.compareTo(record.getForecastTime()) == 0)
+                {
+                    matchFound = true;
+                    break;
+                }
+            }
+            if (!matchFound)
+                forecastTimeList.add(record.getForecastTime());
+            
+        }
+        Collections.sort(forecastTimeList);
+        return forecastTimeList;
     }
     
     /**
@@ -258,6 +313,16 @@ public class GribFile
    }
    
     /**
+     * Returns the number of records skipped due to them being invalid or not
+     * supported.
+     * @return the number of records skipped
+     */
+    public int getRecordsSkippedCount()
+    {
+        return nRecordsSkipped;
+    }
+   
+    /**
      * Get all the records successfully read.
      * @return 
      */
@@ -332,6 +397,62 @@ public class GribFile
         return referenceTimeList;
     }
     
+    /**
+     * Prints out a summary of the GRIB file.
+     * @param out 
+     */
+    public void getSummary(PrintStream out)
+    {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss 'UTC'");
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        int[] centreIds = this.getCentreIDs();
+        int[] processIds = this.getProcessIDs();
+        List<Calendar> refDates = this.getReferenceTimes();
+        List<Calendar> forecastDates = this.getForecastTimes();
+        
+        // Print out generic GRIB file info
+        out.println("---------------------------------------");
+        out.println("Reading file: " + this.filename);
+        out.println("GRIB Edition: " + this.getEdition());
+        out.println("Records successfully read: " + this.getRecordCount() + " of "
+                + (this.getRecordCount() + this.getRecordsSkippedCount()));
+        out.println("---------------------------------------");
+        
+        // Print out originating centre info
+        out.print("Weather Centre(s): ");
+        for (int i = 0; i < centreIds.length; i++)
+        {
+            out.print(centreIds[i]
+                    + " [" + GribCodes.getCentreName(centreIds[i]) + "]");
+            if (i != centreIds.length - 1) out.print(",");
+        }
+        out.println();
+        
+        // Print out generating process info
+        out.print("Generating Process(es): ");
+        for (int i = 0; i < processIds.length; i++)
+        {
+            out.print(processIds[i]
+                    + " [" + GribCodes.getProcessName(processIds[i]) + "]");
+            if (i != processIds.length - 1) out.print(",");
+        }
+        out.println();
+        
+        // Get reference time
+        System.out.println("Reference Time: ");
+        for (Calendar date : refDates)
+        {
+            System.out.println("\t" + sdf.format(date.getTime()));
+        }
+        
+        // Get forecast times
+        System.out.println("Forecast Time(s): ");
+        for (Calendar date : forecastDates)
+        {
+            System.out.println("\t" + sdf.format(date.getTime()));
+        }
+    }
+    
    /**
     * Get a string representation of the GRIB file.
     *
@@ -342,5 +463,7 @@ public class GribFile
     {
         return "GRIB file (" + records.size() + " records)";
     }
+    
+
 
 }
