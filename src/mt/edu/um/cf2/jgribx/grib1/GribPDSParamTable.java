@@ -803,7 +803,7 @@ public class GribPDSParamTable
     */
    public String getParameterUnit(int id)
    {
-      return getParameter(id).getUnit();
+      return getParameter(id).getUnits();
    }
 
    /**
@@ -924,19 +924,19 @@ public class GribPDSParamTable
          Grib1Parameter parameter = new Grib1Parameter();
          tableDefArr = SmartStringArray.split(":", line);
          parameter.number = Integer.parseInt(tableDefArr[0].trim());
-         parameter.abbrev = tableDefArr[1].trim();
+         parameter.code = tableDefArr[1].trim();
          // check to see if unit defined, if not, parameter is undefined
          if (tableDefArr[2].indexOf('[') == -1)
          {
             // Undefined unit
-            parameter.description = parameter.unit = tableDefArr[2].trim();
+            parameter.description = parameter.units = tableDefArr[2].trim();
          }
          else
          {
             String[] arr2 = SmartStringArray.split("[", tableDefArr[2]);
             parameter.description = arr2[0].trim();
             // Remove "]"
-            parameter.unit = arr2[1].substring(0, arr2[1].lastIndexOf(']')).trim();
+            parameter.units = arr2[1].substring(0, arr2[1].lastIndexOf(']')).trim();
 //            parameter.unit = arr2[1].substring(0, arr2[1].lastIndexOf(']')).trim();
          }
          //this.parameters[i++]=parameter;

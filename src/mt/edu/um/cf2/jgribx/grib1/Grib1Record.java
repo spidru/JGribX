@@ -144,6 +144,13 @@ public class Grib1Record extends GribRecord
     {
         return pds.getCentreId();
     }
+    
+    @Override
+    public Calendar getForecastTime()
+    {
+        return this.pds.forecastTime;
+    }
+    
     /**
      * Get the grid definition section of this GRIB record.
      *
@@ -349,7 +356,7 @@ public class Grib1Record extends GribRecord
      @Override
      public Calendar getReferenceTime()
      {
-        return this.pds.getLocalForecastTime();
+        return this.pds.getReferenceTime();
      }
 
      /**

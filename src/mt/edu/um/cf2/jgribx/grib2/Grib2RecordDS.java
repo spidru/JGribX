@@ -13,6 +13,7 @@ package mt.edu.um.cf2.jgribx.grib2;
 import java.io.IOException;
 import static mt.edu.um.cf2.jgribx.Bytes2Number.INT_SM;
 import mt.edu.um.cf2.jgribx.GribInputStream;
+import mt.edu.um.cf2.jgribx.NotSupportedException;
 import mt.edu.um.cf2.jgribx.grib2.Grib2RecordBMS.Indicator;
 
 /**
@@ -24,7 +25,7 @@ public class Grib2RecordDS
     protected int length;
     protected float data[]; 
     
-    public static Grib2RecordDS readFromStream(GribInputStream in, Grib2RecordDRS drs, Grib2RecordGDS gds, Grib2RecordBMS bms) throws IOException
+    public static Grib2RecordDS readFromStream(GribInputStream in, Grib2RecordDRS drs, Grib2RecordGDS gds, Grib2RecordBMS bms) throws IOException, NotSupportedException
     {
         Grib2RecordDS ds = new Grib2RecordDS();
         
@@ -132,7 +133,7 @@ public class Grib2RecordDS
         // test
         if (drs.missingValueManagement != 0)
         {
-            System.err.println("Unsupported feature");
+            throw new NotSupportedException("Missing Value Management is not supported");
         }
         else
         {

@@ -74,7 +74,7 @@ public class Grib2Record extends GribRecord
                     record.gdsList.add(gds);
                     break;
                 case 4:
-                    record.pdsList.add(new Grib2RecordPDS(in, is));
+                    record.pdsList.add(new Grib2RecordPDS(in, is.getDiscipline(), record.ids.referenceTime));
                     break;
                 case 5:
                     drs = Grib2RecordDRS.readFromStream(in);
@@ -103,6 +103,14 @@ public class Grib2Record extends GribRecord
     public int getCentreId()
     {
         return ids.getCentreId();
+    }
+    
+    @Override
+    public Calendar getForecastTime()
+    {
+        if (pdsList.size() > 1)
+            Logger.println("Record contains multiple PDS's", Logger.WARNING);
+        return pdsList.get(0).getForecastTime();
     }
     
     @Override

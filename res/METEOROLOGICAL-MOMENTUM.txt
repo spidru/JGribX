@@ -34,7 +34,7 @@
 33	:	Wind Fetch	:	m	:	WINDF
 34	:	Normal Wind Component	:	m s-1	:	NWIND
 35	:	Tangential Wind Component	:	m s-1	:	TWIND
-36	:	Amplitude Function for Rossby Wave Envelope for Meridional Wind ***	:	m s-1	:	AFRWE
+36	:	Amplitude Function for Rossby Wave Envelope for Meridional Wind	:	m s^-1	:	AFRWE
 37	:	Northward Turbulent Surface Stress	:	N m-2 s	:	NTSS
 38	:	Eastward Turbulent Surface Stress	:	N m-2 s	:	ETSS
 39	:	Eastward Wind Tendency Due to Parameterizations	:	m s-2	:	EWTPARM

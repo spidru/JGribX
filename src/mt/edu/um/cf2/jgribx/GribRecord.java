@@ -25,8 +25,9 @@ public abstract class GribRecord
         GribRecord record = null;
         
         GribRecordIS is = GribRecordIS.readFromStream(in);
+        if (is == null) return null;
         
-        switch (is.edition)
+        switch (is.getGribEdition())
         {
             case 1:
                 record = Grib1Record.readFromStream(in, is);
@@ -35,7 +36,7 @@ public abstract class GribRecord
                 record = Grib2Record.readFromStream(in, is);
                 break;
             default:
-                throw new NoValidGribException("Unsupported GRIB edition "+is.edition);
+                throw new NoValidGribException("Unsupported GRIB edition "+is.getGribEdition());
         }
         
         GribRecordES es = new GribRecordES(in);
@@ -61,6 +62,7 @@ public abstract class GribRecord
      * @return the ID corresponding to the originating centre
      */
     public abstract int getCentreId();
+    public abstract Calendar getForecastTime();
     public abstract String getLevelCode();
     public abstract String getLevelDescription();
     
