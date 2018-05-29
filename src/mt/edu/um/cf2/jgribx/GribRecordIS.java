@@ -53,9 +53,10 @@ public class GribRecordIS
      * @param in {@link BufferedInputStream} containing IS content
      * @return 
      * @throws NotSupportedException 
+     * @throws mt.edu.um.cf2.jgribx.NoValidGribException 
      * @throws IOException           if stream can not be opened etc.
      */
-    public static GribRecordIS readFromStream(GribInputStream in) throws NotSupportedException, IOException
+    public static GribRecordIS readFromStream(GribInputStream in) throws NotSupportedException, NoValidGribException, IOException
     {
         GribRecordIS is = new GribRecordIS();
         byte[] octets = new byte[16];
@@ -64,7 +65,7 @@ public class GribRecordIS
         String startCode = new String(Arrays.copyOfRange(octets, 0, 4));
         if (!startCode.equals("GRIB"))
         {
-            return null;
+            throw new NoValidGribException("Record does not have a valid GRIB header");
         }
       
         // check GRIB edition number

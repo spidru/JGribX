@@ -39,7 +39,7 @@ public class GribRecordES
     {
         int countBytes = 0;
         int code[] = new int[4];
-        while (true)
+        while (in.available() > 0)
         {
             code[countBytes] = in.readUINT(1);
             if (code[0] == '7' && code[1] == '7' && code[2] == '7' && code[3] == '7')
