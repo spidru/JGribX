@@ -73,7 +73,9 @@ public class GribExample1
          *  - causes out of memory error
          */
 //        String gribFilename = "test/gfs_4_20171112_0000_024.grb2";
-        String gribFilename = "test/cached.grb2";
+
+
+        String gribFilename = "test/cached_gfs_4_20180520_0000_000.grb2";
 
 //        String gribFilename = "test/A_HWXE85ECEM210000_C_ECMF_20160721000000_24h_em_ws_850hPa_global_0p5deg_grib2.bin";     // testing files from ECMWF 
         
@@ -153,11 +155,11 @@ public class GribExample1
         }
         catch (FileNotFoundException e)
         {
-            System.err.println("Cannot find " + gribFilename);
+            System.err.println("Cannot find file: " + gribFilename);
         }
         catch (IOException e)
         {
-            System.err.println("Cannot access " + gribFilename);
+            System.err.println("Cannot access file: " + gribFilename);
         }
         catch (NotSupportedException e)
         {

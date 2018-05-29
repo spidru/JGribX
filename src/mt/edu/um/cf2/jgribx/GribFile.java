@@ -127,11 +127,13 @@ public class GribFile
             records.add(record);
         }
         
-        Logger.println("Reached end of file: "+records.size()+" of "+count+" records read successfully", Logger.INFO);
+        
         in.close();
 
         if (records.isEmpty())
-           Logger.println("No GRIB file or no records found.", Logger.WARNING);
+           throw new NoValidGribException("No valid GRIB records found.");
+        else
+            Logger.println("Reached end of file: "+records.size()+" of "+count+" records read successfully", Logger.INFO);
     }
     
     /**
