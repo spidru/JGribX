@@ -33,8 +33,11 @@ Here is a shortlist of the major changes made since JGrib (version 7 beta):
 ## Important Notes
 JGribX is still under active development and therefore contains a large amount of unsupported features and operations. These will be implemented gradually over time. If you would like certain features to be implemented, please open an issue containing all the relevant information.
 
-## Parameter Codes
+### Parameter Codes
 To uniquely identify and represent different parameters, each parameter has been given its own code. A list of parameter codes can be viewed [here](doc/SUPPORTED_PARAMETERS.md).
 
-## Level Codes and LTVIDs
+### Level Codes and LTVIDs
 Similar to parameter codes, level codes are used to uniquely identify each level type and value(s). For example, an isobaric level is represented by the code **ISBL**. In addition, an isobaric level of 200 hPa is represented by the level type-value ID (LTVID) **ISBL:200**. A list of level codes can be viewed [here](doc/SUPPORTED_LEVELS.md).
+
+## Downloads
+Binary builds (currently as JAR files), together with the source, can be found in the [Releases](https://github.com/spidru/JGribX/releases) page. These JAR files are meant to be used as a library in another program. Current versions do not have useful functionality when run as a standalone app.
