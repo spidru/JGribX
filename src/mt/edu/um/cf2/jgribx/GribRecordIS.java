@@ -144,17 +144,41 @@ public class GribRecordIS
       return this.length;
    }
 
-   /**
-    * Get the edition of the GRIB specification used.
-    *
-    * @return edition number of GRIB specification
-    */
-   public int getGribEdition()
-   {
-      return this.edition;
-   }
+    /**
+     * Get the edition of the GRIB specification used.
+     *
+     * @return edition number of GRIB specification
+     */
+    public int getGribEdition()
+    {
+       return this.edition;
+    }
 
-
+    /**
+     * Seeks the location of the next IS header.
+     * If a valid header is found, the input stream is repositioned to the
+     * position just before the found header.
+     * @param in GRIB input stream to read from 
+     * @throws IOException 
+     */
+    public static void seekNext(GribInputStream in) throws IOException
+    {
+        byte code[] = new byte[4];
+        
+        while (in.available() > 0)
+        {
+            in.mark(4);
+            in.read(code);
+            if (Arrays.equals(code, "GRIB".getBytes()))
+            {
+                in.reset();
+                return;
+            }
+            in.reset();
+            in.read(1);     // skip 1 byte
+        }
+    }
+   
    /**
     * Get a string representation of this IS.
     *

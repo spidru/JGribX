@@ -118,6 +118,8 @@ public class GribFile
                 GribRecordES.seekNext(in);
                 continue;
             }
+            
+            GribRecordIS.seekNext(in);
 
             Logger.println("GRIB Record "+count, Logger.INFO);
             Logger.println("\tReference Time: "+record.getReferenceTime().getTime().toString(), Logger.INFO);
@@ -454,7 +456,7 @@ public class GribFile
             System.out.println("\t" + sdf.format(date.getTime()));
         }
     }
-    
+        
    /**
     * Get a string representation of the GRIB file.
     *
