@@ -74,11 +74,10 @@ public class GribExample1
          */
 //        String gribFilename = "test/gfs_4_20171112_0000_024.grb2";
 
-
-        String gribFilename = "test/cached_gfs_4_20180520_0000_000.grb2";
-
 //        String gribFilename = "test/A_HWXE85ECEM210000_C_ECMF_20160721000000_24h_em_ws_850hPa_global_0p5deg_grib2.bin";     // testing files from ECMWF 
         
+        String gribFilename = "test/cached_gfs_4_20180520_0000_000_m.grb2";
+
         // Prepare format for reference times
 //        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss 'UTC'");
