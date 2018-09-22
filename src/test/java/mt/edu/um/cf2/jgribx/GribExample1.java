@@ -8,7 +8,7 @@
  * Licensed under MIT: https://github.com/spidru/JGribX/blob/master/LICENSE
  * ============================================================================
  */
-package test;
+package mt.edu.um.cf2.jgribx;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -76,7 +76,7 @@ public class GribExample1
 
 //        String gribFilename = "test/A_HWXE85ECEM210000_C_ECMF_20160721000000_24h_em_ws_850hPa_global_0p5deg_grib2.bin";     // testing files from ECMWF 
         
-        String gribFilename = "test/cached_gfs_4_20180520_0000_000_m.grb2";
+        String gribFilename = "cached_gfs_4_20180520_0000_000_m.grb2";
 
         // Prepare format for reference times
 //        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
