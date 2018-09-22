@@ -5,3 +5,4 @@ store
 /bin/
 .classpath
 .project
+.settings/
