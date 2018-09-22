@@ -17,6 +17,21 @@ repositories {
     jcenter()
 }
 
+sourceSets {
+	main {
+		resources.srcDirs = ["src/main/java","src/main/resources"]
+	}
+	test {
+		resources.srcDirs = ["src/test/java", "src/test/resources"]
+	}
+}
+
+test {
+		testLogging {
+    		events 'started', 'passed'
+		}
+}
+
 // In this section you declare the dependencies for your production and test code
 dependencies {
     // The production code uses the SLF4J logging API at compile time
