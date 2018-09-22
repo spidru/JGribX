@@ -25,6 +25,14 @@ Similar to parameter codes, level codes are used to uniquely identify each level
 ## Usage
 JGribX was originally designed to be a Java library, meaning that it did not have any useful functionality when run as a standalone app. However, a command-line interface is currently being developed which would allow JGribX to be used as a standalone app via command-line.
 
+### Building a Library
+Ensure that you have a copy of Gradle
+
+Run the following command at the terminal
+```
+gradle clean build
+``` 
+
 ### Library Interface
 The simplistic library interface can be observed from the following code snippet (omitting extra stuff such as try-catches):
 
