@@ -1,6 +1,8 @@
 
 package mt.edu.um.cf2.jgribx;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -22,6 +24,11 @@ public class CommandLine {
         version.setRequired(false);
         options.addOption(version);
         
+        /* File Information */
+        Option inputFile = new Option("i", "input", true, "Specify an input file");
+        inputFile.setRequired(false);
+        options.addOption(inputFile);
+        
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
         org.apache.commons.cli.CommandLine cmd = null;
@@ -35,6 +42,42 @@ public class CommandLine {
             System.out.println(e.getMessage());
             formatter.printHelp("JGribX", options);
             System.exit(1);
+        }
+        
+        /* If no arguments have been specified, display help */
+        if (cmd.getOptions().length == 0)
+        {
+            System.err.println("No arguments specified");
+            formatter.printHelp("JGribX", options);
+            System.exit(1);
+        }
+        
+        if (cmd.hasOption("i"))
+        {
+            String inputFilePath = cmd.getOptionValue("i");
+            try
+            {
+                GribFile gribFile = new GribFile(inputFilePath);
+            
+                // Print out generic GRIB file info
+                gribFile.getSummary(System.out);
+            }
+            catch (FileNotFoundException e)
+            {
+                System.err.println("Cannot find file: " + inputFilePath);
+            }
+            catch (IOException e)
+            {
+                System.err.println("Could not open file: " + inputFilePath);
+            }
+            catch (NotSupportedException e)
+            {
+                System.err.println("GRIB file contains unsupported features: " + e);
+            }
+            catch (NoValidGribException e)
+            {
+                System.err.println("GRIB file is invalid: " + e);
+            }
         }
         
         if (cmd.hasOption("v"))

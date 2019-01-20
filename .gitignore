@@ -1,8 +1,8 @@
-build
-nbproject
-store
+# Git ignore file for JGribX
 .gradle/
-/bin/
 .classpath
 .project
 .settings/
+build
+dist
+nbproject
