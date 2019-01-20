@@ -3,6 +3,7 @@ package mt.edu.um.cf2.jgribx;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -61,6 +62,13 @@ public class CommandLine {
             
                 // Print out generic GRIB file info
                 gribFile.getSummary(System.out);
+                
+                List<String> params = gribFile.getParameterCodes();
+                System.out.println("Parameters:");
+                for (String param : params)
+                {
+                    System.out.print(param + " ");
+                }
             }
             catch (FileNotFoundException e)
             {

@@ -78,7 +78,7 @@ public class GribExample1
 //        String gribFilename = "test/A_HWXE85ECEM210000_C_ECMF_20160721000000_24h_em_ws_850hPa_global_0p5deg_grib2.bin";     // testing files from ECMWF 
         
 //        String gribFilename = "cached_gfs_4_20180520_0000_000_m.grb2";
-        final String gribFilename = "/gfsanl_3_20170512_0000_000.grb2";
+        final String gribFilename = "gfsanl_3_20170512_0000_000.grb2";
 
         // Prepare format for reference times
 //        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -87,8 +87,8 @@ public class GribExample1
         
         try
         {
-        	final InputStream gribStream = GribExample1.class.getResourceAsStream(gribFilename);
-            GribFile gribFile = new GribFile(gribStream);
+//            System.out.println(GribExample1.class.getClassLoader().getResource(gribFilename));
+            GribFile gribFile = new GribFile("src/test/resources/" + gribFilename);
             
             // Get info
             int nRecords = gribFile.getRecordCount();
