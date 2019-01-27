@@ -14,7 +14,7 @@ Here is a shortlist of the major changes made since JGrib (version 7 beta):
  * skips invalid/unsupported GRIB records (showing the appropriate errors/warnings)
  
 ## Important Notes
-JGribX is still under active development and therefore contains a large amount of unsupported features and operations. These will be implemented gradually over time. If you would like certain features to be implemented, please open an issue containing all the relevant information.
+JGribX is still under active development and therefore contains a large amount of unsupported features and operations. These will be implemented gradually over time. If you would like certain features to be implemented or perhaps have found some issues, please open an issue containing all the relevant information.
 
 ### Parameter Codes
 To uniquely identify and represent different parameters, each parameter has been given its own code. A list of parameter codes can be viewed [here](doc/SUPPORTED_PARAMETERS.md).
@@ -23,7 +23,7 @@ To uniquely identify and represent different parameters, each parameter has been
 Similar to parameter codes, level codes are used to uniquely identify each level type and value(s). For example, an isobaric level is represented by the code **ISBL**. In addition, an isobaric level of 200 hPa is represented by the level type-value ID (LTVID) **ISBL:200**. A list of level codes can be viewed [here](doc/SUPPORTED_LEVELS.md).
 
 ## Usage
-JGribX was originally designed to be a Java library, meaning that it did not have any useful functionality when run as a standalone app. However, a command-line interface is currently being developed which would allow JGribX to be used as a standalone app via command-line.
+JGribX was originally designed to be a Java library, meaning that it did not have any useful functionality when run as a standalone app. However, a command-line interface is currently being developed which allows JGribX to be used as a standalone app via command-line.
 
 ### Building a Library
 Ensure that you have a copy of Gradle
@@ -54,11 +54,11 @@ double value = record.getValue(latitude, longitude);
 Further examples on how to use JGribX can be found [here](https://github.com/spidru/JGribX/tree/master/src/test).
 
 ### Command-Line Interface
-As of version 1.0, JGribX can also be used from command-line. For example, to get a quick summary of the contents of a GRIB file:
+As of version 0.4, JGribX can also be used from command-line. For example, to get a quick summary of the contents of a GRIB file:
 
 ```bat
 java -jar JGribX.jar -i path/to/file
 ```
 
 ## Downloads
-Binary builds (currently as JAR files), together with the source, can be found in the [Releases](https://github.com/spidru/JGribX/releases) page. These JAR files are meant to be used as a library in another program. Current versions do not have useful functionality when run as a standalone app.
+Binary builds (currently as JAR files), together with the source, can be found in the [Releases](https://github.com/spidru/JGribX/releases) page. As of v0.4, these JAR files can be used both as a library and as a standalone app (CLI). Previous versions can only be used as a library.
