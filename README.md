@@ -54,7 +54,7 @@ double value = record.getValue(latitude, longitude);
 Further examples on how to use JGribX can be found [here](https://github.com/spidru/JGribX/tree/master/src/test).
 
 ### Command-Line Interface
-As of version 1.0, JGribX can also be used from command-line. For example, to get a quick summary of the contents of a GRIB file:
+As of version 0.4, JGribX can also be used from command-line. For example, to get a quick summary of the contents of a GRIB file:
 
 ```bat
 java -jar JGribX.jar -i path/to/file
