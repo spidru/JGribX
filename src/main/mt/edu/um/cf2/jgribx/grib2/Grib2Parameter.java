@@ -11,17 +11,15 @@
 package mt.edu.um.cf2.jgribx.grib2;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import mt.edu.um.cf2.jgribx.GribCodes;
 import mt.edu.um.cf2.jgribx.GribCodes.Discipline;
-import mt.edu.um.cf2.jgribx.JGribX;
 import mt.edu.um.cf2.jgribx.Logger;
 
 /**
@@ -52,22 +50,21 @@ public class Grib2Parameter
     
     public static void loadDefaultParameters()
     {
-        String prefix = JGribX.getResourcePath();
         String filename;
-        File paramTableFile;
         
         for (GribCodes.Discipline discipline : GribCodes.Discipline.values())
         {
             for (GribCodes.ParameterCategory category : GribCodes.ParameterCategory.values())
             {
-                filename = prefix+discipline+"-"+category.toString()+".txt";
-                paramTableFile = new File(filename);
-                if (!paramTableFile.exists())
+                filename = "/" + discipline + "-" + category.toString() + ".txt";                
+                Logger.println("Resource path: " + filename, Logger.INFO);
+                InputStream is = Grib2Parameter.class.getResourceAsStream(filename);
+                if (is == null)
                 {
-                    Logger.println("Cannot find "+paramTableFile.getAbsolutePath(), Logger.ERROR);
-                    continue;
+                    Logger.println("Cannot find " + filename, Logger.ERROR);
+                    break;
                 }
-                try (BufferedReader reader = new BufferedReader(new FileReader(paramTableFile)))
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(is)))
                 {
                     String line;
                     Pattern pattern = Pattern.compile("(\\d+)\\s*:\\s*(.*?)\\s*:\\s*(.*?)\\s*:\\s*(\\w*)");
@@ -85,13 +82,9 @@ public class Grib2Parameter
                         }
                     }
                 }
-                catch (FileNotFoundException e)
-                {
-                    Logger.println("Cannot find "+paramTableFile.getAbsolutePath(), Logger.ERROR);
-                }
                 catch (IOException e)
                 {
-                    Logger.println("Cannot read "+paramTableFile.getAbsolutePath(), Logger.ERROR);
+                    Logger.println("Cannot read " + filename, Logger.ERROR);
                 }
             }
         }
