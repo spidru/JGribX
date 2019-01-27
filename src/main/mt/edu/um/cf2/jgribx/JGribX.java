@@ -16,7 +16,7 @@ public class JGribX
     /**
     * Defines version of JGribX
     */
-    private static final String VERSION = "0.4-190120";
+    private static final String VERSION = "0.4-190127";
     
     public static void setLoggingLevel(int level)
     {
