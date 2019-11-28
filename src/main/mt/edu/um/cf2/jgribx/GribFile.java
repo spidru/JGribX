@@ -350,8 +350,9 @@ public class GribFile
                 closestTime = record.getReferenceTime();
             }
         }
-        
-        Pattern pattern = Pattern.compile("(\\w+):(\\d+)?");
+
+        // Match patterns such as "ISBL:200" and "SFC"
+        Pattern pattern = Pattern.compile("(\\w+)(?::(\\d+))?");
         Matcher matcher;
         for (GribRecord record : records)
         {
@@ -359,20 +360,11 @@ public class GribFile
             if (matcher.find())
             {
                 String code = matcher.group(1);
-                int value = 0;
-                if (matcher.groupCount() == 2)
-                    value = Integer.parseInt(matcher.group(2));
-                if (
-                        record.getReferenceTime().equals(closestTime) && 
-                        record.getParameterCode().equals(parameterAbbrev) && 
+                if (record.getReferenceTime().equals(closestTime) &&
+                        record.getParameterCode().equals(parameterAbbrev) &&
                         record.getLevelCode().equals(code) &&
-                        (
-                            matcher.groupCount() == 1 ||
-                            (
-                                matcher.groupCount() == 2 && record.getLevelValues()[0] == value
-                            )
-                        )
-                    )
+                        (matcher.group(2) == null || (record.getLevelValues()[0] == Integer.parseInt(matcher.group(2))))
+                )
                 {
                     return record;
                 }
