@@ -334,20 +334,33 @@ public class GribFile
     {
         return records;
     }
-    
+
+    /**
+     * Search for a record using the forecast time, parameter and level.
+     * <p>
+     * Searches through all records which have been successfully read.
+     * The search works by first finding the closest forecast time to the one specified
+     * in the list of records. This forecast time is then used together with the
+     * specified parameter and level to find a record which matches these values.
+     * </p>
+     * @param time Forecast time to search for
+     * @param parameterAbbrev Parameter to search for
+     * @param levelCode Level to search for
+     * @return The found record, null if no record has been found
+     */
     public GribRecord getRecord(Calendar time, String parameterAbbrev, String levelCode)
     {
-        // Find closest time
+        // Find closest forecast time
         long delta_ms;
         long deltaMin_ms = Long.MAX_VALUE;
         Calendar closestTime = null;
         for (GribRecord record : records)
         {
-            delta_ms = Math.abs(time.getTimeInMillis() - record.getReferenceTime().getTimeInMillis());
+            delta_ms = Math.abs(time.getTimeInMillis() - record.getForecastTime().getTimeInMillis());
             if (delta_ms < deltaMin_ms)
             {
                 deltaMin_ms = delta_ms;
-                closestTime = record.getReferenceTime();
+                closestTime = record.getForecastTime();
             }
         }
 
@@ -360,7 +373,7 @@ public class GribFile
             if (matcher.find())
             {
                 String code = matcher.group(1);
-                if (record.getReferenceTime().equals(closestTime) &&
+                if (record.getForecastTime().equals(closestTime) &&
                         record.getParameterCode().equals(parameterAbbrev) &&
                         record.getLevelCode().equals(code) &&
                         (matcher.group(2) == null || (record.getLevelValues()[0] == Integer.parseInt(matcher.group(2))))
