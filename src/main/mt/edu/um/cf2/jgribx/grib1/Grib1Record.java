@@ -107,7 +107,7 @@ public class Grib1Record extends GribRecord
 
         /* Read BDS */
         in.resetBitCounter();
-        record.bds = new Grib1RecordBDS(in, record.pds.getDecimalScale(), record.bms);
+        record.bds = new Grib1RecordBDS(in, record.bms, record.gds, record.pds);
         if (in.getByteCounter() != record.bds.length)
             throw new NoValidGribException("Incorrect BDS length");
 

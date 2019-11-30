@@ -4,7 +4,7 @@
  * ============================================================================
  * Written by Andrew Spiteri <andrew.spiteri@um.edu.mt>
  * Adapted from JGRIB: http://jgrib.sourceforge.net/
- * 
+ *
  * Licensed under MIT: https://github.com/spidru/JGribX/blob/master/LICENSE
  * ============================================================================
  */
@@ -74,7 +74,7 @@ public class Grib1RecordBDS
     * Indicates whether the BMS is represented by a single value
     *   -  Octet 12 is empty, and the data is represented by the reference value.
     */
-    protected boolean isConstant = false;
+   protected boolean isConstant = false;
 
 
    // *** constructors *******************************************************
@@ -85,15 +85,16 @@ public class Grib1RecordBDS
     * defined is not available.
     *
     * @param in - bit input stream with BDS content
-    * @param decimalscale - the exponent of the decimal scale
+    * @param gds Grid Definition Section of record
+    * @param pds Product Definition Section of record
     *
-    * @throws IOException - if stream can not be opened etc.
-    * @throws NotSupportedException 
+    * @throws IOException If stream can not be opened etc.
+    * @throws NotSupportedException If a required feature is not supported
     */
-   public Grib1RecordBDS(GribInputStream in, int decimalscale)
-         throws IOException, NotSupportedException
+   public Grib1RecordBDS(GribInputStream in, Grib1RecordGDS gds, Grib1RecordPDS pds)
+           throws IOException, NotSupportedException
    {
-      this(in, decimalscale, null);
+      this(in, null, gds, pds);
    }
 
 
@@ -101,54 +102,54 @@ public class Grib1RecordBDS
     * Constructs a <tt>GribRecordBDS</tt> object from a bit input stream.
     * A bit map indicates the grid points where no parameter value is defined.
     *
-    * @param in - bit input stream with BDS content
-    * @param decimalscale - the exponent of the decimal scale
-    * @param bms - bit map section of GRIB record
+    * @param in Bit input stream containing BDS content
+    * @param bms Bit Map Section of GRIB record
+    * @param gds Grid Definition Section of record
+    * @param pds Product Definition Section of record
     *
-    * @throws IOException - if stream can not be opened etc.
-    * @throws NotSupportedException 
+    * @throws IOException If stream can not be opened etc.
+    * @throws NotSupportedException If a required feature is not supported
     */
-    public Grib1RecordBDS(GribInputStream in, int decimalscale, Grib1RecordBMS bms)
-         throws IOException, NotSupportedException
-    {
-//        int[] data = in.readUI8(11);
-        byte[] octets = new byte[11];
-        int unusedbits;
-        
-        in.read(octets);
+   public Grib1RecordBDS(GribInputStream in, Grib1RecordBMS bms, Grib1RecordGDS gds, Grib1RecordPDS pds)
+           throws IOException, NotSupportedException
+   {
+      byte[] octets = new byte[11];
+      int unusedBits;
 
-      // octets 1-3 (section length)
-//      this.length = Bytes2Number.uint3(data[0], data[1], data[2]);
-        length = Bytes2Number.bytesToUint(Arrays.copyOfRange(octets, 0, 3));
+      /* Extract required information from PDS */
+      int decimalScale = pds.decscale;
+
+      in.read(octets);
+
+      /* octets 1-3 (section length) */
+      length = Bytes2Number.bytesToUint(Arrays.copyOfRange(octets, 0, 3));
 
       // octet 4, 1st half (packing flag)
       int flag = octets[3];
       if ((flag & 240) != 0)
       {
          throw new NotSupportedException("GribRecordBDS: No other flag " +
-                   "(octet 4, 1st half) than 0 (= simple packed floats as " +
-                   "grid point data) supported yet in BDS section.");
+                 "(octet 4, 1st half) than 0 (= simple packed floats as " +
+                 "grid point data) supported yet in BDS section.");
       }
 
       // octet 4, 2nd half (number of unused bits at end of this section)
-      unusedbits = flag & 15;
+      unusedBits = flag & 15;
 
       // octets 5-6 (binary scale factor)
-//      this.binscale = Bytes2Number.int2(data[4], data[5]);
       binscale = Bytes2Number.bytesToInt(Arrays.copyOfRange(octets, 4, 6), Bytes2Number.INT_SM);
 
       // octets 7-10 (reference point = minimum value)
       refvalue = Bytes2Number.bytesToFloat(Arrays.copyOfRange(octets, 6, 10), Bytes2Number.FLOAT_IBM);
 
       // octet 11 (number of bits per value)
-      this.numbits = Bytes2Number.bytesToUint(octets[10]);
-      if (this.numbits == 0)
-         isConstant = true;
+      numbits = Bytes2Number.bytesToUint(octets[10]);
+      isConstant = (numbits == 0);
 
       // *** read values ************************************************************
 
-      float ref = (float) (Math.pow(10.0, -decimalscale) * this.refvalue);
-      float scale = (float) (Math.pow(10.0, -decimalscale) * Math.pow(2.0, this.binscale));
+      float ref = (float) (Math.pow(10.0, -decimalScale) * this.refvalue);
+      float scale = (float) (Math.pow(10.0, -decimalScale) * Math.pow(2.0, this.binscale));
 
       if (bms != null)
       {
@@ -176,7 +177,7 @@ public class Grib1RecordBDS
       else
       {
          if (!isConstant){
-            this.values = new float[((this.length - 11) * 8 - unusedbits) / this.numbits];
+            this.values = new float[((this.length - 11) * 8 - unusedBits) / this.numbits];
 
             for (int i = 0; i < values.length; i++)
             {
@@ -187,13 +188,16 @@ public class Grib1RecordBDS
                if (this.values[i] < this.minvalue)
                   this.minvalue = this.values[i];
             }
-         }else{ // constant valued - same min and max
-            this.maxvalue = ref;
-            this.minvalue = ref;
+         }
+         else
+         {
+            // constant valued - same min and max
+            values = new float[gds.grid_nx * gds.grid_ny];
+            Arrays.fill(values, ref);
          }
       }
       in.seekNextByte();
-      in.skip(unusedbits / 8);
+      in.skip(unusedBits / 8);
    }
 
 
@@ -266,10 +270,10 @@ public class Grib1RecordBDS
 
    /**
     * Get data/parameter value as a float.
-    * @param index 
+    * @param index
     *
     * @return  array of parameter values
-    * @throws NoValidGribException 
+    * @throws NoValidGribException
     */
    public float getValue(int index) throws NoValidGribException
    {
@@ -308,11 +312,11 @@ public class Grib1RecordBDS
    public String toString()
    {
       return "    BDS section:" + '\n' +
-            "        min/max value: " + this.minvalue + " " + this.maxvalue + "\n" +
-            "        ref. value: " + this.refvalue + "\n" +
-            "        is a constant: " + this.isConstant + "\n" +
-            "        bin. scale: " + this.binscale + "\n" +
-            "        num bits: " + this.numbits;
+              "        min/max value: " + this.minvalue + " " + this.maxvalue + "\n" +
+              "        ref. value: " + this.refvalue + "\n" +
+              "        is a constant: " + this.isConstant + "\n" +
+              "        bin. scale: " + this.binscale + "\n" +
+              "        num bits: " + this.numbits;
    }
 
 }
