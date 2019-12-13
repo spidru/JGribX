@@ -30,6 +30,11 @@ public class CommandLine {
         inputFile.setRequired(false);
         options.addOption(inputFile);
         
+        /* Logging Level */
+        Option logLevel = new Option("l", "loglevel", true, "Specify the logging level");
+        logLevel.setRequired(false);
+        options.addOption(logLevel);
+        
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
         org.apache.commons.cli.CommandLine cmd = null;
@@ -51,6 +56,17 @@ public class CommandLine {
             System.err.println("No arguments specified");
             formatter.printHelp("JGribX", options);
             System.exit(1);
+        }
+        
+        /* Must be first option processed due to logging */
+        if (cmd.hasOption("l"))
+        {
+            int level = Integer.parseInt(cmd.getOptionValue("l"));
+            if (level > 0 && level < 6)
+            {
+                Logger.setLoggingMode(Logger.LoggingMode.CONSOLE);
+                JGribX.setLoggingLevel(level - 1);
+            }
         }
         
         if (cmd.hasOption("i"))
