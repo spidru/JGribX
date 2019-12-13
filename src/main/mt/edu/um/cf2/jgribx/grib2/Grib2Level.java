@@ -90,6 +90,12 @@ public class Grib2Level
                 level.value1 = value;
                 level.description = (int) level.value1 + " " + level.units + " above ground";
                 break;
+            case 105:
+                level.code = "HYBL";
+                level.name = "Hybrid level";
+                level.value1 = value;
+                level.description = (int) value + " hybrid level(s)";
+                break;
             case 106:
                 level.code = "DBLL";
                 level.description = "depth below land surface";
