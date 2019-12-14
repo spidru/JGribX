@@ -121,8 +121,6 @@ public class Grib2Level
                 break;
             default:
                 level = null;
-//                code = "???";
-//                level.description = "unknown";
                 break;
         }
         return level;

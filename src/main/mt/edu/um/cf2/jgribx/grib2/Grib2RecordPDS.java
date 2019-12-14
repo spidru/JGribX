@@ -69,7 +69,7 @@ public class Grib2RecordPDS
     private int templateId;
     
     /**
-     * Constructs a {@link GribRecordPDS} object from a bit input stream.
+     * Constructs a {@link Grib2RecordPDS} object from a bit input stream.
      *
      * @param in bit input stream with PDS content
      * @param discipline
@@ -112,7 +112,12 @@ public class Grib2RecordPDS
                     Grib2Parameter.loadDefaultParameters();
                 
                 parameter = Grib2Parameter.getParameter(discipline, paramCategory, paramNumber);
-                
+                if (parameter == null)
+                {
+                    throw new NotSupportedException("Unsupported parameter: D:" + discipline + " C:" + paramCategory
+                            + " N:" + paramNumber);
+                }
+
                 /* [12] Type of generating process */
                 genProcessType = in.readUINT(1);
                 
@@ -213,6 +218,10 @@ public class Grib2RecordPDS
                 float level2Value = level2ScaledValue / (float) Math.pow(10, level2ScaleFactor);
                 
                 level = Grib2Level.getLevel(level1Type, level1Value);
+                if (level == null)
+                {
+                    throw new NotSupportedException("Unsupported level of type " + level1Type);
+                }
                 
                 if (level2Type != 255)
                     Logger.println("Second surface is not yet supported", Logger.ERROR);
@@ -309,14 +318,14 @@ public class Grib2RecordPDS
     }
     
     public String getLevelCode()
-    {
-        return level.code;
-    }
+        {
+            return level.code;
+        }
     
     public String getLevelDescription()
-    {
-        return level.description;
-    }
+        {
+            return level.description;
+        }
     
     public String getLevelIdentifier()
     {
