@@ -1,5 +1,7 @@
 # JGribX
 
+[![spidru](https://circleci.com/gh/spidru/JGribX.svg?style=shield)](https://circleci.com/gh/spidru/JGribX)
+
 ## Introduction
 JGribX is a GRIB decoder written in Java. It is essentially a fork of [JGrib](http://jgrib.sourceforge.net/), which as far as I know is now no longer being actively developed. JGribX currently supports both GRIB-1 and GRIB-2 files.
 
