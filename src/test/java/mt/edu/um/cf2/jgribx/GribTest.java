@@ -43,6 +43,7 @@ public class GribTest
         final int[] GENERATING_PROCESSES = {81, 96};
 
         URL url = GribTest.class.getResource(FILENAME);
+        System.out.println("Path to file: " + url);
         GribFile gribFile = new GribFile(url.openStream());
 
         assertEquals("Records read successfully", N_RECORDS_EXPECTED, gribFile.getRecordCount());
