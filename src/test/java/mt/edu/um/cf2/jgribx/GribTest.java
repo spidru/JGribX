@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
@@ -33,7 +34,7 @@ public class GribTest
     @Test
     public void testGrib1Gfs3() throws NotSupportedException, IOException, NoValidGribException
     {
-        final String FILENAME = "CF2_20150706_092531.grb";
+        final String FILENAME = "/CF2_20150706_092531.grb";
 
         // Define expected data
         final int N_RECORDS_EXPECTED = 304;
@@ -41,15 +42,13 @@ public class GribTest
         final int[] WEATHER_CENTRES = {7};
         final int[] GENERATING_PROCESSES = {81, 96};
 
-        //try
-        {
-            GribFile gribFile = new GribFile("src/test/resources/" + FILENAME);
+        URL url = GribTest.class.getResource(FILENAME);
+        GribFile gribFile = new GribFile(url.openStream());
 
-            assertEquals("Records read successfully", N_RECORDS_EXPECTED, gribFile.getRecordCount());
-            assertEquals("GRIB edition", GRIB_EDITION, gribFile.getEdition());
-            assertArrayEquals("Weather centres", WEATHER_CENTRES, gribFile.getCentreIDs());
-            assertArrayEquals("Generating processes", GENERATING_PROCESSES, gribFile.getProcessIDs());
-        }
+        assertEquals("Records read successfully", N_RECORDS_EXPECTED, gribFile.getRecordCount());
+        assertEquals("GRIB edition", GRIB_EDITION, gribFile.getEdition());
+        assertArrayEquals("Weather centres", WEATHER_CENTRES, gribFile.getCentreIDs());
+        assertArrayEquals("Generating processes", GENERATING_PROCESSES, gribFile.getProcessIDs());
     }
 
 }
