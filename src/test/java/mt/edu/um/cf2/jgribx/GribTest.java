@@ -42,6 +42,8 @@ public class GribTest
         final int[] WEATHER_CENTRES = {7};
         final int[] GENERATING_PROCESSES = {81, 96};
 
+        Logger.setLoggingMode(Logger.LoggingMode.CONSOLE);
+        JGribX.setLoggingLevel(5);
         URL url = GribTest.class.getResource(FILENAME);
         System.out.println("Path to file: " + url);
         GribFile gribFile = new GribFile(url.openStream());
