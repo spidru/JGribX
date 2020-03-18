@@ -65,6 +65,7 @@ public class GribRecordIS
         String startCode = new String(Arrays.copyOfRange(octets, 0, 4));
         if (!startCode.equals("GRIB"))
         {
+            Logger.println("Start code not recognised: " + startCode, Logger.WARNING);
             throw new NoValidGribException("Record does not have a valid GRIB header");
         }
       
