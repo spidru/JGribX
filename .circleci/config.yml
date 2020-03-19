@@ -32,6 +32,8 @@ jobs:
             - v1-dependencies-
 
       - run: gradle dependencies
+      
+      - run: git lfs pull
 
       - save_cache:
           paths:
