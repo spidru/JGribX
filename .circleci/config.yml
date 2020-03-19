@@ -33,6 +33,9 @@ jobs:
 
       - run: gradle dependencies
       
+      # Set up Git LFS
+      - run: sudo apt-get install git-lfs
+      - run: git lfs install
       - run: git lfs pull
 
       - save_cache:
