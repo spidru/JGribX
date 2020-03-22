@@ -37,15 +37,23 @@ public class GribRecordES
     
     public static void seekNext(GribInputStream in) throws IOException
     {
+        int nBytes = 0;
         int countBytes = 0;
-        int code[] = new int[4];
+        int[] code = new int[4];
         while (in.available() > 0)
         {
             code[countBytes] = in.readUINT(1);
+            nBytes++;
             if (code[0] == '7' && code[1] == '7' && code[2] == '7' && code[3] == '7')
-                return;
+            {
+                break;
+            }
             countBytes++;
-            if (countBytes == 4) countBytes = 0;
+            if (countBytes == 4)
+            {
+                countBytes = 0;
+            }
         }
+        Logger.println("Skipped " + nBytes + "bytes to end of record", Logger.INFO);
     }
 }
