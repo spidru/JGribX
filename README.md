@@ -45,7 +45,7 @@ The simplistic library interface can be observed from the following code snippet
 
 GribFile gribFile = new GribFile("filename.grb");   // typically .grb or .grb2 extension
 
-Calendar forecastDate = new GregorianCalendar(2017, 10, 6, 14, 0, 0);   // 6th November 2017 14:00:00
+Calendar forecastDate = new GregorianCalendar(2017, Calendar.NOVEMBER, 6, 14, 0, 0);
 String parameterCode = "TMP";    // parameter code for temperature
 String ltvid = "ISBL:200";       // LTVID (level type-value ID)
 double latitude = 35.8985;       // latitude at point of interest
