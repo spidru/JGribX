@@ -1,8 +1,14 @@
 # Git ignore file for JGribX
-.gradle/
 .classpath
 .project
 .settings/
 build
 dist
-nbproject
+
+# Gradle
+.gradle/
+out
+
+# IDE generated
+.idea/
+nbproject/
