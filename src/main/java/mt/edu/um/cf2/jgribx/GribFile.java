@@ -115,11 +115,14 @@ public class GribFile
             {
                 Logger.println("Skipping GRIB record "+count+" ("+e.getMessage()+")", Logger.WARNING);
                 nRecordsSkipped++;
+                // Skip to end of current record
                 GribRecordES.seekNext(in);
                 continue;
             }
-            
-            GribRecordIS.seekNext(in);
+            finally
+            {
+                GribRecordIS.seekNext(in);
+            }
 
             Logger.println("GRIB Record "+count, Logger.INFO);
             Logger.println("\tReference Time: "+record.getReferenceTime().getTime().toString(), Logger.INFO);
@@ -128,8 +131,7 @@ public class GribFile
             
             records.add(record);
         }
-        
-        
+
         in.close();
 
         if (records.isEmpty())

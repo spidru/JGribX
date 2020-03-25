@@ -165,6 +165,7 @@ public class GribRecordIS
     public static void seekNext(GribInputStream in) throws IOException
     {
         byte code[] = new byte[4];
+        int nBytesSkipped = 0;
         
         while (in.available() > 0)
         {
@@ -173,10 +174,17 @@ public class GribRecordIS
             if (Arrays.equals(code, "GRIB".getBytes()))
             {
                 in.reset();
-                return;
+                break;
             }
             in.reset();
             in.read(1);     // skip 1 byte
+            nBytesSkipped++;
+        }
+
+        if (nBytesSkipped > 0)
+        {
+            Logger.println("Extra " + nBytesSkipped + " bytes were found between end of last record "
+                    + "and start of next record", Logger.WARNING);
         }
     }
    
