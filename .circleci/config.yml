@@ -33,11 +33,17 @@ jobs:
 
       - run: gradle dependencies
       
-      # Set up Git LFS
-      - run: curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
-      - run: sudo apt-get install git-lfs
-      - run: git lfs install
-      - run: git lfs pull
+      - run:
+            name: Install Git LFS
+            command: |
+                curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
+                sudo apt-get install git-lfs
+      
+      - run:
+            name: Pull Git LFS files
+            command: |
+                git lfs install
+                git lfs pull
 
       - save_cache:
           paths:
