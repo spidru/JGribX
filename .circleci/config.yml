@@ -23,6 +23,13 @@ jobs:
 
     steps:
       - checkout
+      
+      # Compute checksum of test resources
+      - run:
+          name: Compute checksum of test resources
+          command: |
+              resources_checksum=($(find src/test/resources -type f -exec md5sum {} \; | sort -k 2 | md5sum))
+              echo Checksum of src/test/resources: $resources_checksum
 
       # Download and cache dependencies
       - restore_cache:
@@ -43,7 +50,7 @@ jobs:
       - restore_cache:
           name: Restore Git LFS files from cache
           keys:
-            - git-lfs-cache-{{ checksum ".git/index"}}
+            - git-lfs-cache-{{ .Environment.resources_checksum }}
             - git-lfs-cache-
       
       - run:
@@ -52,10 +59,11 @@ jobs:
                 git lfs install
                 [ -d .git/lfs/objects ] && git lfs checkout || git lfs pull
                 
+                
       # Cache Git LFS files
       - save_cache:
             name: Cache Git LFS files
-            key: git-lfs-cache-{{ checksum ".git/index"}}
+            key: git-lfs-cache-{{ .Environment.resources_checksum }}
             paths:
               - .git/lfs/objects
 
