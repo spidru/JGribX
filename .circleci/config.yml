@@ -48,7 +48,7 @@ jobs:
             name: Pull Git LFS files
             command: |
                 git lfs install
-                git lfs checkout || git lfs pull
+                [ -d .git/lfs/objects ] && git lfs checkout || git lfs pull
                 
       # Cache Git LFS files
       - save_cache:
