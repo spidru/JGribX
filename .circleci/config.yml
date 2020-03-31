@@ -38,17 +38,27 @@ jobs:
             command: |
                 curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
                 sudo apt-get install git-lfs
+                
+      - restore_cache:
+          - keys:
+              - git-lfs-cache-{{ checksum ".git/index"}}
+              - git-lfs-cache-
       
       - run:
             name: Pull Git LFS files
             command: |
                 git lfs install
                 git lfs checkout || git lfs pull
+                
+      # Cache Git LFS files
+      - save_cache:
+            key: git-lfs-cache-{{ checksum ".git/index"}}
+            paths:
+              - .git/lfs/objects
 
       - save_cache:
           paths:
             - ~/.gradle
-            - src/test/resources
           key: v1-dependencies-{{ checksum "build.gradle" }}
 
       # run tests!
