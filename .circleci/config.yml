@@ -26,6 +26,7 @@ jobs:
 
       # Download and cache dependencies
       - restore_cache:
+          name: Restore Gradle from cache
           keys:
             - v1-dependencies-{{ checksum "build.gradle" }}
             # fallback to using the latest cache if no exact match is found
@@ -40,6 +41,7 @@ jobs:
                 sudo apt-get install git-lfs
                 
       - restore_cache:
+          name: Restore Git LFS files from cache
           keys:
             - git-lfs-cache-{{ checksum ".git/index"}}
             - git-lfs-cache-
@@ -52,11 +54,13 @@ jobs:
                 
       # Cache Git LFS files
       - save_cache:
+            name: Cache Git LFS files
             key: git-lfs-cache-{{ checksum ".git/index"}}
             paths:
               - .git/lfs/objects
 
       - save_cache:
+          name: Cache Gradle
           paths:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
