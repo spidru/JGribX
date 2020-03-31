@@ -49,8 +49,10 @@ jobs:
                 
       - restore_cache:
           name: Restore Git LFS files from cache
+          environment:
+            checksum: $resources_checksum
           keys:
-            - git-lfs-cache-{{ .Environment.resources_checksum }}
+            - git-lfs-cache-{{ .Environment.checksum }}
             - git-lfs-cache-
       
       - run:
