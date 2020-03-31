@@ -44,12 +44,11 @@ jobs:
             command: |
                 git lfs install
                 git lfs checkout || git lfs pull
-                ls -l ~/src/test/resources
 
       - save_cache:
           paths:
             - ~/.gradle
-            - ~/src/test/resources
+            - src/test/resources
           key: v1-dependencies-{{ checksum "build.gradle" }}
 
       # run tests!
