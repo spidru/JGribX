@@ -40,9 +40,9 @@ jobs:
                 sudo apt-get install git-lfs
                 
       - restore_cache:
-          - keys:
-              - git-lfs-cache-{{ checksum ".git/index"}}
-              - git-lfs-cache-
+          keys:
+            - git-lfs-cache-{{ checksum ".git/index"}}
+            - git-lfs-cache-
       
       - run:
             name: Pull Git LFS files
