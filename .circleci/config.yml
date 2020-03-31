@@ -30,6 +30,7 @@ jobs:
           command: |
               resources_checksum=($(find src/test/resources -type f -exec md5sum {} \; | sort -k 2 | md5sum))
               echo Checksum of src/test/resources: $resources_checksum
+              echo 'export RESOURCES_MD5=$resources_checksum' >> $BASH_ENV
 
       # Download and cache dependencies
       - restore_cache:
@@ -49,10 +50,8 @@ jobs:
                 
       - restore_cache:
           name: Restore Git LFS files from cache
-          environment:
-            checksum: $resources_checksum
           keys:
-            - git-lfs-cache-{{ .Environment.checksum }}
+            - git-lfs-cache-{{ .Environment.RESOURCES_MD5 }}
             - git-lfs-cache-
       
       - run:
@@ -65,7 +64,7 @@ jobs:
       # Cache Git LFS files
       - save_cache:
             name: Cache Git LFS files
-            key: git-lfs-cache-{{ .Environment.resources_checksum }}
+            key: git-lfs-cache-{{ .Environment.RESOURCES_MD5 }}
             paths:
               - .git/lfs/objects
 
