@@ -58,8 +58,7 @@ jobs:
             name: Pull Git LFS files
             command: |
                 git lfs install
-                [ -d .git/lfs/objects ] && git lfs checkout || git lfs pull
-                echo RESOURCES_MD5: "$(cat RESOURCES_MD5)"
+                git lfs pull
                 
       # Cache Git LFS files
       - save_cache:
