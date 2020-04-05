@@ -18,18 +18,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import mt.edu.um.cf2.jgribx.GribCodes;
-import mt.edu.um.cf2.jgribx.GribCodes.Discipline;
+
 import mt.edu.um.cf2.jgribx.Logger;
 
-/**
- *
- * @author AVLAB-USER3
- */
 public class Grib2Parameter
 {
-    private GribCodes.Discipline discipline;
-    private GribCodes.ParameterCategory category;
+    private ProductDiscipline discipline;
+    private ParameterCategory category;
     private int index;
     private String abbrev;
     private String desc;
@@ -38,7 +33,7 @@ public class Grib2Parameter
     private static List<Grib2Parameter> paramList = new ArrayList();
     private static boolean defaultLoaded = false;
     
-    public Grib2Parameter(Discipline discipline, GribCodes.ParameterCategory category, int index, String abbrev, String desc, String units)
+    public Grib2Parameter(ProductDiscipline discipline, ParameterCategory category, int index, String abbrev, String desc, String units)
     {
         this.discipline = discipline;
         this.category = category;
@@ -52,9 +47,9 @@ public class Grib2Parameter
     {
         String filename;
         
-        for (GribCodes.Discipline discipline : GribCodes.Discipline.values())
+        for (ProductDiscipline discipline : ProductDiscipline.getValues())
         {
-            for (GribCodes.ParameterCategory category : GribCodes.ParameterCategory.values())
+            for (ParameterCategory category : discipline.getParameterCategories())
             {
                 filename = "/" + discipline + "-" + category.toString() + ".txt";                
                 Logger.println("Resource path: " + filename, Logger.INFO);
@@ -91,12 +86,12 @@ public class Grib2Parameter
         defaultLoaded = true;
     }
     
-    public static Grib2Parameter getParameter(Discipline discipline, int category, int index)
+    public static Grib2Parameter getParameter(ProductDiscipline discipline, int category, int index)
     {
         for (Grib2Parameter parameter : paramList)
         {
-            if ((parameter.discipline == discipline) &&
-                    (parameter.category.ordinal() == category) &&
+            if ((parameter.discipline.equals(discipline)) &&
+                    (parameter.category.getValue() == category) &&
                     (parameter.index == index)
                 )
             {

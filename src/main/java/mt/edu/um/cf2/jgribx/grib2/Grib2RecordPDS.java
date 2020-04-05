@@ -10,16 +10,12 @@
  */
 package mt.edu.um.cf2.jgribx.grib2;
 
-import java.io.IOException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
-import mt.edu.um.cf2.jgribx.GribCodes.Discipline;
 import mt.edu.um.cf2.jgribx.GribInputStream;
-import mt.edu.um.cf2.jgribx.GribRecordIS;
 import mt.edu.um.cf2.jgribx.Logger;
 import mt.edu.um.cf2.jgribx.NotSupportedException;
+
+import java.io.IOException;
+import java.util.Calendar;
 
 /**
  * A class representing the product definition section (PDS) of a GRIB record.
@@ -78,7 +74,7 @@ public class Grib2RecordPDS
      * @throws IOException if stream can not be opened etc.
      * @throws NotSupportedException
      */
-    public Grib2RecordPDS(GribInputStream in, Discipline discipline, Calendar referenceTime) throws NotSupportedException, IOException
+    public Grib2RecordPDS(GribInputStream in, ProductDiscipline discipline, Calendar referenceTime) throws NotSupportedException, IOException
     {
         /* [1-4] Section Length */
         length = in.readUINT(4);

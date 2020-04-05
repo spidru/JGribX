@@ -13,7 +13,7 @@ package mt.edu.um.cf2.jgribx;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.util.Arrays;
-import mt.edu.um.cf2.jgribx.GribCodes.Discipline;
+import mt.edu.um.cf2.jgribx.grib2.ProductDiscipline;
 
 
 /**
@@ -45,7 +45,7 @@ public class GribRecordIS
     */
    private int edition;
    
-   protected Discipline discipline;
+   protected ProductDiscipline discipline;
 
     /**
      * Constructs a {@link GribRecordIS} object from a buffered input stream.
@@ -65,7 +65,7 @@ public class GribRecordIS
         String startCode = new String(Arrays.copyOfRange(octets, 0, 4));
         if (!startCode.equals("GRIB"))
         {
-            Logger.println("Start code not recognised: " + startCode, Logger.WARNING);
+            Logger.println("Start code not recognised: " + startCode, Logger.INFO);
             throw new NoValidGribException("Record does not have a valid GRIB header");
         }
       
@@ -77,7 +77,7 @@ public class GribRecordIS
                 is.length = 8;
                 break;
             case 2:
-                is.discipline = getDiscipline(octets[6]);
+                is.discipline = new ProductDiscipline(octets[6]);
                 is.length = 16;
                 in.read(octets, 8, 8);
                 break;
@@ -94,33 +94,8 @@ public class GribRecordIS
         
         return is;
    }
-    
-    /**
-     * Get the discipline associated with the specified code.
-     * @param code the code value representing a particular discipline
-     * @return the associated {@link Discipline}
-     */
-    private static Discipline getDiscipline(int code)
-    {
-        switch (code)
-        {
-            case 0:
-                return Discipline.METEOROLOGICAL;
-            case 1:
-                return Discipline.HYDROLOGICAL;
-            case 2:
-                return Discipline.LAND_SURFACE;
-            case 3:
-            case 4:
-                return Discipline.SPACE;
-            case 10:
-                return Discipline.OCEANOGRAPHIC;
-            default:
-                return null;
-        }
-    }
 
-    public Discipline getDiscipline()
+    public ProductDiscipline getDiscipline()
     {
         return discipline;
     }
