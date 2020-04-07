@@ -27,7 +27,7 @@ public class GribTest
 
         // Configure logging
         Logger.setLoggingMode(Logger.LoggingMode.CONSOLE);
-        JGribX.setLoggingLevel(Logger.INFO);
+        JGribX.setLoggingLevel(Logger.DEBUG);
     }
 
     @Test

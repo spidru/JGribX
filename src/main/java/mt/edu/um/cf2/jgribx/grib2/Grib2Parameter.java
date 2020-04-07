@@ -46,10 +46,16 @@ public class Grib2Parameter
     public static void loadDefaultParameters()
     {
         String filename;
+
+        Logger.println("Number of product disciplines: " + ProductDiscipline.getValues().size(), Logger.DEBUG);
+
         
         for (ProductDiscipline discipline : ProductDiscipline.getValues())
         {
-            for (ParameterCategory category : discipline.getParameterCategories())
+            List<ParameterCategory> categories = discipline.getParameterCategories();
+            Logger.println("Number of " + discipline + " parameter categories: " + categories.size(),
+                    Logger.DEBUG);
+            for (ParameterCategory category : categories)
             {
                 filename = "/" + discipline + "-" + category.toString() + ".txt";                
                 Logger.println("Resource path: " + filename, Logger.INFO);

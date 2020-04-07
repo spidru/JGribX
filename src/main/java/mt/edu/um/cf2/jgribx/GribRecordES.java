@@ -54,6 +54,6 @@ public class GribRecordES
                 countBytes = 0;
             }
         }
-        Logger.println("Skipped " + nBytes + "bytes to end of record", Logger.INFO);
+        Logger.println("Skipped " + nBytes + " bytes to end of record", Logger.INFO);
     }
 }

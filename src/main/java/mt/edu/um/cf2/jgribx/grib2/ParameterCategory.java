@@ -1,5 +1,7 @@
 package mt.edu.um.cf2.jgribx.grib2;
 
+import mt.edu.um.cf2.jgribx.Logger;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -84,6 +86,7 @@ public abstract class ParameterCategory
             List<ParameterCategory> list = new ArrayList<>();
             for (Integer key : entries.keySet())
             {
+                Logger.println("Adding Meteorological category: " + key, Logger.DEBUG);
                 list.add(new ParameterCategory.Meteorological(key));
             }
             return list;
