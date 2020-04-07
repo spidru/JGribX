@@ -63,7 +63,7 @@ public class Grib2Parameter
                 if (is == null)
                 {
                     Logger.println("Cannot find " + filename, Logger.ERROR);
-                    break;
+                    continue;
                 }
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(is)))
                 {
