@@ -16,12 +16,12 @@ Here is a shortlist of the major changes made since JGrib (version 7 beta):
  * looks up parameter information from locally stored Grib Parameter Tables (GPT) (instead of a single hardcoded GPT)
  * validates each GRIB record
  * skips invalid/unsupported GRIB records (showing the appropriate errors/warnings)
- 
-## Important Notes
-JGribX is still under active development and therefore contains a large amount of unsupported features and operations. These will be implemented gradually over time. If you would like certain features to be implemented or perhaps have found some issues, please open an issue containing all the relevant information.
 
 ## Dependencies
 Requires JDK/JRE version 9 or above.
+
+## Important Notes
+JGribX is still under active development and therefore contains a large amount of unsupported features and operations. These will be implemented gradually over time. If you would like certain features to be implemented or perhaps have found some issues, please open an issue containing all the relevant information.
 
 ### Parameter Codes
 To uniquely identify and represent different parameters, each parameter has been given its own code. A list of parameter codes can be viewed [here](doc/SUPPORTED_PARAMETERS.md).
