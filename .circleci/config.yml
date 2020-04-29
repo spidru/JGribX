@@ -88,3 +88,12 @@ jobs:
             path: ~/test-results
       - store_artifacts:
             path: ~/test-results/junit
+            
+      # Deploy application as JAR
+      - run:
+            name: Deploy Application
+            command: |
+                gradle jar
+      - store_artifacts:
+            path: build/libs
+      
