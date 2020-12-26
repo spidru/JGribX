@@ -3,10 +3,9 @@ package mt.edu.um.cf2.jgribx.grib2;
 import mt.edu.um.cf2.jgribx.Logger;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static java.util.Map.entry;
 
 public abstract class ParameterCategory
 {
@@ -63,13 +62,15 @@ public abstract class ParameterCategory
 
     public static class Meteorological extends ParameterCategory
     {
-        private static final Map<Integer, String> entries = Map.ofEntries(
-                entry(0, "TEMPERATURE"),
-                entry(1, "MOISTURE"),
-                entry(2, "MOMENTUM"),
-                entry(3, "MASS"),
-                entry(14, "TRACE_GASES")
-        );
+        private static final Map<Integer, String> entries = new HashMap();
+
+        static {
+            entries.put(0, "TEMPERATURE");
+            entries.put(1, "MOISTURE");
+            entries.put(2, "MOMENTUM");
+            entries.put(3, "MASS");
+            entries.put(14, "TRACE_GASES");
+        }
 
         public Meteorological(int categoryId)
         {
@@ -95,10 +96,12 @@ public abstract class ParameterCategory
 
     public static class Hydrological extends ParameterCategory
     {
-        private static final Map<Integer, String> entries = Map.ofEntries(
-                entry(0, "BASIC"),
-                entry(1, "PROBABILITIES")
-        );
+        private static final Map<Integer, String> entries = new HashMap<>();
+
+        static {
+            entries.put(0, "BASIC");
+            entries.put(1, "PROBABILITIES");
+        }
 
         public Hydrological(int categoryId)
         {
@@ -123,10 +126,12 @@ public abstract class ParameterCategory
 
     public static class LandSurface extends ParameterCategory
     {
-        private static final Map<Integer, String> entries = Map.ofEntries(
-                entry(0, "VEGETATION_BIOMASS"),
-                entry(1, "AGRICULTURAL_AQUACULTURAL")
-        );
+        private static final Map<Integer, String> entries = new HashMap<>();
+
+        static {
+            entries.put(0, "VEGETATION_BIOMASS");
+            entries.put(1, "AGRICULTURAL_AQUACULTURAL");
+        }
 
         public LandSurface(int categoryId)
         {
@@ -151,10 +156,12 @@ public abstract class ParameterCategory
 
     public static class SatelliteRemoteSensing extends ParameterCategory
     {
-        private static final Map<Integer, String> entries = Map.ofEntries(
-                entry(0, "IMAGE_FORMAT"),
-                entry(1, "QUANTITATIVE")
-        );
+        private static final Map<Integer, String> entries = new HashMap<>();
+
+        static {
+            entries.put(0, "IMAGE_FORMAT");
+            entries.put(1, "QUANTITATIVE");
+        }
 
         public SatelliteRemoteSensing(int categoryId)
         {
@@ -179,10 +186,12 @@ public abstract class ParameterCategory
 
     public static class Oceanographic extends ParameterCategory
     {
-        private static final Map<Integer, String> entries = Map.ofEntries(
-                entry(0, "WAVES"),
-                entry(1, "CURRENTS")
-        );
+        private static final Map<Integer, String> entries = new HashMap<>();
+
+        static {
+            entries.put(0, "WAVES");
+            entries.put(1, "CURRENTS");
+        }
 
         public Oceanographic(int categoryId)
         {

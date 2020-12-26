@@ -2,21 +2,21 @@ package mt.edu.um.cf2.jgribx.grib2;
 
 import java.util.*;
 
-import static java.util.Map.entry;
-
 public class ProductDiscipline
 {
-    private int value;
-    private String name;
-    private List<ParameterCategory> categories;
+    private final int value;
+    private final String name;
+    private final List<ParameterCategory> categories;
 
-    private static final Map<Integer, String> entries = Map.ofEntries(
-            entry(0, "METEOROLOGICAL"),
-            entry(1, "HYDROLOGICAL"),
-            entry(2, "LAND_SURFACE"),
-            entry(3, "SATELLITE_REMOTE_SENSING"),
-            entry(10, "OCEANOGRAPHIC")
-    );
+    private static final Map<Integer, String> entries = new HashMap<>();
+
+    static {
+        entries.put(0, "METEOROLOGICAL");
+        entries.put(1, "HYDROLOGICAL");
+        entries.put(2, "LAND_SURFACE");
+        entries.put(3, "SATELLITE_REMOTE_SENSING");
+        entries.put(10, "OCEANOGRAPHIC");
+    }
 
     public ProductDiscipline(int discipline)
     {
