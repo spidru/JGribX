@@ -23,14 +23,14 @@ jobs:
 
     steps:
       - checkout
-      
+
       # Compute checksum of test resources
       - run:
           name: Compute checksum of test resources
           command: |
-              resources_checksum=($(find src/test/resources -type f -exec md5sum {} \; | sort -k 2 | md5sum))
-              echo Checksum of src/test/resources: $resources_checksum
-              echo $resources_checksum > RESOURCES_MD5
+            resources_checksum=($(find src/test/resources -type f -exec md5sum {} \; | sort -k 2 | md5sum))
+            echo Checksum of src/test/resources: $resources_checksum
+            echo $resources_checksum > RESOURCES_MD5
 
       # Download and cache dependencies
       - restore_cache:
@@ -40,32 +40,32 @@ jobs:
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
 
-      - run: gradle dependencies
-      
+      - run: ./gradlew dependencies
+
       - run:
-            name: Install Git LFS
-            command: |
-                curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
-                sudo apt-get install git-lfs
-                
+          name: Install Git LFS
+          command: |
+            curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
+            sudo apt-get install git-lfs
+
       - restore_cache:
           name: Restore Git LFS files from cache
           keys:
             - git-lfs-cache-{{ checksum "RESOURCES_MD5" }}
             - git-lfs-cache-
-      
+
       - run:
-            name: Pull Git LFS files
-            command: |
-                git lfs install
-                git lfs pull
-                
+          name: Pull Git LFS files
+          command: |
+            git lfs install
+            git lfs pull
+
       # Cache Git LFS files
       - save_cache:
-            name: Cache Git LFS files
-            key: git-lfs-cache-{{ checksum "RESOURCES_MD5" }}
-            paths:
-              - .git/lfs/objects
+          name: Cache Git LFS files
+          key: git-lfs-cache-{{ checksum "RESOURCES_MD5" }}
+          paths:
+            - .git/lfs/objects
 
       - save_cache:
           name: Cache Gradle
@@ -74,26 +74,26 @@ jobs:
           key: v1-dependencies-{{ checksum "build.gradle" }}
 
       # run tests!
-      - run: gradle test
-      
+      - run: ./gradlew test
+
       - run:
-            name: Save test results
-            command: |
-                mkdir -p ~/test-results/junit/
-                find . -type f -regex ".*/build/test-results/.*xml" -exec cp {} ~/test-results/junit/ \;
-                mkdir -p ~/test-results/junit/report/
-                cp -r build/reports/tests/test ~/test-results/junit/report/
-            when: always
+          name: Save test results
+          command: |
+            mkdir -p ~/test-results/junit/
+            find . -type f -regex ".*/build/test-results/.*xml" -exec cp {} ~/test-results/junit/ \;
+            mkdir -p ~/test-results/junit/report/
+            cp -r build/reports/tests/test ~/test-results/junit/report/
+          when: always
       - store_test_results:
-            path: ~/test-results
+          path: ~/test-results
       - store_artifacts:
-            path: ~/test-results/junit
-            
+          path: ~/test-results/junit
+
       # Deploy application as JAR
       - run:
-            name: Deploy Application
-            command: |
-                gradle jar
+          name: Deploy Application
+          command: |
+            ./gradlew jar
       - store_artifacts:
-            path: build/libs
+          path: build/libs
       
