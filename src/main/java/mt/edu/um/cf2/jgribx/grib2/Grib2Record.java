@@ -68,6 +68,7 @@ public class Grib2Record extends GribRecord
                     record.ids = Grib2RecordIDS.readFromStream(in);
                     break;
                 case 2:
+                    in.skip(sectionLength);
                     break;
                 case 3:
                     gds = Grib2RecordGDS.readFromStream(in);
@@ -208,5 +209,21 @@ public class Grib2Record extends GribRecord
         }
         
         return value;
+    }
+
+    /**
+     * Access to grid definition section (GDS) records.
+     * @return GDS records
+     */
+    public List<Grib2RecordGDS> getGDS() {
+        return gdsList;
+    }
+
+    /**
+     * Access to data section (DS) records.
+     * @return DS records
+     */
+    public List<Grib2RecordDS> getDS() {
+        return dsList;
     }
 }
