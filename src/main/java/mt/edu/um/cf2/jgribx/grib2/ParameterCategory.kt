@@ -10,6 +10,7 @@ abstract class ParameterCategory(internal val value: Int, private val name: Stri
 					1 to "MOISTURE",
 					2 to "MOMENTUM",
 					3 to "MASS",
+					6 to "CLOUD",
 					14 to "TRACE_GASES")
 					.entries
 					.onEach { (k, _) -> Logger.debug("Adding Meteorological category: ${k}") }

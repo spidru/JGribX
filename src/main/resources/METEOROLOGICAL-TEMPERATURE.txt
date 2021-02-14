@@ -1,30 +1,46 @@
-0	:	Temperature	:	K	:	TMP
-1	:	Virtual Temperature	:	K	:	VTMP
-2	:	Potential Temperature	:	K	:	POT
-3	:	Pseudo-Adiabatic Potential Temperature (or Equivalent Potential Temperature)	:	K	:	EPOT
-4	:	Maximum Temperature	:	K	:	TMAX
-5	:	Minimum Temperature	:	K	:	TMIN
-6	:	Dew Point Temperature	:	K	:	DPT
-7	:	Dew Point Depression (or Deficit)	:	K	:	DEPR
-8	:	Lapse Rate	:	K m-1	:	LAPR
-9	:	Temperature Anomaly	:	K	:	TMPA
-10	:	Latent Heat Net Flux	:	W m-2	:	LHTFL
-11	:	Sensible Heat Net Flux	:	W m-2	:	SHTFL
-12	:	Heat Index	:	K	:	HEATX
-13	:	Wind Chill Factor	:	K	:	WCF
-14	:	Minimum Dew Point Depression*	:	K	:	MINDPD
-15	:	Virtual Potential Temperature	:	K	:	VPTMP
-16	:	Snow Phase Change Heat Flux	:	W m-2	:	SNOHF
-17	:	Skin Temperature	:	K	:	SKINT
-18	:	Snow Temperature (top of snow)	:	K	:	SNOT
-19	:	Turbulent Transfer Coefficient for Heat	:	Numeric	:	TTCHT
-20	:	Turbulent Diffusion Coefficient for Heat	:	m2s-1	:	TDCHT
-21	:	Apparent Temperature	:	K	:	APTMP
-22	:	Temperature Tendency due to Short-Wave Radiation	:	K s-1	:	TTSWR
-23	:	Temperature Tendency due to Long-Wave Radiation	:	K s-1	:	TTLWR
-24	:	Temperature Tendency due to Short-Wave Radiation, Clear Sky	:	K s-1	:	TTSWRCS
-25	:	Temperature Tendency due to Long-Wave Radiation, Clear Sky	:	K s-1	:	TTLWRCS
-26	:	Temperature Tendency due to parameterizations	:	K s-1	:	TTPARM
-27	:	Wet Bulb Temperature	:	K	:	WETBT
-28	:	Unbalanced Component of Temperature	:	K	:	UCTMP
-29	:	Temperature Advection	:	K s-1	:	TMPADV
+0		:	Temperature																		:	K		:	TMP
+1		:	Virtual Temperature																:	K		:	VTMP
+2		:	Potential Temperature															:	K		:	POT
+3		:	Pseudo-Adiabatic Potential Temperature (or Equivalent Potential Temperature)	:	K		:	EPOT
+4		:	Maximum Temperature																:	K		:	TMAX
+5		:	Minimum Temperature																:	K		:	TMIN
+6		:	Dew Point Temperature															:	K		:	DPT
+7		:	Dew Point Depression (or Deficit)												:	K		:	DEPR
+8		:	Lapse Rate																		:	K m-1	:	LAPR
+9		:	Temperature Anomaly																:	K		:	TMPA
+10		:	Latent Heat Net Flux															:	W m-2	:	LHTFL
+11		:	Sensible Heat Net Flux															:	W m-2	:	SHTFL
+12		:	Heat Index																		:	K		:	HEATX
+13		:	Wind Chill Factor																:	K		:	WCF
+14		:	Minimum Dew Point Depression*													:	K		:	MINDPD
+15		:	Virtual Potential Temperature													:	K		:	VPTMP
+16		:	Snow Phase Change Heat Flux														:	W m-2	:	SNOHF
+17		:	Skin Temperature																:	K		:	SKINT
+18		:	Snow Temperature (top of snow)													:	K		:	SNOT
+19		:	Turbulent Transfer Coefficient for Heat											:	Numeric	:	TTCHT
+20		:	Turbulent Diffusion Coefficient for Heat										:	m2s-1	:	TDCHT
+21		:	Apparent Temperature															:	K		:	APTMP
+22		:	Temperature Tendency due to Short-Wave Radiation								:	K s-1	:	TTSWR
+23		:	Temperature Tendency due to Long-Wave Radiation									:	K s-1	:	TTLWR
+24		:	Temperature Tendency due to Short-Wave Radiation, Clear Sky						:	K s-1	:	TTSWRCS
+25		:	Temperature Tendency due to Long-Wave Radiation, Clear Sky						:	K s-1	:	TTLWRCS
+26		:	Temperature Tendency due to parameterizations									:	K s-1	:	TTPARM
+27		:	Wet Bulb Temperature															:	K		:	WETBT
+28		:	Unbalanced Component of Temperature												:	K		:	UCTMP
+29		:	Temperature Advection															:	K s-1	:	TMPADV
+30-191	:	Reserved																		:			:	RESERVED
+192		:	Snow Phase Change Heat Flux														:	W m-2	:	SNOHF
+193		:	Temperature Tendency by All Radiation											:	K s-1	:	TTRAD
+194		:	Relative Error Variance															:			:	REV
+195		:	Large Scale Condensate Heating Rate												:	K s-1	:	LRGHR
+196		:	Deep Convective Heating Rate													:	K s-1	:	CNVHR
+197		:	Total Downward Heat Flux at Surface												:	W m-2	:	THFLX
+198		:	Temperature Tendency by All Physics												:	K s-1	: 	TTDIA
+199		:	Temperature Tendency by Non-radiation Physics									:	K s-1	:	TTPHY
+200		:	Standard Dev. of IR Temp. over 1x1 deg. area									:	K		:	TSD1D
+201		:	Shallow Convective Heating Rate													:	K s-1	:	SHAHR
+202		:	Vertical Diffusion Heating rate													:	K s-1	:	VDFHR
+203		:	Potential Temperature at Top of Viscous Sublayer								:	K		:	THZ0
+204		:	Tropical Cyclone Heat Potential													:	Jm-2K	:	TCHP
+205		:	Effective Layer (EL) Temperature												:	C		:	ELMELT
+255		:	Missing																			:			:	MISSING

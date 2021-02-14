@@ -1,0 +1,21 @@
+0		:	Flash Flood Guidance (Encoded as an accumulation over a floating subinterval of time between the reference time and valid time)	:	kg m-2		:	FFLDG
+1		:	Flash Flood Runoff (Encoded as an accumulation over a floating subinterval of time)												:	kg m-2		:	FFLDRO
+2		:	Remotely Sensed Snow Cover																										:				:	RSSC
+3		:	Elevation of Snow Covered Terrain																								:				:	ESCT
+4		:	Snow Water Equivalent Percent of Normal																							:	%			:	SWEPON
+5		:	Baseflow-Groundwater Runoff																										: 	kg m-2		:	BGRUN
+6		:	Storm Surface Runoff																											:	kg m-2		:	SSRUN
+7		:	Discharge from Rivers or Streams																								:	m3 s-1		:	DISRS
+8		:	Group Water Upper Storage																										:	kg m-2		:	GWUPS
+9		:	Group Water Lower Storage																										:	kg m-2		:	GWLOWS
+10		:	Side Flow into River Channel																									:	m3 s-1 m-1	:	SFLORC
+11		:	River Storage of Water																											:	m3			:	RVERSW
+12		:	Flood Plain Storage of Water																									:	m3			:	FLDPSW
+13		:	Depth of Water on Soil Surface																									:	kg m-2		:	DEPWSS
+14		:	Upstream Accumulated Precipitation																								:	kg m-2		:	UPAPCP
+15		:	Upstream Accumulated Snow Melt																									:	kg m-2		:	UPASM
+16		:	Percolation Rate																												:	kg m-2 s-1	:	PERRATE
+17-191	:	Reserved																														:				:	RESERVED
+192		:	Baseflow-Groundwater Runoff																										:	kg m-2		:	BGRUN
+193		:	Storm Surface Runoff																											:	kg m-2		:	SSRUN
+255		:	Missing																															:				:	MISSING

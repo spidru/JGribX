@@ -1,80 +1,95 @@
-0	:	Wind Direction (from which blowing)	:	degrees true	:	WDIR
-1	:	Wind Speed	:	m s-1	:	WIND
-2	:	U-Component of Wind	:	m s-1	:	UGRD
-3	:	V-Component of Wind	:	m s-1	:	VGRD
-4	:	Stream Function	:	m2 s-1	:	STRM
-5	:	Velocity Potential	:	m2 s-1	:	VPOT
-6	:	Montgomery Stream Function 	m2 s-2	:	MNTSF
-7	:	Sigma Coordinate Vertical Velocity	:	s-1	:	SGCVV
-8	:	Vertical Velocity (Pressure)	:	Pa s-1	:	VVEL
-9	:	Vertical Velocity (Geometric) 	m s-1	:	DZDT
-10	:	Absolute Vorticity	:	s-1	:	ABSV
-11	:	Absolute Divergence	:	s-1	:	ABSD
-12	:	Relative Vorticity	:	s-1	:	RELV
-13	:	Relative Divergence	:	s-1	:	RELD
-14	:	Potential Vorticity	:	K m2 kg-1 s-1	:	PVORT
-15	:	Vertical U-Component Shear	:	s-1	:	VUCSH
-16	:	Vertical V-Component Shear	:	s-1	:	VVCSH
-17	:	Momentum Flux, U-Component	:	N m-2	:	UFLX
-18	:	Momentum Flux, V-Component	:	N m-2	:	VFLX
-19	:	Wind Mixing Energy	:	J	:	WMIXE
-20	:	Boundary Layer Dissipation	:	W m-2	:	BLYDP
-21	:	Maximum Wind Speed *	:	m s-1	:	MAXGUST
-22	:	Wind Speed (Gust)	:	m s-1	:	GUST
-23	:	U-Component of Wind (Gust)	:	m s-1	:	UGUST
-24	:	V-Component of Wind (Gust)	:	m s-1	:	VGUST
-25	:	Vertical Speed Shear	:	s-1	:	VWSH
-26	:	Horizontal Momentum Flux	:	N m-2	:	MFLX
-27	:	U-Component Storm Motion	:	m s-1	:	USTM
-28	:	V-Component Storm Motion	:	m s-1	:	VSTM
-29	:	Drag Coefficient	:	Numeric	:	CD
-30	:	Frictional Velocity	: 	m s-1	:	FRICV
-31	:	Turbulent Diffusion Coefficient for Momentum	:	m2 s-1	:	TDCMOM
-32	:	Eta Coordinate Vertical Velocity	:	s-1	:	ETACVV
-33	:	Wind Fetch	:	m	:	WINDF
-34	:	Normal Wind Component	:	m s-1	:	NWIND
-35	:	Tangential Wind Component	:	m s-1	:	TWIND
-36	:	Amplitude Function for Rossby Wave Envelope for Meridional Wind	:	m s^-1	:	AFRWE
-37	:	Northward Turbulent Surface Stress	:	N m-2 s	:	NTSS
-38	:	Eastward Turbulent Surface Stress	:	N m-2 s	:	ETSS
-39	:	Eastward Wind Tendency Due to Parameterizations	:	m s-2	:	EWTPARM
-40	:	Northward Wind Tendency Due to Parameterizations	:	m s-2	:	NWTPARM
-41	:	U-Component of Geostrophic Wind	:	m s-1	:	UGWIND
-42	:	V-Component of Geostrophic Wind	:	m s-1	:	VGWIND
-43	:	Geostrophic Wind Direction	:	degree true	:	GEOWD
-44	:	Geostrophic Wind Speed	:	m s-1	:	GEOWS
-45	:	Unbalanced Component of Divergence	:	s-1	:	UNDIV
-46	:	Vorticity Advection	:	s-2	:	VORTADV
-192	:	Vertical Speed Shear	:	s-1	:	VWSH
-193	:	Horizontal Momentum Flux	:	N m-2	:	MFLX
-194	:	U-Component Storm Motion	:	m s-1	:	USTM
-195	:	V-Component Storm Motion	:	m s-1	:	VSTM
-196	:	Drag Coefficient	:	non-dim	:	CD
-197	:	Frictional Velocity	:	m s-1	:	FRICV
-198	:	Latitude of U Wind Component of Velocity	:	deg	:	LAUV
-199	:	Longitude of U Wind Component of Velocity	:	deg	:	LOUV
-200	:	Latitude of V Wind Component of Velocity	:	deg	:	LAVV
-201	:	Longitude of V Wind Component of Velocity	:	deg	:	LOVV
-202	:	Latitude of Presure Point	:	deg	:	LAPP
-203	:	Longitude of Presure Point	:	deg	:	LOPP
-204	:	Vertical Eddy Diffusivity Heat exchange	:	m2 s-1	:	VEDH
-205	:	Covariance between Meridional and Zonal Components of the wind.	:	m2 s-2	:	COVMZ
-206	:	Covariance between Temperature and Zonal Components of the wind.	:	K*m s-1	:	COVTZ
-207	:	Covariance between Temperature and Meridional Components of the wind.	:	K*m s-1	:	COVTM
-208	:	Vertical Diffusion Zonal Acceleration	:	m s-2	:	VDFUA
-209	:	Vertical Diffusion Meridional Acceleration	:	m s-2	:	VDFVA
-210	:	Gravity wave drag zonal acceleration	:	m s-2	:	GWDU
-211	:	Gravity wave drag meridional acceleration	:	m s-2	:	GWDV
-212	:	Convective zonal momentum mixing acceleration	:	m s-2	:	CNVU
-213	:	Convective meridional momentum mixing acceleration	:	m s-2	:	CNVV
-214	:	Tendency of vertical velocity	:	m s-2	:	WTEND
-215	:	Omega (Dp/Dt) divide by density	:	K	:	OMGALF
-216	:	Convective Gravity wave drag zonal acceleration	:	m s-2	:	CNGWDU
-217	:	Convective Gravity wave drag meridional acceleration	:	m s-2	:	CNGWDV
-218	:	Velocity Point Model Surface	:		:	LMV
-219	:	Potential Vorticity (Mass-Weighted)	:	1/s/m	:	PVMWW
-220	:	Hourly Maximum of Upward Vertical Velocity in the lowest 400hPa	:	m s-1	:	MAXUVV
-221	:	Hourly Maximum of Downward Vertical Velocity in the lowest 400hPa	:	m s-1	:	MAXDVV
-222	:	U Component of Hourly Maximum 10m Wind Speed	:	m s-1	:	MAXUW
-223	:	V Component of Hourly Maximum 10m Wind Speed	:	m s-1	:	MAXVW
-224	:	Ventilation Rate	:	m2 s-1	:	VRATE
+0		:	Wind Direction (from which blowing)										:	degrees true	:	WDIR
+1		:	Wind Speed																:	m s-1			:	WIND
+2		:	U-Component of Wind														:	m s-1			:	UGRD
+3		:	V-Component of Wind														:	m s-1			:	VGRD
+4		:	Stream Function															:	m2 s-1			:	STRM
+5		:	Velocity Potential														:	m2 s-1			:	VPOT
+6		:	Montgomery Stream Function												:	m2 s-2			:	MNTSF
+7		:	Sigma Coordinate Vertical Velocity										:	s-1				:	SGCVV
+8		:	Vertical Velocity (Pressure)											:	Pa s-1			:	VVEL
+9		:	Vertical Velocity (Geometric)											: 	m s-1			:	DZDT
+10		:	Absolute Vorticity														:	s-1				:	ABSV
+11		:	Absolute Divergence														:	s-1				:	ABSD
+12		:	Relative Vorticity														:	s-1				:	RELV
+13		:	Relative Divergence														:	s-1				:	RELD
+14		:	Potential Vorticity														:	K m2 kg-1 s-1	:	PVORT
+15		:	Vertical U-Component Shear												:	s-1				:	VUCSH
+16		:	Vertical V-Component Shear												:	s-1				:	VVCSH
+17		:	Momentum Flux, U-Component												:	N m-2			:	UFLX
+18		:	Momentum Flux, V-Component												:	N m-2			:	VFLX
+19		:	Wind Mixing Energy														:	J				:	WMIXE
+20		:	Boundary Layer Dissipation												:	W m-2			:	BLYDP
+21		:	Maximum Wind Speed *													:	m s-1			:	MAXGUST
+22		:	Wind Speed (Gust)														:	m s-1			:	GUST
+23		:	U-Component of Wind (Gust)												:	m s-1			:	UGUST
+24		:	V-Component of Wind (Gust)												:	m s-1			:	VGUST
+25		:	Vertical Speed Shear													:	s-1				:	VWSH
+26		:	Horizontal Momentum Flux												:	N m-2			:	MFLX
+27		:	U-Component Storm Motion												:	m s-1			:	USTM
+28		:	V-Component Storm Motion												:	m s-1			:	VSTM
+29		:	Drag Coefficient														:	Numeric			:	CD
+30		:	Frictional Velocity														: 	m s-1			:	FRICV
+31		:	Turbulent Diffusion Coefficient for Momentum							:	m2 s-1			:	TDCMOM
+32		:	Eta Coordinate Vertical Velocity										:	s-1				:	ETACVV
+33		:	Wind Fetch																:	m				:	WINDF
+34		:	Normal Wind Component													:	m s-1			:	NWIND
+35		:	Tangential Wind Component												:	m s-1			:	TWIND
+36		:	Amplitude Function for Rossby Wave Envelope for Meridional Wind			:	m s^-1			:	AFRWE
+37		:	Northward Turbulent Surface Stress										:	N m-2 s			:	NTSS
+38		:	Eastward Turbulent Surface Stress										:	N m-2 s			:	ETSS
+39		:	Eastward Wind Tendency Due to Parameterizations							:	m s-2			:	EWTPARM
+40		:	Northward Wind Tendency Due to Parameterizations						:	m s-2			:	NWTPARM
+41		:	U-Component of Geostrophic Wind											:	m s-1			:	UGWIND
+42		:	V-Component of Geostrophic Wind											:	m s-1			:	VGWIND
+43		:	Geostrophic Wind Direction												:	degree true		:	GEOWD
+44		:	Geostrophic Wind Speed													:	m s-1			:	GEOWS
+45		:	Unbalanced Component of Divergence										:	s-1				:	UNDIV
+46		:	Vorticity Advection														:	s-2				:	VORTADV
+47-191	:	Reserved																:					:	RESERVED
+192		:	Vertical Speed Shear													:	s-1				:	VWSH
+193		:	Horizontal Momentum Flux												:	N m-2			:	MFLX
+194		:	U-Component Storm Motion												:	m s-1			:	USTM
+195		:	V-Component Storm Motion												:	m s-1			:	VSTM
+196		:	Drag Coefficient														:	non-dim			:	CD
+197		:	Frictional Velocity														:	m s-1			:	FRICV
+198		:	Latitude of U Wind Component of Velocity								:	deg				:	LAUV
+199		:	Longitude of U Wind Component of Velocity								:	deg				:	LOUV
+200		:	Latitude of V Wind Component of Velocity								:	deg				:	LAVV
+201		:	Longitude of V Wind Component of Velocity								:	deg				:	LOVV
+202		:	Latitude of Presure Point												:	deg				:	LAPP
+203		:	Longitude of Presure Point												:	deg				:	LOPP
+204		:	Vertical Eddy Diffusivity Heat exchange									:	m2 s-1			:	VEDH
+205		:	Covariance between Meridional and Zonal Components of the wind.			:	m2 s-2			:	COVMZ
+206		:	Covariance between Temperature and Zonal Components of the wind.		:	K*m s-1			:	COVTZ
+207		:	Covariance between Temperature and Meridional Components of the wind.	:	K*m s-1			:	COVTM
+208		:	Vertical Diffusion Zonal Acceleration									:	m s-2			:	VDFUA
+209		:	Vertical Diffusion Meridional Acceleration								:	m s-2			:	VDFVA
+210		:	Gravity wave drag zonal acceleration									:	m s-2			:	GWDU
+211		:	Gravity wave drag meridional acceleration								:	m s-2			:	GWDV
+212		:	Convective zonal momentum mixing acceleration							:	m s-2			:	CNVU
+213		:	Convective meridional momentum mixing acceleration						:	m s-2			:	CNVV
+214		:	Tendency of vertical velocity											:	m s-2			:	WTEND
+215		:	Omega (Dp/Dt) divide by density											:	K				:	OMGALF
+216		:	Convective Gravity wave drag zonal acceleration							:	m s-2			:	CNGWDU
+217		:	Convective Gravity wave drag meridional acceleration					:	m s-2			:	CNGWDV
+218		:	Velocity Point Model Surface											:					:	LMV
+219		:	Potential Vorticity (Mass-Weighted)										:	1/s/m			:	PVMWW
+220		:	Hourly Maximum of Upward Vertical Velocity in the lowest 400hPa			:	m s-1			:	MAXUVV
+221		:	Hourly Maximum of Downward Vertical Velocity in the lowest 400hPa		:	m s-1			:	MAXDVV
+222		:	U Component of Hourly Maximum 10m Wind Speed							:	m s-1			:	MAXUW
+223		:	V Component of Hourly Maximum 10m Wind Speed							:	m s-1			:	MAXVW
+224		:	Ventilation Rate														:	m2 s-1			:	VRATE
+225		:	Transport Wind Speed													: 	m s-1			:	TRWSPD
+226		:	Transport Wind Direction												:	Deg				:	TRWDIR
+227		:	Earliest Reasonable Arrival Time (10% exceedance)						:	s				:	TOA10
+228		:	Most Likely Arrival Time (50% exceedance)								:	s				:	TOA50
+229		:	Most Likely Departure Time (50% exceedance)								:	s				:	TOD50
+230		:	Latest Reasonable Departure Time (90% exceedance)						:	s				:	TOD90
+231		:	Tropical Wind Direction													:	°				:	TPWDIR
+232		:	Tropical Wind Speed														:	m s-1			:	TPWSPD
+233		:	Inflow Based (ESFC) to 50% EL Shear Magnitude							:	kt				:	ESHR
+234		:	U Component Inflow Based to 50% EL Shear Vector							:	kt				:	UESH
+235		:	V Component Inflow Based to 50% EL Shear Vector							:	kt				:	VESH
+236		:	U Component Bunkers Effective Right Motion								:	kt				:	UEID
+237		:	V Component Bunkers Effective Right Motion								:	kt				:	VEID
+255		:	Missing																	:					:	MISSING
