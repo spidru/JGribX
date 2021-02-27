@@ -14,6 +14,7 @@ import mt.edu.um.cf2.jgribx.GribInputStream
 import mt.edu.um.cf2.jgribx.GribOutputStream
 import mt.edu.um.cf2.jgribx.NoValidGribException
 import mt.edu.um.cf2.jgribx.NotSupportedException
+import mt.edu.um.cf2.jgribx.api.GribGridDefinitionSectionInternal
 
 /**
  * ### [SSection 2: Grid description section](https://apps.ecmwf.int/codes/grib/format/grib1/sections/2/)
@@ -92,7 +93,7 @@ import mt.edu.um.cf2.jgribx.NotSupportedException
  */
 abstract class Grib1RecordGDS(
 		internal val numberOfVerticalCoordinateValues: Int,
-		internal val pvlLocation: Int) : Grib1Section {
+		internal val pvlLocation: Int) : Grib1Section, GribGridDefinitionSectionInternal {
 
 	companion object {
 		/** Radius of earth used in calculating projections per table 7 - assumes spheroid */
@@ -150,15 +151,6 @@ abstract class Grib1RecordGDS(
 	// rdg - the remaining coordinates are not common to all types, and as such
 	//    should be removed.  They are left here (temporarily) for continuity.
 	//    These should be implemented in a GribGDSxxxx child class.
-
-	/** Get all longitide coordinates */
-	abstract val xCoords: DoubleArray
-
-	/** Get all latitude coordinates */
-	abstract val yCoords: DoubleArray
-
-	/** Get grid coordinates in longitude/latitude */
-	abstract val gridCoords: DoubleArray
 
 	/**
 	 * Table J.Resolution and Component Flags,

@@ -12,6 +12,7 @@ package mt.edu.um.cf2.jgribx.grib1
 
 import mt.edu.um.cf2.jgribx.*
 import kotlin.math.abs
+import kotlin.math.roundToInt
 
 /**
  * ### [Grid 0: Latitude/longitude grid or equidistant cylindrical, or Plate Carrée](https://apps.ecmwf.int/codes/grib/format/grib1/grids/0/)
@@ -173,7 +174,6 @@ open class Grib1GDSLatLon(numberOfVerticalCoordinateValues: Int,
 	override val isUVEastNorth: Boolean
 		get() = resolutionAndComponentFlags and 0x08 == 0
 
-	/** Longitude coordinates converted to the range +/- 180 */
 	override val xCoords: DoubleArray
 		get() = getXCoords(true)
 
@@ -193,7 +193,6 @@ open class Grib1GDSLatLon(numberOfVerticalCoordinateValues: Int,
 		return coords
 	}
 
-	/** Get all latitude coordinates */
 	override val yCoords: DoubleArray
 		get() {
 			val coords = DoubleArray(gridNj)
@@ -205,15 +204,9 @@ open class Grib1GDSLatLon(numberOfVerticalCoordinateValues: Int,
 			return coords
 		}// move x-coordinates to the range -180..180
 
-	/**
-	 * Get grid coordinates in longitude/latitude pairs Longitude is returned in the range +/- 180 degrees
-	 *
-	 * @see Grib1RecordGDS.gridCoords
-	 * @return longitide/latituide as doubles
-	 */
-	override val gridCoords: DoubleArray
+	override val coords: Array<DoubleArray>
 		get() {
-			val coords = DoubleArray(gridNj * gridNi * 2)
+			val coords = Array(gridNj * gridNi) { DoubleArray(2) }
 			var k = 0
 			for (y in 0 until gridNj) {
 				for (x in 0 until gridNi) {
@@ -225,12 +218,30 @@ open class Grib1GDSLatLon(numberOfVerticalCoordinateValues: Int,
 					if (longi < -180.0) longi += 360.0
 					if (lati > 90.0 || lati < -90.0) Logger.error(
 							"GribGDSLatLon.getGridCoords: latitude out of range (-90 to 90).")
-					coords[k++] = longi
-					coords[k++] = lati
+					coords[k][0] = longi
+					coords[k][1] = lati
+					k++
 				}
 			}
 			return coords
 		}
+
+	override val dataIndices: Sequence<Int>
+		get() = generateSequence(0 to 0) { (i, _) -> (i + 1) to getDataIndex(i + 1) }
+				.take(gridNi * gridNj)
+				.map { (_, index) -> index }
+
+	override fun getDataIndex(sequence: Int) = getDataIndex(sequence % gridNi, sequence / gridNi)
+
+	override fun getDataIndex(latitude: Double, longitude: Double): Int {
+		val i = ((longitude - longitudeOfFirstGridPoint) / iDirectionIncrement).roundToInt()
+		val j = ((latitude - latitudeOfFirstGridPoint) / jDirectionIncrement).roundToInt()
+		return getDataIndex(i, j)
+	}
+
+	// Adjacent points in i direction are consecutive
+	private fun getDataIndex(i: Int, j: Int): Int = if (scanningMode and 0x20 != 0x20)
+		gridNi * j + i else gridNj * i + j
 
 	// Attributes for Lat/Lon grid not included in GribRecordGDS
 	// None!  The Lat/Lon grid is the most basic, and all attributes match

@@ -39,5 +39,9 @@ interface GribMessage {
 	/** List of GRIB records */
 	val records: List<GribRecord>
 
+	/** @see GribRecord.cutOut */
+	fun cutOut(north: Double, east: Double, south: Double, west: Double) = records
+			.forEach { it.cutOut(north, east, south, west) }
+
 	fun writeTo(gribOutputStream: GribOutputStream)
 }

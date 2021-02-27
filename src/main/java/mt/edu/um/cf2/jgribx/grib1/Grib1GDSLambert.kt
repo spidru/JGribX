@@ -300,6 +300,13 @@ class Grib1GDSLambert(numberOfVerticalCoordinateValues: Int,
 			return xCoords
 		}
 
+	override val dataIndices: Sequence<Int>
+		get() = TODO("Not yet implemented")
+
+	override fun getDataIndex(sequence: Int): Int = TODO("Not yet implemented")
+
+	override fun getDataIndex(latitude: Double, longitude: Double): Int = TODO("Not yet implemented")
+
 	/**
 	 * Get y Axis grid coordinates
 	 * @returns latitude as double
@@ -330,7 +337,7 @@ class Grib1GDSLambert(numberOfVerticalCoordinateValues: Int,
 			return yCoords
 		}
 
-	override val gridCoords: DoubleArray
+	override val coords: Array<DoubleArray>
 		get() {
 			var rho: Double
 			var theta: Double
@@ -348,7 +355,7 @@ class Grib1GDSLambert(numberOfVerticalCoordinateValues: Int,
 			//latin2r = Math.toRadians(grid_latin2);
 
 			// need space for a lat and lon for each grid point
-			val coords = DoubleArray(gridNy * gridNx * 2)
+			val coords = Array(gridNy * gridNx) { DoubleArray(2) }
 
 			// compute the lat and lon for each grid point
 			// note - grid points are NOT the indices of the arrays, they are computed
@@ -372,8 +379,9 @@ class Grib1GDSLambert(numberOfVerticalCoordinateValues: Int,
 					if (lon < -180.0) lon += 360.0
 					if (lat > 90.0 || lat < -90.0) Logger.error("GribGDSLambert: latitude out of range (-90 to 90).")
 					//coords[gridNx * y + x] =
-					coords[k++] = lon
-					coords[k++] = lat
+					coords[k][0] = lon
+					coords[k][1] = lat
+					k++
 				}
 			}
 			return coords

@@ -13,6 +13,7 @@ package mt.edu.um.cf2.jgribx
 import mt.edu.um.cf2.jgribx.GribCodes.getCentreName
 import mt.edu.um.cf2.jgribx.GribCodes.getProcessName
 import mt.edu.um.cf2.jgribx.api.GribMessage
+import mt.edu.um.cf2.jgribx.api.GribRecord
 import java.io.BufferedInputStream
 import java.io.FileInputStream
 import java.io.InputStream
@@ -269,6 +270,10 @@ class GribFile(gribInputStream: GribInputStream) {
 			out.println("\t${simpleDateFormat.format(date.time)}")
 		}
 	}
+
+	/** @see GribRecord.cutOut */
+	fun cutOut(north: Double, east: Double, south: Double, west: Double) = messages
+			.forEach { it.cutOut(north, east, south, west) }
 
 	override fun toString(): String = "GRIB file (${recordCount} records)"
 }

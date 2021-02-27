@@ -42,7 +42,7 @@ import kotlin.math.roundToInt
  * @param binaryScaleFactor (`5-6`)   Scale factor (E)
  * @param referenceValue    (`7-10`)  Reference value (minimum of packed values)
  * @param bitsPerValue      (`11`)    Number of bits containing each packed value
- * @param values            (`12-nn`) Variable, depending on the flag value in octet 4
+ * @param data              (`12-nn`) Variable, depending on the flag value in octet 4
  *
  * @throws java.io.IOException If stream can not be opened etc.
  * @throws NotSupportedException If a required feature is not supported
@@ -58,7 +58,7 @@ class Grib1RecordBDS(
 		private val binaryScaleFactor: Int,
 		internal val referenceValue: Float,
 		private val bitsPerValue: Int,
-		internal val values: FloatArray) : Grib1Section {
+		private val data: FloatArray) : Grib1Section {
 	companion object {
 		/** Constant value for an undefined grid value. */
 		private const val UNDEFINED = 99999e20f
@@ -97,35 +97,43 @@ class Grib1RecordBDS(
 			// *** read values ************************************************************
 			val ref = (10.0.pow(-decimalScale.toDouble()) * referenceValue).toFloat()
 			val scale = (10.0.pow(-decimalScale.toDouble()) * 2.0.pow(binaryScaleFactor.toDouble())).toFloat()
-			val values: FloatArray
+			val data: FloatArray
 			if (bms != null) {
 				val bitmap: BooleanArray = bms.bitmap
-				values = FloatArray(bitmap.size)
+				data = FloatArray(bitmap.size)
 				bitmap.indices.forEach { i ->
 					if (bitmap[i]) {
 						if (!isConstant) {
-							values[i] = ref + scale * gribInputStream.readUBits(bitsPerValue)
+							data[i] = ref + scale * gribInputStream.readUBits(bitsPerValue)
 						} else { // rdg - added this to handle a constant valued parameter
-							values[i] = ref
+							data[i] = ref
 						}
-					} else values[i] = UNDEFINED
+					} else data[i] = UNDEFINED
 				}
 			} else {
 				if (!isConstant) {
-					values = FloatArray(((length - 11) * 8 - unusedBits) / bitsPerValue)
-					values.indices.forEach { i ->
+					data = FloatArray(((length - 11) * 8 - unusedBits) / bitsPerValue)
+					data.indices.forEach { i ->
 						val byte = gribInputStream.readUBits(bitsPerValue)
-						values[i] = ref + scale * byte
+						data[i] = ref + scale * byte
 					}
 				} else {
 					// constant valued - same min and max
-					values = FloatArray(gds.gridCols * gds.gridRows)
-					Arrays.fill(values, ref)
+					data = FloatArray(gds.gridCols * gds.gridRows)
+					Arrays.fill(data, ref)
 				}
 			}
 			gribInputStream.seekNextByte()
 			gribInputStream.skip((unusedBits / 8).toLong())
-			return Grib1RecordBDS(pds, gds, bms, dataFlag, binaryScaleFactor, referenceValue, bitsPerValue, values)
+
+			// rdg - added the check for a constant field - otherwise this fails
+			if (!isConstant && data.size != gds.gridCols * gds.gridRows) {
+				Logger.error("Grid should contain" +
+						" ${gds.gridCols} * ${gds.gridRows} = ${gds.gridCols * gds.gridRows} values." +
+						" But BDS section delivers only ${data.size}.")
+			}
+
+			return Grib1RecordBDS(pds, gds, bms, dataFlag, binaryScaleFactor, referenceValue, bitsPerValue, data)
 					.takeIf { it.length == length }
 					?: throw NoValidGribException("BDS length mismatch")
 		}
@@ -133,7 +141,7 @@ class Grib1RecordBDS(
 
 	/** Length in bytes of this BDS. */
 	override val length: Int
-		get() = 11 + ceil(values.size * bitsPerValue / 8.0).toInt() + (dataFlag and 15) / 8
+		get() = 11 + ceil(data.size * bitsPerValue / 8.0).toInt() + (dataFlag and 15) / 8
 
 	/**
 	 * rdg - added this to prevent a divide by zero error if variable data empty
@@ -146,22 +154,24 @@ class Grib1RecordBDS(
 
 
 	private val minValue: Float
-		get() = values.minOrNull() ?: -Float.MAX_VALUE
+		get() = data.minOrNull() ?: -Float.MAX_VALUE
 
 	private val maxValue: Float
-		get() = values.maxOrNull() ?: Float.MAX_VALUE
+		get() = data.maxOrNull() ?: Float.MAX_VALUE
 
 	/**
-	 * Get data/parameter value as a float.
-	 * @param index
+	 * Data values ordered with the defined [grid][mt.edu.um.cf2.jgribx.grib2.Grib2RecordDS.gds].
 	 *
-	 * @return  array of parameter values
-	 * @throws NoValidGribException
+	 * Since this iterates over data and instantiates an new array on every call it should only be use when one
+	 * needs the while data for sequential access. For random access use one of the
+	 * [mt.edu.um.cf2.jgribx.grib2.Grib2RecordDS.getValue] methods.
 	 */
-	fun getValue(index: Int): Float {
-		if (index >= 0 && index < values.size) return values[index]
-		throw NoValidGribException("GribRecordBDS: Array index out of bounds")
-	}
+	internal val values: FloatArray
+		get() = gds.dataIndices.map { data[it] }.toList().toFloatArray()
+
+	internal fun getValue(sequence: Int) = gds.getDataIndex(sequence).let { data[it] }
+
+	internal fun getValue(latitude: Double, longitude: Double): Float = gds.getDataIndex(latitude, longitude).let { data[it] }
 
 	override fun writeTo(outputStream: GribOutputStream) {
 		super.writeTo(outputStream)  // [1-3] length
@@ -173,7 +183,7 @@ class Grib1RecordBDS(
 		val decimalScale = pds.decimalScale
 		val ref = (10.0.pow(-decimalScale.toDouble()) * referenceValue)
 		val scale = (10.0.pow(-decimalScale.toDouble()) * 2.0.pow(binaryScaleFactor.toDouble()))
-		values.forEachIndexed { i, value ->
+		data.forEach { value ->
 			val byte = ((value.toDouble() - ref) / scale).roundToInt()
 			outputStream.writeUBits(byte, numBits = bitsPerValue)  // [12-nn]
 		}
@@ -189,8 +199,8 @@ class Grib1RecordBDS(
 			&& binaryScaleFactor == other.binaryScaleFactor
 			&& referenceValue == other.referenceValue
 			&& bitsPerValue == other.bitsPerValue
-			&& values
-			.mapIndexed { i, value -> value to other.values.getOrNull(i) }
+			&& data
+			.mapIndexed { i, value -> value to other.data.getOrNull(i) }
 			.all { (a, b) -> b != null && abs(a - b) < FLOAT_PRECISION }
 
 	override fun hashCode(): Int {
@@ -199,7 +209,7 @@ class Grib1RecordBDS(
 		result = 31 * result + binaryScaleFactor
 		result = 31 * result + referenceValue.hashCode()
 		result = 31 * result + bitsPerValue
-		result = 31 * result + values.contentHashCode()
+		result = 31 * result + data.contentHashCode()
 		return result
 	}
 
@@ -210,6 +220,6 @@ class Grib1RecordBDS(
 			"\tIs a constant: ${isConstant}",
 			"\tBinary scale: ${binaryScaleFactor}",
 			"\tNumber of bits: ${bitsPerValue}",
-			"\tData: ${values.joinToString(", ")}")
+			"\tData: ${data.joinToString(", ")}")
 			.joinToString("\n")
 }

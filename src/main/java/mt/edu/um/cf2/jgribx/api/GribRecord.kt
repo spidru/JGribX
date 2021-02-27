@@ -8,8 +8,9 @@
  * Licensed under MIT: https://github.com/spidru/JGribX/blob/master/LICENSE
  * ============================================================================
  */
-package mt.edu.um.cf2.jgribx
+package mt.edu.um.cf2.jgribx.api
 
+import mt.edu.um.cf2.jgribx.GribRecordIS
 import java.util.*
 
 /**
@@ -18,24 +19,42 @@ import java.util.*
  * [GRIB message][mt.edu.um.cf2.jgribx.api.GribMessage]. Currently GRIB1 supports exactly one records per message while
  * GRIB2 supports multiple records per message due to possible repetitions of sections 2 to 7, 3 to 7, or 4 to 7.
  *
- * @param indicatorSection [Section 0: Indicator Section](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_sect0.shtml)
  * @author Jan Kubovy [jan@kubovy.eu]
  */
-abstract class GribRecord(val indicatorSection: GribRecordIS) {
+interface GribRecord {
+	/** [Section 0: Indicator Section](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_sect0.shtml) */
+	val indicatorSection: GribRecordIS
+	val gridDefinitionSection: GribGridDefinitionSection
+
 	/** Returns the ID corresponding to the originating centre. */
-	abstract val centreId: Int
-	abstract val forecastTime: Calendar
-	abstract val levelCode: String
-	abstract val levelDescription: String
+	val centreId: Int
+	val forecastTime: Calendar
+	val levelCode: String
+	val levelDescription: String
 
 	/** Returns the unique ID for the level code and value combination. */
-	abstract val levelIdentifier: String
-	abstract val levelValues: FloatArray
-	abstract val parameterCode: String
-	abstract val parameterDescription: String
+	val levelIdentifier: String
+	val levelValues: FloatArray
+	val parameterCode: String
+	val parameterDescription: String
 
 	/** Returns the ID corresponding to the generating process. */
-	abstract val processId: Int
-	abstract val referenceTime: Calendar
-	abstract fun getValue(latitude: Double, longitude: Double): Double
+	val processId: Int
+	val referenceTime: Calendar
+
+	val values: FloatArray
+
+	fun getValue(sequence: Int): Float
+
+	fun getValue(latitude: Double, longitude: Double): Float
+
+	/**
+	 * Cut a bounding box from grid. The defined bounding box must be inside the grid.
+	 *
+	 * @param north Northern latitude of the cutout
+	 * @param east Eastern longitude of the cutout
+	 * @param south Southern latitude of the cutout
+	 * @param west Western longitude of the cutout
+	 */
+	fun cutOut(north: Double, east: Double, south: Double, west: Double)
 }

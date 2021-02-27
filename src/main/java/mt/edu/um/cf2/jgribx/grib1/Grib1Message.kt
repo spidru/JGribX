@@ -12,9 +12,9 @@ package mt.edu.um.cf2.jgribx.grib1
 
 import mt.edu.um.cf2.jgribx.*
 import mt.edu.um.cf2.jgribx.api.GribMessage
+import mt.edu.um.cf2.jgribx.api.GribRecord
 import java.io.IOException
 import java.util.*
-import kotlin.math.roundToInt
 
 /**
  * A class representing a single GRIB message (and record). A GRIB message consists of five sections:
@@ -35,12 +35,12 @@ import kotlin.math.roundToInt
  * @author Benjamin Stark
  * @author Jan Kubovy [jan@kubovy.eu]
  */
-class Grib1Message private constructor(indicatorSection: GribRecordIS,
+class Grib1Message private constructor(override val indicatorSection: GribRecordIS,
 									   private val productDefinitionSection: Grib1RecordPDS,
-									   private var gridDefinitionSection: Grib1RecordGDS,
+									   override var gridDefinitionSection: Grib1RecordGDS,
 									   private var bitmapSection: Grib1RecordBMS?,
 									   private var binaryDataSection: Grib1RecordBDS) :
-		GribRecord(indicatorSection), GribMessage {
+		GribRecord, GribMessage {
 
 	companion object {
 		/**
@@ -84,15 +84,6 @@ class Grib1Message private constructor(indicatorSection: GribRecordIS,
 			if (gribInputStream.byteCounter != binaryDataSection.length)
 				throw NoValidGribException("Incorrect BDS length")
 
-			// number of values
-			// rdg - added the check for a constant field - otherwise this fails
-			if (!binaryDataSection.isConstant
-					&& binaryDataSection.values.size != gridDefinitionSection.gridCols * gridDefinitionSection.gridRows) {
-				Logger.error("Grid should contain" +
-						" ${gridDefinitionSection.gridCols} * ${gridDefinitionSection.gridRows} =" +
-						" ${gridDefinitionSection.gridCols * gridDefinitionSection.gridRows} values.")
-				Logger.error("But BDS section delivers only ${binaryDataSection.values.size}.")
-			}
 			return Grib1Message(
 					indicatorSection,
 					productDefinitionSection,
@@ -125,19 +116,17 @@ class Grib1Message private constructor(indicatorSection: GribRecordIS,
 		get() = productDefinitionSection.processId
 
 	/** Get grid coordinates in longitude/latitude */
-	val gridCoords: DoubleArray
-		get() = gridDefinitionSection.gridCoords
+	val gridCoords: Array<DoubleArray>
+		get() = gridDefinitionSection.coords
 
 	/** Get data/parameter values as an array of float. */
-	val values: FloatArray
+	override val values: FloatArray
 		get() {
 			if (!binaryDataSection.isConstant) return binaryDataSection.values
 			val gridSize: Int = gridDefinitionSection.gridCols * gridDefinitionSection.gridRows
 			val values = FloatArray(gridSize)
 			val ref: Float = binaryDataSection.referenceValue
-			for (i in 0 until gridSize) {
-				values[i] = ref
-			}
+			for (i in 0 until gridSize) values[i] = ref
 			return values
 		}
 
@@ -164,39 +153,9 @@ class Grib1Message private constructor(indicatorSection: GribRecordIS,
 	override val referenceTime: Calendar
 		get() = productDefinitionSection.referenceTime
 
-	/**
-	 * Get a single value from the BDS using i/x, j/y index.
-	 *
-	 * Retrieves using a row major indexing.
-	 * @param i
-	 * @param j
-	 *
-	 * @return  array of parameter values
-	 * @throws NoValidGribException
-	 */
-	fun getValue(i: Int, j: Int): Float {
-		if (i >= 0 && i < gridDefinitionSection.gridCols && j >= 0 && j < gridDefinitionSection.gridRows) {
-			return binaryDataSection.getValue(gridDefinitionSection.gridCols * j + i)
-		}
-		throw NoValidGribException("GribRecord:  Array index out of bounds")
-	}
+	override fun getValue(sequence: Int): Float = binaryDataSection.getValue(sequence)
 
-	override fun getValue(latitude: Double, longitude: Double): Double {
-		var value = Double.NaN
-		val i = ((longitude - gridDefinitionSection.longitudeOfFirstGridPoint) / gridDefinitionSection.gridDeltaX).roundToInt()
-		val j = ((latitude - gridDefinitionSection.latitudeOfFirstGridPoint) / gridDefinitionSection.gridDeltaY).roundToInt()
-		try {
-			value = if (gridDefinitionSection.scanningMode and 0x20 != 0x20) {
-				// Adjacent points in i direction are consecutive
-				binaryDataSection.getValue(gridDefinitionSection.gridCols * j + i).toDouble()
-			} else {
-				binaryDataSection.getValue(gridDefinitionSection.gridRows * i + j).toDouble()
-			}
-		} catch (e: NoValidGribException) {
-			Logger.error("Cannot find a value for the given lat-long")
-		}
-		return value
-	}
+	override fun getValue(latitude: Double, longitude: Double): Float = binaryDataSection.getValue(latitude, longitude)
 
 	override fun toString(): String = listOfNotNull(
 			"GRIB1 record:",
@@ -215,4 +174,7 @@ class Grib1Message private constructor(indicatorSection: GribRecordIS,
 		binaryDataSection.writeTo(gribOutputStream)
 		GribRecordES(true).writeTo(gribOutputStream)
 	}
+
+	override fun cutOut(north: Double, east: Double, south: Double, west: Double) =
+			TODO("Not yet implemented")
 }
