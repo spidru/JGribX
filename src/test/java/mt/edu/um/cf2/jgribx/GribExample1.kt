@@ -105,7 +105,7 @@ object GribExample1 {
 			println("Reading file: $gribFilename")
 			println("GRIB Edition: " + gribFile.edition)
 			println("Records successfully read: " + nRecords + " of "
-					+ (nRecords + gribFile.recordsSkippedCount))
+					+ (nRecords + gribFile.messagesSkippedCount))
 			println("---------------------------------------")
 
 			// Print out originating centre info
