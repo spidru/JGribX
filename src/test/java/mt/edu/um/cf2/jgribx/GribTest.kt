@@ -63,6 +63,19 @@ class GribTest {
 	}
 
 	@Test
+	fun testGrib1OpenSkiron() {
+		val refTimes: MutableList<Calendar> = ArrayList()
+		refTimes.add(GregorianCalendar(2021, Calendar.FEBRUARY, 27, 0, 0, 0)
+				.apply { timeZone = TimeZone.getTimeZone("UTC") })
+		val url = GribTest::class.java.getResource("/Azov_SKIRON_270221.grb")
+		val file = GribFile(url.openStream())
+		Assert.assertEquals("GRIB edition", 1L, file.edition.toLong())
+		Assert.assertEquals("Reference time(s)", file.referenceTimes, refTimes)
+		Assert.assertArrayEquals("Weather centres", intArrayOf(7), file.centreIDs.toIntArray())
+		Assert.assertArrayEquals("Generating processes", intArrayOf(31), file.processIDs)
+	}
+
+	@Test
 	@Throws(IOException::class, NoValidGribException::class, NotSupportedException::class)
 	fun testGrib2Gfs3() {
 		/* TODO
@@ -84,14 +97,39 @@ class GribTest {
 
 		// Define expected data
 		val refTimes: MutableList<Calendar> = ArrayList()
-		refTimes.add(GregorianCalendar(2017, Calendar.MAY, 12, 0, 0, 0).also {
-			it.timeZone = TimeZone.getTimeZone("UTC")
-		})
+		refTimes.add(GregorianCalendar(2017, Calendar.MAY, 12, 0, 0, 0)
+				.apply { timeZone = TimeZone.getTimeZone("UTC") })
 		val url = GribTest::class.java.getResource("/gfsanl_3_20170512_0000_000.grb2")
 		val file = GribFile(url.openStream())
 		Assert.assertEquals("GRIB edition", 2L, file.edition.toLong())
 		Assert.assertEquals("Reference time(s)", file.referenceTimes, refTimes)
 		Assert.assertArrayEquals("Weather centres", intArrayOf(7), file.centreIDs.toIntArray())
 		Assert.assertArrayEquals("Generating processes", intArrayOf(81), file.processIDs)
+	}
+
+	@Test
+	fun testGrib2OpenSkironEuNest() {
+		val refTimes: MutableList<Calendar> = ArrayList()
+		refTimes.add(GregorianCalendar(2021, Calendar.FEBRUARY, 27, 0, 0, 0)
+				.apply { timeZone = TimeZone.getTimeZone("UTC") })
+		val url = GribTest::class.java.getResource("/North_Sea_NE_ICON_EU_EWAM_20210227-00.grb2")
+		val file = GribFile(url.openStream())
+		Assert.assertEquals("GRIB edition", 2L, file.edition.toLong())
+		Assert.assertEquals("Reference time(s)", file.referenceTimes, refTimes)
+		Assert.assertArrayEquals("Weather centres", intArrayOf(78), file.centreIDs.toIntArray())
+		Assert.assertArrayEquals("Generating processes", intArrayOf(2), file.processIDs)
+	}
+
+	@Test
+	fun testGrib2OpenSkironIconD2() {
+		val refTimes: MutableList<Calendar> = ArrayList()
+		refTimes.add(GregorianCalendar(2021, Calendar.FEBRUARY, 27, 0, 0, 0)
+				.apply { timeZone = TimeZone.getTimeZone("UTC") })
+		val url = GribTest::class.java.getResource("/Copenhagen_ICON-D2_EWAM_20210227-00.grb2")
+		val file = GribFile(url.openStream())
+		Assert.assertEquals("GRIB edition", 2L, file.edition.toLong())
+		Assert.assertEquals("Reference time(s)", file.referenceTimes, refTimes)
+		Assert.assertArrayEquals("Weather centres", intArrayOf(78), file.centreIDs.toIntArray())
+		Assert.assertArrayEquals("Generating processes", intArrayOf(11), file.processIDs)
 	}
 }

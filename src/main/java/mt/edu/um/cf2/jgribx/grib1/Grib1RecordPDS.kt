@@ -272,6 +272,7 @@ class Grib1RecordPDS internal constructor(gribInputStream: GribInputStream) {
 
 		// octets 13-17 (base time of forecast in UTC)
 		referenceTime = GregorianCalendar(100 * (century - 1) + centuryYear, month - 1, day, hour, minute)
+				.apply { timeZone = TimeZone.getTimeZone("UTC") }
 		when (timeUnit) {
 			10 -> {
 				p1 *= 3
@@ -364,13 +365,12 @@ class Grib1RecordPDS internal constructor(gribInputStream: GribInputStream) {
 		}
 
 		// octets 13-17 (time of forecast)
-		// All defined times are in UTC
-		localForecastTime = GregorianCalendar(TimeZone.getTimeZone("UTC")).apply {
-			set((century - 1) * 100 + year1, month1 - 1, day1, hour1, minute1)
-		}
-		forecastTime2 = GregorianCalendar(TimeZone.getTimeZone("UTC")).apply {
-			set((century - 1) * 100 + year2, month2 - 1, day2, hour2, minute2)
-		}
+		localForecastTime = GregorianCalendar(TimeZone.getTimeZone("UTC"))
+				.apply { timeZone = TimeZone.getTimeZone("UTC") }
+				.apply { set((century - 1) * 100 + year1, month1 - 1, day1, hour1, minute1) }
+		forecastTime2 = GregorianCalendar(TimeZone.getTimeZone("UTC"))
+				.apply { timeZone = TimeZone.getTimeZone("UTC") }
+				.apply { set((century - 1) * 100 + year2, month2 - 1, day2, hour2, minute2) }
 	}
 
 	/**
