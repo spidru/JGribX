@@ -13,7 +13,6 @@ package mt.edu.um.cf2.jgribx.grib2
 import mt.edu.um.cf2.jgribx.GribInputStream
 import mt.edu.um.cf2.jgribx.GribOutputStream
 import mt.edu.um.cf2.jgribx.NoValidGribException
-import mt.edu.um.cf2.jgribx.api.GribSection
 
 /**
  * ### [Section 2: Local use section](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_sect2.shtml)
@@ -29,12 +28,12 @@ import mt.edu.um.cf2.jgribx.api.GribSection
  * @author spidru
  * @author Jan Kubovy [jan@kubovy.eu]
  */
-class Grib2RecordLUS internal constructor(internal val data: ByteArray?) : GribSection {
+class Grib2RecordLUS internal constructor(internal val data: ByteArray?) : Grib2Section {
 
 	companion object {
 		internal fun readFromStream(gribInputStream: GribInputStream, readEntire: Boolean = false): Grib2RecordLUS {
 			/* [1-5] Length, section number */
-			val length = GribSection.readFromStream(gribInputStream, 2)
+			val length = Grib2Section.readFromStream(gribInputStream, 2)
 
 			/* [6-N] Local Use */
 			var data: ByteArray? = null

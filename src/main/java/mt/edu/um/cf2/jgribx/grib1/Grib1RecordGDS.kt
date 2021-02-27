@@ -10,12 +10,41 @@
  */
 package mt.edu.um.cf2.jgribx.grib1
 
-import mt.edu.um.cf2.jgribx.Bytes2Number
 import mt.edu.um.cf2.jgribx.GribInputStream
+import mt.edu.um.cf2.jgribx.GribOutputStream
+import mt.edu.um.cf2.jgribx.NoValidGribException
 import mt.edu.um.cf2.jgribx.NotSupportedException
 
 /**
- * A class that represents the grid definition section (GDS) of a GRIB record.
+ * ### [SSection 2: Grid description section](https://apps.ecmwf.int/codes/grib/format/grib1/sections/2/)
+ *
+ *     | Octets | # | Key                              | Type      | Content                                         |
+ *     |--------|---|----------------------------------|-----------|-------------------------------------------------|
+ *     | 1-3    | 3 | section4Length                   | unsigned  | Length of section                               |
+ *     | 4      | 1 | numberOfVerticalCoordinateValues | unsigned  | NV number of vertical coordinate parameters     |
+ *     | 5      | 1 | pvlLocation                      | unsigned  | PV location (octet number) of the list of       |
+ *     |        |   |                                  |           | vertical coordinate parameters, if present; or  |
+ *     |        |   |                                  |           | PL location (octet number) of the list of       |
+ *     |        |   |                                  |           | numbers of points in each row (if no vertical   |
+ *     |        |   |                                  |           | coordinate parameters are present), if present; |
+ *     |        |   |                                  |           | or 255 (all bits set to 1) if neither are       |
+ *     |        |   |                                  |           | present                                         |
+ *     | 6      | 1 | dataRepresentationType           | codetable | Data representation type (see Code table 6)     |
+ *     | 7-32   |   |                                  |           | Grid definition (according to data              |
+ *     |        |   |                                  |           | representation type octet 6 above)              |
+ *     | 33-42  |   |                                  |           | Extensions of grid definition for rotation or   |
+ *     |        |   |                                  |           | stretching of the coordinate system or Lambert  |
+ *     |        |   |                                  |           | conformal projection or Mercator projection     |
+ *     | 33-44  |   |                                  |           | Extensions of grid definition for space view    |
+ *     |        |   |                                  |           | perspective projection                          |
+ *     | 33-52  |   |                                  |           | Extensions of grid definition for stretched and |
+ *     |        |   |                                  |           | rotated coordinate system                       |
+ *
+ * - `PV`: List of vertical coordinate parameters (`length = NV × 4 octets`); if present, then `PL = 4NV + PV`
+ * - `PL`: List of numbers of points in each row (`length = NROWS x 2` octets, where `NROWS` is the total number of rows
+ *       defined within the grid description)
+ *
+ * See [Code Table 6: Data representation type ](https://apps.ecmwf.int/codes/grib/format/grib1/ctable/6/)
  *
  * 5 Okt 05 - Changed class to become abstract as intended by RDG all common methods between this class and all known
  * subclasses is changed to abstract methods, so it becomes more clear, which methods one should actually implement,
@@ -50,98 +79,77 @@ import mt.edu.um.cf2.jgribx.NotSupportedException
  * class - it's on the to do list), but use the GribGDS factory instead, and add new child classes (e.g. GribGDSXxxx)
  * as needed for additional grid_types.
  *
- * @author  Benjamin Stark
- * @author  Capt Richard D. Gonzalez, USAF (Modified original code)
- * @author  Peter Gylling <peg at frv.dk> (Made class abstract)</peg>
- * @version 3.0
+ * @param numberOfVerticalCoordinateValues (`4`) NV number of vertical coordinate parameters
+ * @param pvlLocation                      (`5`) PV location (octet number) of the list of vertical coordinate
+ *                                               parameters, if present; or PL location (octet number) of the list of
+ *                                               numbers of points in each row (if no vertical coordinate parameters
+ *                                               are present), if present; or 255 (all bits set to 1) if neither are
+ *                                               present
+ * @author Benjamin Stark
+ * @author Capt Richard D. Gonzalez, USAF (Modified original code)
+ * @author Peter Gylling <peg at frv.dk> (Made class abstract)</peg>
+ * @author Jan Kubovy [jan@kubovy.eu]
  */
-abstract class Grib1RecordGDS {
+abstract class Grib1RecordGDS(
+		internal val numberOfVerticalCoordinateValues: Int,
+		internal val pvlLocation: Int) : Grib1Section {
+
 	companion object {
 		/** Radius of earth used in calculating projections per table 7 - assumes spheroid */
 		internal const val EARTH_RADIUS = 6367470.0
 
-		fun readFromStream(inputStream: GribInputStream): Grib1RecordGDS {
-			inputStream.mark(6)
-			inputStream.skip(5)
-			val type = inputStream.readUINT(1)
-			inputStream.reset()
-			return when (type) {
-				0 -> Grib1GDSLatLon(inputStream)
+		fun readFromStream(gribInputStream: GribInputStream): Grib1RecordGDS {
+			// octets 1-3 (GDS section length)
+			val length = Grib1Section.readFromStream(gribInputStream)
+
+			// [4] NV -- number of vertical coordinate parameters */
+			val numberOfVerticalCoordinateValues = gribInputStream.readUINT(1)
+
+			// [5] PV -- location (octet number) of the list of vertical coordinate parameters, if present; or
+			//     PL -- location (octet number) of the list of numbers of points in each row (if no vertical coordinate parameters are present), if present; or
+			//     255 (all bits set to 1) if neither are present
+			val pvlLocation = gribInputStream.readUINT(1)
+
+			// [6] Data representation type
+			val dataRepresentationType = gribInputStream.readUINT(1)
+			return when (dataRepresentationType) {
+				0 -> Grib1GDSLatLon.readFromStream(gribInputStream, numberOfVerticalCoordinateValues, pvlLocation)
 				1 -> throw NotSupportedException("Mercator projection is not yet supported")
-				else -> throw NotSupportedException("Unknown GDS type: ${type}")
-			}
+				//3 -> Grib1GDSLambert.readFromStream(gribInputStream, numberOfVerticalCoordinateValues, pvlLocation)
+				//5 -> Grib1GDSPolarStereo.readFromStream(gribInputStream, numberOfVerticalCoordinateValues, pvlLocation)
+				10 -> Grib1GDSRotatedLatLon.readFromStream(gribInputStream, numberOfVerticalCoordinateValues, pvlLocation)
+				else -> throw NotSupportedException("Unknown GDS type: ${dataRepresentationType}")
+			}.takeIf { it.length == length } ?: throw NoValidGribException("GRS length mismatch")
 		}
 	}
 
-	protected var latitudeFirst = 0.0
-	protected var latitudeLast = 0.0
-	protected var longitudeFirst = 0.0
-	protected var longitudeLast = 0.0
-	protected var nDataPoints = 0
-
-	/** Length in bytes of this section. */
-	var length: Int
-		protected set
-
-	/** Type of grid (See table 6) */
-	var gridType: Int = 0
-		private set
+	/** (`6`) Type of grid (See table 6) */
+	abstract val dataRepresentationType: Int
 
 	/** Number of grid columns. (Also Ni) */
-	var gridNX = 0
-		protected set
+	abstract val gridCols: Int
 
 	/** Number of grid rows. (Also Nj) */
-	var gridNY = 0
-		protected set
+	abstract val gridRows: Int
 
 	/** Latitude of grid start point. */
-	var gridLat1 = 0.0
-		protected set
+	abstract val latitudeOfFirstGridPoint: Double
 
 	/** Longitude of grid start point. */
-	var gridLng1 = 0.0
-		protected set
-
-	/** Mode of grid (See table 7) only 128 supported == increments given) */
-	var gridMode = 0
-		protected set
-
-	/** Latitude of grid end point. Get y-coordinate/latitude of grid end point. */
-	var gridLat2 = 0.0
-		protected set
-
-	/** Longitude of grid end point. Get x-coordinate/longitude of grid end point. */
-	var gridLng2 = 0.0
-		protected set
+	abstract val longitudeOfFirstGridPoint: Double
 
 	/** x-distance between two grid points can be delta-Lon or delta x. */
-	var gridDX = 0.0
-		protected set
+	abstract val gridDeltaX: Double
 
 	/** y-distance of two grid points can be delta-Lat or delta y. */
-	var gridDY = 0.0
-		protected set
+	abstract val gridDeltaY: Double
 
 	/** Scanning mode (See table 8). Get scan mode (sign of increments). *Only 64, 128 and 192 supported so far. */
-	var gridScanmode = 0
-		protected set
+	abstract val scanningMode: Int
 
 	// rdg - the remaining coordinates are not common to all types, and as such
 	//    should be removed.  They are left here (temporarily) for continuity.
 	//    These should be implemented in a GribGDSxxxx child class.
-
-	/** y-coordinate/latitude of south pole of a rotated lat/lon grid. */
-	var gridLatSP = 0.0
-		protected set
-
-	/** x-coordinate/longitude of south pole of a rotated lat/lon grid. */
-	var gridLngSP = 0.0
-		protected set
-
-	/** Rotation angle of rotated lat/lon grid. */
-	var gridRotAngle = 0.0
-		protected set
 
 	/** Get all longitide coordinates */
 	abstract val xCoords: DoubleArray
@@ -163,44 +171,6 @@ abstract class Grib1RecordGDS {
 	 */
 	abstract val isUVEastNorth: Boolean
 
-	constructor(inputStream: GribInputStream) {
-		// [1-3] Length of section in octets
-		length = inputStream.readUINT(4)
-
-		// [4] NV -- number of vertical coordinate parameters */
-		inputStream.skip(1)
-
-		// [5] PV -- location (octet number) of the list of vertical coordinate parameters, if present; or
-		//     PL -- location (octet number) of the list of numbers of points in each row (if no vertical coordinate parameters are present), if present; or
-		//     255 (all bits set to 1) if neither are present
-		inputStream.skip(1)
-
-		// [6] Data representation type
-		gridType = inputStream.readUINT(1)
-
-		//[7-xx]
-	}
-
-	/**
-	 * New constructor created for child classes, which has to be public!
-	 *
-	 * @param header integer array of header data (octets 1-6) read in GribGDSFactory exceptions are thrown in
-	 *               children and passed up
-	 */
-	constructor(header: ByteArray) {
-
-		// octets 1-3 (GDS section length)
-		// this.length = Bytes2Number.uint3(header[0], header[1], header[2]);
-		length = Bytes2Number.bytesToUint(header.copyOfRange(0, 3))
-
-		// octet 4 (number of vertical coordinate parameters) and
-		// octet 5 (octet location of vertical coordinate parameters
-		// not implemented yet
-
-		// octet 6 (grid type)
-		gridType = Bytes2Number.bytesToUint(header[5])
-	}
-
 	// *** public methods **************************************************************
 	// rdg - the basic getters can remain here, but other functionality should
 	//    be moved to the child GribGDSxxxx classes.  For now, overriding these
@@ -209,6 +179,13 @@ abstract class Grib1RecordGDS {
 	// peg - turned all common methods into abstract methods, so it will become
 	//       easier to subclass with a new GDS type class, this way it's much
 	//       more clear which methods is standard for all GDS types
+
+	override fun writeTo(outputStream: GribOutputStream) {
+		super.writeTo(outputStream)  // [1-3] length
+		outputStream.writeUInt(numberOfVerticalCoordinateValues, bytes = 1) // [4]
+		outputStream.writeUInt(pvlLocation, bytes = 1) // [5]
+		outputStream.writeUInt(dataRepresentationType, bytes = 1) // [6]
+	}
 
 	/**
 	 * rdg - added this method to be used in a comparator for sorting while extracting records.
@@ -219,4 +196,19 @@ abstract class Grib1RecordGDS {
 	 * @see java.util.Comparator.compare
 	 */
 	abstract fun compare(gds: Grib1RecordGDS): Int
+
+	override fun equals(other: Any?) = this === other
+			|| other is Grib1RecordGDS
+			&& length == other.length
+			&& numberOfVerticalCoordinateValues == other.numberOfVerticalCoordinateValues
+			&& pvlLocation == other.pvlLocation
+			&& dataRepresentationType == other.dataRepresentationType
+
+	override fun hashCode(): Int {
+		var result = length
+		result = 31 * result + numberOfVerticalCoordinateValues
+		result = 31 * result + pvlLocation
+		result = 31 * result + dataRepresentationType
+		return result
+	}
 }

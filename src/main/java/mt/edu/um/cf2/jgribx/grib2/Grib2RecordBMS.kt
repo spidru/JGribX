@@ -13,7 +13,6 @@ package mt.edu.um.cf2.jgribx.grib2
 import mt.edu.um.cf2.jgribx.GribInputStream
 import mt.edu.um.cf2.jgribx.GribOutputStream
 import mt.edu.um.cf2.jgribx.NoValidGribException
-import mt.edu.um.cf2.jgribx.api.GribSection
 
 /**
  * ### [Section 6: Bit-Map Section](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_sect6.shtml)
@@ -32,7 +31,7 @@ import mt.edu.um.cf2.jgribx.api.GribSection
  * @author AVLAB-USER3
  * @author Jan Kubovy [jan@kubovy.eu]
  */
-class Grib2RecordBMS internal constructor(private val indicatorValue: Int) : GribSection {
+class Grib2RecordBMS internal constructor(private val indicatorValue: Int) : Grib2Section {
 	/**
 	 * ### [Table 6.0: Bit Map Indicator](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table6-0.shtml)
 	 *
@@ -64,7 +63,7 @@ class Grib2RecordBMS internal constructor(private val indicatorValue: Int) : Gri
 
 		internal fun readFromStream(gribInputStream: GribInputStream): Grib2RecordBMS {
 			/* [1-5] Length, section number */
-			val length = GribSection.readFromStream(gribInputStream, 6)
+			val length = Grib2Section.readFromStream(gribInputStream, 6)
 
 			/* [6] Bitmap indicator */
 			val indicatorValue = gribInputStream.readUINT(1)

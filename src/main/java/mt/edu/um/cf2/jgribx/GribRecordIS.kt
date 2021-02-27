@@ -53,8 +53,6 @@ class GribRecordIS internal constructor(var gribEdition: Int,
 										var discipline: ProductDiscipline?,
 										val recordLength: Long) : GribSection {
 
-	override val number: Int = 0
-
 	companion object {
 		/**
 		 * Constructs a [GribRecordIS] object from a buffered input stream.
@@ -146,14 +144,12 @@ class GribRecordIS internal constructor(var gribEdition: Int,
 	override fun equals(other: Any?) = this === other
 			|| other is GribRecordIS
 			&& length == other.length
-			&& number == other.number
 			&& gribEdition == other.gribEdition
 			&& discipline == other.discipline
 			&& recordLength == other.recordLength
 
 	override fun hashCode(): Int {
 		var result = length
-		result = 31 * result + number
 		result = 31 * result + gribEdition
 		result = 31 * result + (discipline?.hashCode() ?: 0)
 		result = 31 * result + recordLength.hashCode()

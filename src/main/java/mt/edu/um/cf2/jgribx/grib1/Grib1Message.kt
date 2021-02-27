@@ -57,7 +57,7 @@ class Grib1Message private constructor(indicatorSection: GribRecordIS,
 		internal fun readFromStream(gribInputStream: GribInputStream,
 									indicatorSection: GribRecordIS): Grib1Message {
 			gribInputStream.resetBitCounter()
-			val productDefinitionSection = Grib1RecordPDS(gribInputStream)
+			val productDefinitionSection = Grib1RecordPDS.readFromStream(gribInputStream)
 			if (gribInputStream.byteCounter != productDefinitionSection.length)
 				throw NoValidGribException("Incorrect PDS length")
 
@@ -66,33 +66,31 @@ class Grib1Message private constructor(indicatorSection: GribRecordIS,
 				Grib1RecordGDS.readFromStream(gribInputStream).also {
 					if (gribInputStream.byteCounter != it.length) throw NoValidGribException("Incorrect GDS length")
 				}
-			} else {
-				throw NoValidGribException("GribRecord: No GDS included.")
-			}
+			} else throw NoValidGribException("GribRecord: No GDS included.")
 
 			val bitmapSection: Grib1RecordBMS? = if (productDefinitionSection.bmsExists) {
 				gribInputStream.resetBitCounter()
-				Grib1RecordBMS(gribInputStream).also { // read Bitmap Section
+				Grib1RecordBMS.readFromStream(gribInputStream).also { // read Bitmap Section
 					if (gribInputStream.byteCounter != it.length) throw NoValidGribException("Incorrect BMS length")
 				}
 			} else null
 
 			gribInputStream.resetBitCounter()
-			val binaryDataSection = Grib1RecordBDS(
+			val binaryDataSection = Grib1RecordBDS.readFromStream(
 					gribInputStream,
-					bitmapSection,
+					productDefinitionSection,
 					gridDefinitionSection,
-					productDefinitionSection)
+					bitmapSection)
 			if (gribInputStream.byteCounter != binaryDataSection.length)
 				throw NoValidGribException("Incorrect BDS length")
 
 			// number of values
 			// rdg - added the check for a constant field - otherwise this fails
 			if (!binaryDataSection.isConstant
-					&& binaryDataSection.values.size != gridDefinitionSection.gridNX * gridDefinitionSection.gridNY) {
+					&& binaryDataSection.values.size != gridDefinitionSection.gridCols * gridDefinitionSection.gridRows) {
 				Logger.error("Grid should contain" +
-						" ${gridDefinitionSection.gridNX} * ${gridDefinitionSection.gridNY} =" +
-						" ${gridDefinitionSection.gridNX * gridDefinitionSection.gridNY} values.")
+						" ${gridDefinitionSection.gridCols} * ${gridDefinitionSection.gridRows} =" +
+						" ${gridDefinitionSection.gridCols * gridDefinitionSection.gridRows} values.")
 				Logger.error("But BDS section delivers only ${binaryDataSection.values.size}.")
 			}
 			return Grib1Message(
@@ -108,7 +106,7 @@ class Grib1Message private constructor(indicatorSection: GribRecordIS,
 		get() = listOf(this)
 
 	override val centreId: Int
-		get() = productDefinitionSection.centreId
+		get() = productDefinitionSection.centre
 
 	override val forecastTime: Calendar
 		get() = productDefinitionSection.localForecastTime
@@ -134,7 +132,7 @@ class Grib1Message private constructor(indicatorSection: GribRecordIS,
 	val values: FloatArray
 		get() {
 			if (!binaryDataSection.isConstant) return binaryDataSection.values
-			val gridSize: Int = gridDefinitionSection.gridNX * gridDefinitionSection.gridNY
+			val gridSize: Int = gridDefinitionSection.gridCols * gridDefinitionSection.gridRows
 			val values = FloatArray(gridSize)
 			val ref: Float = binaryDataSection.referenceValue
 			for (i in 0 until gridSize) {
@@ -152,16 +150,16 @@ class Grib1Message private constructor(indicatorSection: GribRecordIS,
 		get() = productDefinitionSection.parameterUnits
 
 	override val levelCode: String
-		get() = productDefinitionSection.pDSLevel?.code ?: ""
+		get() = productDefinitionSection.level?.code ?: ""
 
 	override val levelDescription: String
-		get() = productDefinitionSection.pDSLevel?.description ?: ""
+		get() = productDefinitionSection.level?.description ?: ""
 
 	override val levelIdentifier: String
-		get() = productDefinitionSection.pDSLevel?.identifier ?: ""
+		get() = productDefinitionSection.level?.identifier ?: ""
 
 	override val levelValues: FloatArray
-		get() = productDefinitionSection.pDSLevel?.values ?: floatArrayOf(Float.NaN, Float.NaN)
+		get() = productDefinitionSection.level?.values ?: floatArrayOf(Float.NaN, Float.NaN)
 
 	override val referenceTime: Calendar
 		get() = productDefinitionSection.referenceTime
@@ -177,22 +175,22 @@ class Grib1Message private constructor(indicatorSection: GribRecordIS,
 	 * @throws NoValidGribException
 	 */
 	fun getValue(i: Int, j: Int): Float {
-		if (i >= 0 && i < gridDefinitionSection.gridNX && j >= 0 && j < gridDefinitionSection.gridNY) {
-			return binaryDataSection.getValue(gridDefinitionSection.gridNX * j + i)
+		if (i >= 0 && i < gridDefinitionSection.gridCols && j >= 0 && j < gridDefinitionSection.gridRows) {
+			return binaryDataSection.getValue(gridDefinitionSection.gridCols * j + i)
 		}
 		throw NoValidGribException("GribRecord:  Array index out of bounds")
 	}
 
 	override fun getValue(latitude: Double, longitude: Double): Double {
 		var value = Double.NaN
-		val i = ((longitude - gridDefinitionSection.gridLng1) / gridDefinitionSection.gridDX).roundToInt()
-		val j = ((latitude - gridDefinitionSection.gridLat1) / gridDefinitionSection.gridDY).roundToInt()
+		val i = ((longitude - gridDefinitionSection.longitudeOfFirstGridPoint) / gridDefinitionSection.gridDeltaX).roundToInt()
+		val j = ((latitude - gridDefinitionSection.latitudeOfFirstGridPoint) / gridDefinitionSection.gridDeltaY).roundToInt()
 		try {
-			value = if (gridDefinitionSection.gridScanmode and 0x20 != 0x20) {
+			value = if (gridDefinitionSection.scanningMode and 0x20 != 0x20) {
 				// Adjacent points in i direction are consecutive
-				binaryDataSection.getValue(gridDefinitionSection.gridNX * j + i).toDouble()
+				binaryDataSection.getValue(gridDefinitionSection.gridCols * j + i).toDouble()
 			} else {
-				binaryDataSection.getValue(gridDefinitionSection.gridNY * i + j).toDouble()
+				binaryDataSection.getValue(gridDefinitionSection.gridRows * i + j).toDouble()
 			}
 		} catch (e: NoValidGribException) {
 			Logger.error("Cannot find a value for the given lat-long")
@@ -209,5 +207,12 @@ class Grib1Message private constructor(indicatorSection: GribRecordIS,
 			binaryDataSection.toString().prependIndent("\t"))
 			.joinToString("\n")
 
-	override fun writeTo(gribOutputStream: GribOutputStream) = TODO("Not yet implemented")
+	override fun writeTo(gribOutputStream: GribOutputStream) {
+		indicatorSection.writeTo(gribOutputStream)
+		productDefinitionSection.writeTo(gribOutputStream)
+		gridDefinitionSection.writeTo(gribOutputStream)
+		bitmapSection?.writeTo(gribOutputStream)
+		binaryDataSection.writeTo(gribOutputStream)
+		GribRecordES(true).writeTo(gribOutputStream)
+	}
 }

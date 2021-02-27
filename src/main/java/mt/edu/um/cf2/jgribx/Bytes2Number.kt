@@ -100,20 +100,18 @@ object Bytes2Number {
 	 * @return a single value as a single precision IEEE754 float
 	 * @see <a href="https://en.wikipedia.org/wiki/IBM_Floating_Point_Architecture">IBM_Floating_Point_Architecture</a>
 	 */
-	fun bytesToFloat(bytes: ByteArray, format: Int): Float {
-		return when (format) {
-			FLOAT_IBM -> {
-				val sign = if (bytes[0].toInt() and 0x80 == 0x80) -1 else 1
-				val exponent: Int = (bytes[0].toInt() and 0x7F) - 64
-				val mantissa = bytesToUint(bytes.copyOfRange(1, 4))
-				(sign * 16.0.pow((exponent - 6).toDouble()) * mantissa).toFloat()
-			}
-			FLOAT_IEEE754 -> ByteBuffer
-					.wrap(bytes)
-					.order(ByteOrder.BIG_ENDIAN)
-					.float
-			else -> throw IllegalArgumentException("Invalid format specified")
+	fun bytesToFloat(bytes: ByteArray, format: Int): Float = when (format) {
+		FLOAT_IBM -> {
+			val sign = if (bytes[0].toInt() and 0x80 == 0x80) -1 else 1
+			val exponent: Int = (bytes[0].toInt() and 0x7F) - 64
+			val mantissa = bytesToUint(bytes.copyOfRange(1, 4))
+			(sign * 16.0.pow((exponent - 6).toDouble()) * mantissa).toFloat()
 		}
+		FLOAT_IEEE754 -> ByteBuffer
+				.wrap(bytes)
+				.order(ByteOrder.BIG_ENDIAN)
+				.float
+		else -> throw IllegalArgumentException("Invalid format specified")
 	}
 
 	/**

@@ -45,8 +45,6 @@ class GribRecordES internal constructor(internal val isValid: Boolean) : GribSec
 
 	override val length: Int = 4
 
-	override val number: Int = 8
-
 	override fun writeTo(outputStream: GribOutputStream) {
 		outputStream.write(SEQUENCE)
 	}
@@ -54,13 +52,7 @@ class GribRecordES internal constructor(internal val isValid: Boolean) : GribSec
 	override fun equals(other: Any?) = this === other
 			|| other is GribRecordES
 			&& length == other.length
-			&& number == other.number
 			&& isValid == other.isValid
 
-	override fun hashCode(): Int {
-		var result = length
-		result = 31 * result + number
-		result = 31 * result + isValid.hashCode()
-		return result
-	}
+	override fun hashCode() = 31 * length + isValid.hashCode()
 }

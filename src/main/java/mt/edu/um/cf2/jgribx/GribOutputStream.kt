@@ -43,6 +43,28 @@ class GribOutputStream(outputStream: OutputStream) : FilterOutputStream(outputSt
 		out.write(data)
 	}
 
+	fun writeFloatIBM(value: Float) {
+		if (value.isNaN()) throw NumberFormatException("Value must be finite")
+		val bits = java.lang.Float.floatToIntBits(value)
+		val s = if (bits shr 31 == 0) 1 else -1
+		val e = bits shr 23 and 0xFF
+		val m = if (e == 0) bits and 0x7FFFFF shl 1 else bits and 0x7FFFFF or 0x800000
+
+		var exp = (e - 150) / 4 + 6
+		var mant: Int
+		val mantissaShift = (e - 150) % 4 // compensate for base 16
+
+		mant = if (mantissaShift >= 0) m shr mantissaShift else m shr Math.abs(mantissaShift)
+		if (mant > 0xFFFFFFF) {
+			mant = mant shr 4
+			exp++
+		} // loose of precision */
+
+		val a = (1 - s shl 6 or exp + 64).toByte()
+		val bytes = byteArrayOf(a, (mant shr 16).toByte(), (mant shr 8).toByte(), mant.toByte())
+		out.write(bytes)
+	}
+
 	private var bitsWritten: Int = 0
 	private var byteToWrite: Int = 0
 

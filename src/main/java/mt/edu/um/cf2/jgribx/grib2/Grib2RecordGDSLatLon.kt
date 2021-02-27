@@ -333,13 +333,13 @@ class Grib2RecordGDSLatLon internal constructor(gridDefinitionSource: Int,
 			&& gridNj == other.gridNj
 			&& basicAngle == other.basicAngle
 			&& basicAngleSubdiv == other.basicAngleSubdiv
-			&& abs(lat1 - other.lat1) < 0.000005
-			&& abs(lon1 - other.lon1) < 0.000005
+			&& abs(lat1 - other.lat1) < FLOAT_PRECISION
+			&& abs(lon1 - other.lon1) < FLOAT_PRECISION
 			&& flags == other.flags
-			&& abs(lat2 - other.lat2) < 0.000005
-			&& abs(lon2 - other.lon2) < 0.000005
-			&& abs(gridDi - other.gridDi) < 0.000005
-			&& abs(gridDj - other.gridDj) < 0.000005
+			&& abs(lat2 - other.lat2) < FLOAT_PRECISION
+			&& abs(lon2 - other.lon2) < FLOAT_PRECISION
+			&& abs(gridDi - other.gridDi) < FLOAT_PRECISION
+			&& abs(gridDj - other.gridDj) < FLOAT_PRECISION
 			&& scanMode == other.scanMode
 			&& additionalPoints.contentEquals(other.additionalPoints)
 

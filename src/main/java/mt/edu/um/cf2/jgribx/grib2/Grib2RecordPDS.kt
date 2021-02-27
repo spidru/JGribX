@@ -14,7 +14,6 @@ import mt.edu.um.cf2.jgribx.GribInputStream
 import mt.edu.um.cf2.jgribx.GribOutputStream
 import mt.edu.um.cf2.jgribx.NoValidGribException
 import mt.edu.um.cf2.jgribx.NotSupportedException
-import mt.edu.um.cf2.jgribx.api.GribSection
 import java.util.*
 
 /**
@@ -34,18 +33,19 @@ import java.util.*
  * @param parameter           Parameter
  * @param processId           Process ID
  *
- * @author Jan Kubovy [jan@kubovy.eu]
+ * @throws java.io.IOException if stream can not be opened etc.
+ * @throws NotSupportedException
  */
 abstract class Grib2RecordPDS protected constructor(val numberOfCoordinates: Int,
 													val parameter: Grib2Parameter,
-													internal val processId: Int) : GribSection {
+													internal val processId: Int) : Grib2Section {
 
 	companion object {
 		internal fun readFromStream(gribInputStream: GribInputStream,
 									discipline: ProductDiscipline,
 									referenceTime: Calendar): Grib2RecordPDS {
 			/* [1-5] Length, section number */
-			val length = GribSection.readFromStream(gribInputStream, 4)
+			val length = Grib2Section.readFromStream(gribInputStream, 4)
 
 			/* [6-7] Number of coordinate values after template */
 			val numberOfCoordinates = gribInputStream.readUINT(2)

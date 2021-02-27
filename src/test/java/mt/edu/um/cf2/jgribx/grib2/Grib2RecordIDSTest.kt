@@ -2,7 +2,7 @@ package mt.edu.um.cf2.jgribx.grib2
 
 import mt.edu.um.cf2.jgribx.GribInputStream
 import mt.edu.um.cf2.jgribx.GribOutputStream
-import mt.edu.um.cf2.jgribx.bytesSpace
+import mt.edu.um.cf2.jgribx.byteSpace
 import org.junit.Assert.*
 import org.junit.Test
 import java.io.ByteArrayInputStream
@@ -15,11 +15,11 @@ class Grib2RecordIDSTest {
 	fun testWritingWithoutReserved() {
 		// Given
 		val expected = Grib2RecordIDS(
-				Random.nextInt(2.bytesSpace()),
-				Random.nextInt(2.bytesSpace()),
-				Random.nextInt(1.bytesSpace()),
-				Random.nextInt(1.bytesSpace()),
-				Random.nextInt(1.bytesSpace()),
+				Random.nextInt(2.byteSpace()),
+				Random.nextInt(2.byteSpace()),
+				Random.nextInt(1.byteSpace()),
+				Random.nextInt(1.byteSpace()),
+				Random.nextInt(1.byteSpace()),
 				GregorianCalendar(
 						Random.nextInt(1970, 2050),
 						Random.nextInt(0, 12),
@@ -28,8 +28,8 @@ class Grib2RecordIDSTest {
 						Random.nextInt(0, 60),
 						Random.nextInt(0, 60))
 						.also { it.timeZone = TimeZone.getTimeZone("UTC") },
-				Random.nextInt(1.bytesSpace()),
-				Random.nextInt(1.bytesSpace()),
+				Random.nextInt(1.byteSpace()),
+				Random.nextInt(1.byteSpace()),
 				null)
 
 		// When
@@ -54,11 +54,11 @@ class Grib2RecordIDSTest {
 	fun testWritingWithReserved() {
 		// Given
 		val expected = Grib2RecordIDS(
-				Random.nextInt(2.bytesSpace()),
-				Random.nextInt(2.bytesSpace()),
-				Random.nextInt(1.bytesSpace()),
-				Random.nextInt(1.bytesSpace()),
-				Random.nextInt(1.bytesSpace()),
+				Random.nextInt(2.byteSpace()),
+				Random.nextInt(2.byteSpace()),
+				Random.nextInt(1.byteSpace()),
+				Random.nextInt(1.byteSpace()),
+				Random.nextInt(1.byteSpace()),
 				GregorianCalendar(
 						Random.nextInt(1970, 2050),
 						Random.nextInt(0, 12),
@@ -67,8 +67,8 @@ class Grib2RecordIDSTest {
 						Random.nextInt(0, 60),
 						Random.nextInt(0, 60))
 						.also { it.timeZone = TimeZone.getTimeZone("UTC") },
-				Random.nextInt(1.bytesSpace()),
-				Random.nextInt(1.bytesSpace()),
+				Random.nextInt(1.byteSpace()),
+				Random.nextInt(1.byteSpace()),
 				Random.nextBytes(Random.nextInt(100)))
 
 		// When
@@ -95,11 +95,11 @@ class Grib2RecordIDSTest {
 	fun testWritingWithReservedWithoutReadingEntireSection() {
 		// Given
 		val expected = Grib2RecordIDS(
-				Random.nextInt(2.bytesSpace()),
-				Random.nextInt(2.bytesSpace()),
-				Random.nextInt(1.bytesSpace()),
-				Random.nextInt(1.bytesSpace()),
-				Random.nextInt(1.bytesSpace()),
+				Random.nextInt(2.byteSpace()),
+				Random.nextInt(2.byteSpace()),
+				Random.nextInt(1.byteSpace()),
+				Random.nextInt(1.byteSpace()),
+				Random.nextInt(1.byteSpace()),
 				GregorianCalendar(
 						Random.nextInt(1970, 2050),
 						Random.nextInt(0, 12),
@@ -108,8 +108,8 @@ class Grib2RecordIDSTest {
 						Random.nextInt(0, 60),
 						Random.nextInt(0, 60))
 						.also { it.timeZone = TimeZone.getTimeZone("UTC") },
-				Random.nextInt(1.bytesSpace()),
-				Random.nextInt(1.bytesSpace()),
+				Random.nextInt(1.byteSpace()),
+				Random.nextInt(1.byteSpace()),
 				Random.nextBytes(Random.nextInt(100)))
 
 		// When

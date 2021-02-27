@@ -11,7 +11,6 @@
 package mt.edu.um.cf2.jgribx.grib2
 
 import mt.edu.um.cf2.jgribx.*
-import mt.edu.um.cf2.jgribx.api.GribSection
 
 /**
  * ### [Section 3: Grid Definition Section](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_sect3.shtml)
@@ -43,7 +42,7 @@ import mt.edu.um.cf2.jgribx.api.GribSection
 abstract class Grib2RecordGDS protected constructor(protected var gridDefinitionSource: Int,
 													var numberOfDataPoints: Int,
 													protected var nBytes: Int,
-													protected var interpretation: Int) : GribSection {
+													protected var interpretation: Int) : Grib2Section {
 
 	data class ScanMode internal constructor(internal val flags: Byte) {
 		internal var iDirectionPositive: Boolean = flags.toInt() and 0x80 != 0x80
@@ -59,7 +58,7 @@ abstract class Grib2RecordGDS protected constructor(protected var gridDefinition
 	companion object {
 		internal fun readFromStream(gribInputStream: GribInputStream): Grib2RecordGDS {
 			/* [1-5] Length, section number */
-			val length = GribSection.readFromStream(gribInputStream, 3)
+			val length = Grib2Section.readFromStream(gribInputStream, 3)
 
 			/* [6] Grid Definition Source */
 			val gridDefinitionSource = gribInputStream.readUINT(1)

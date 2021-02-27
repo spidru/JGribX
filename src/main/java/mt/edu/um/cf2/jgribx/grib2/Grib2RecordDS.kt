@@ -12,7 +12,6 @@ package mt.edu.um.cf2.jgribx.grib2
 
 import mt.edu.um.cf2.jgribx.GribInputStream
 import mt.edu.um.cf2.jgribx.NoValidGribException
-import mt.edu.um.cf2.jgribx.api.GribSection
 
 /**
  * ### [Section 7: Data Section](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_sect7.shtml)
@@ -31,20 +30,19 @@ import mt.edu.um.cf2.jgribx.api.GribSection
  * @param bms Reference to [Section 6: Bit Map Section](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_sect6.shtml)
  * @param data Decoded data
  *
- * @author AVLAB-USER3
  * @author Jan Kubovy [jan@kubovy.eu]
  */
-abstract class Grib2RecordDS<DRS : Grib2RecordDRS> protected constructor(internal val gds: Grib2RecordGDS,
-																		 internal val drs: DRS,
-																		 internal val bms: Grib2RecordBMS,
-																		 val data: FloatArray) : GribSection {
+abstract class Grib2RecordDS<DRS : Grib2RecordDRS> internal constructor(internal val gds: Grib2RecordGDS,
+																		internal val drs: DRS,
+																		internal val bms: Grib2RecordBMS,
+																		val data: FloatArray) : Grib2Section {
 	companion object {
 		internal fun <DRS : Grib2RecordDRS> readFromStream(gribInputStream: GribInputStream,
 														   gds: Grib2RecordGDS,
 														   drs: DRS,
 														   bms: Grib2RecordBMS): Grib2RecordDS<*> {
 			/* [1-5] Length, section number */
-			val length = GribSection.readFromStream(gribInputStream, 7)
+			val length = Grib2Section.readFromStream(gribInputStream, 7)
 
 			return when (drs) {
 				// Order is relevant since, e.g., DRS3 inherits DRS2 and DRS2 inherits DRS0!

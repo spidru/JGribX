@@ -2,7 +2,7 @@ package mt.edu.um.cf2.jgribx.grib2
 
 import mt.edu.um.cf2.jgribx.GribInputStream
 import mt.edu.um.cf2.jgribx.GribOutputStream
-import mt.edu.um.cf2.jgribx.bytesSpace
+import mt.edu.um.cf2.jgribx.byteSpace
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Test
@@ -15,29 +15,29 @@ class Grib2RecordGDSLatLonTest {
 	fun testWriting() {
 		// Given
 		val expected = Grib2RecordGDSLatLon(
-				Random.nextInt(1.bytesSpace()),
-				Random.nextInt(4.bytesSpace()),
-				Random.nextInt(1.bytesSpace()),
-				Random.nextInt(1.bytesSpace()),
+				Random.nextInt(1.byteSpace()),
+				Random.nextInt(4.byteSpace()),
+				Random.nextInt(1.byteSpace()),
+				Random.nextInt(1.byteSpace()),
 
-				Random.nextInt(1.bytesSpace()),
-				Random.nextInt(1.bytesSpace()),
-				Random.nextInt(4.bytesSpace()),
-				Random.nextInt(1.bytesSpace()),
-				Random.nextInt(4.bytesSpace()),
-				Random.nextInt(1.bytesSpace()),
-				Random.nextInt(4.bytesSpace()),
-				Random.nextInt(4.bytesSpace()),
-				Random.nextInt(4.bytesSpace()),
+				Random.nextInt(1.byteSpace()),
+				Random.nextInt(1.byteSpace()),
+				Random.nextInt(4.byteSpace()),
+				Random.nextInt(1.byteSpace()),
+				Random.nextInt(4.byteSpace()),
+				Random.nextInt(1.byteSpace()),
+				Random.nextInt(4.byteSpace()),
+				Random.nextInt(4.byteSpace()),
+				Random.nextInt(4.byteSpace()),
 				0,
-				Random.nextInt(4.bytesSpace()),
-				Random.nextInt(4.bytesSpace()) / 1.0e6,
-				Random.nextInt(4.bytesSpace()) / 1.0e6,
+				Random.nextInt(4.byteSpace()),
+				Random.nextInt(4.byteSpace()) / 1.0e6,
+				Random.nextInt(4.byteSpace()) / 1.0e6,
 				0x10 or 0x20,
-				Random.nextInt(4.bytesSpace()) / 1.0e6,
-				Random.nextInt(4.bytesSpace()) / 1.0e6,
-				Random.nextInt(4.bytesSpace()) / 1.0e6,
-				Random.nextInt(4.bytesSpace()) / 1.0e6,
+				Random.nextInt(4.byteSpace()) / 1.0e6,
+				Random.nextInt(4.byteSpace()) / 1.0e6,
+				Random.nextInt(4.byteSpace()) / 1.0e6,
+				Random.nextInt(4.byteSpace()) / 1.0e6,
 				Grib2RecordGDS.ScanMode(0x40),
 				Random.nextBytes(Random.nextInt(10)))
 

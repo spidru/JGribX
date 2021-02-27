@@ -1,10 +1,13 @@
 package mt.edu.um.cf2.jgribx
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import kotlin.math.abs
 import kotlin.math.pow
+import kotlin.random.Random
 
 class GribOutputStreamTest {
 	@Test
@@ -33,6 +36,26 @@ class GribOutputStreamTest {
 				println("V[${nbits}] ${value}")
 				assertEquals(it, value.toInt())
 			}
+		}
+	}
+
+	@Test
+	fun testWriteIbmFloat() {
+		repeat(1000) { // Also tests float precision
+			// Given
+			val expected = Random.nextDouble(0.0, 100.0).toFloat()
+
+			// When
+			val bos = ByteArrayOutputStream(4)
+			val gos = GribOutputStream(bos)
+			gos.writeFloatIBM(expected)
+
+			val gis = GribInputStream(ByteArrayInputStream(bos.toByteArray()))
+			val actual = gis.readFloat(4, Bytes2Number.FLOAT_IBM)
+
+			// Then
+			assertTrue("${expected} ?= ${actual} = ${expected - actual} (${abs(expected - actual) < FLOAT_PRECISION})",
+					abs(expected - actual) < FLOAT_PRECISION)
 		}
 	}
 }

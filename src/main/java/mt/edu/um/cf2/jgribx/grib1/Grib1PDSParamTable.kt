@@ -44,12 +44,7 @@ package mt.edu.um.cf2.jgribx.grib1
 
 import mt.edu.um.cf2.jgribx.Logger
 import mt.edu.um.cf2.jgribx.NotSupportedException
-import java.io.BufferedReader
-import java.io.File
-import java.io.FileNotFoundException
-import java.io.FileReader
-import java.io.IOException
-import java.io.InputStreamReader
+import java.io.*
 import java.net.URL
 import java.util.*
 import java.util.regex.Matcher
@@ -596,7 +591,7 @@ class Grib1PDSParamTable(protected var filename: String? = null,
 	 */
 	private fun setParameter(pdsPar: Grib1Parameter?): Boolean {
 		if (pdsPar == null) return false
-		val id = pdsPar.number
+		val id = pdsPar.id
 		if (id < 0 || id >= NPARAMETERS) return false
 		parameters?.set(id, pdsPar)
 		return true
