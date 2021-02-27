@@ -14,29 +14,28 @@ import mt.edu.um.cf2.jgribx.GribRecordIS
 import java.util.*
 
 /**
- * A GRIB Record is a representation of part of a [GRIB message][mt.edu.um.cf2.jgribx.api.GribMessage] containing one
- * dataset. Different GRIB editions support different number of such records per
- * [GRIB message][mt.edu.um.cf2.jgribx.api.GribMessage]. Currently GRIB1 supports exactly one records per message while
- * GRIB2 supports multiple records per message due to possible repetitions of sections 2 to 7, 3 to 7, or 4 to 7.
+ * A GRIB Record is a representation of part of a [GRIB message][GribMessage] containing one dataset. Different GRIB
+ * editions support different number of such records per [GRIB message][GribMessage]. Currently
+ * GRIB1 supports exactly one records per message while GRIB2 supports multiple records per message due to possible
+ * repetitions of sections 2 to 7, 3 to 7, or 4 to 7.
  *
  * @author Jan Kubovy [jan@kubovy.eu]
  */
 interface GribRecord {
 	/** [Section 0: Indicator Section](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_sect0.shtml) */
-	val indicatorSection: GribRecordIS
-	val gridDefinitionSection: GribGridDefinitionSection
+	val indicator: GribRecordIS
+	val productDefinition: GribProductDefinitionSection
+	val gridDefinition: GribGridDefinitionSection
 
 	/** Returns the ID corresponding to the originating centre. */
 	val centreId: Int
 	val forecastTime: Calendar
-	val levelCode: String
-	val levelDescription: String
 
-	/** Returns the unique ID for the level code and value combination. */
-	val levelIdentifier: String
-	val levelValues: FloatArray
-	val parameterCode: String
-	val parameterDescription: String
+	val parameter: GribParameter
+		get() = productDefinition.parameter
+
+	val level: GribLevel?
+		get() = productDefinition.level
 
 	/** Returns the ID corresponding to the generating process. */
 	val processId: Int

@@ -11,6 +11,7 @@
 package mt.edu.um.cf2.jgribx.grib2
 
 import mt.edu.um.cf2.jgribx.Logger
+import mt.edu.um.cf2.jgribx.api.GribParameter
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
@@ -19,10 +20,10 @@ import java.util.regex.Pattern
 
 class Grib2Parameter private constructor(private val discipline: ProductDiscipline,
 										 internal val category: ParameterCategory,
-										 internal val index: Int,
-										 val code: String,
-										 val description: String,
-										 val units: String) {
+										 override val id: Int,
+										 override val code: String,
+										 override val description: String,
+										 val units: String) : GribParameter {
 
 	companion object {
 		private val paramList = mutableListOf<Grib2Parameter>()
@@ -80,7 +81,7 @@ class Grib2Parameter private constructor(private val discipline: ProductDiscipli
 			for (parameter in paramList) {
 				if (parameter.discipline == discipline &&
 						parameter.category.value == category &&
-						parameter.index == index) {
+						parameter.id == index) {
 					return parameter
 				}
 			}
@@ -92,15 +93,14 @@ class Grib2Parameter private constructor(private val discipline: ProductDiscipli
 			|| other is Grib2Parameter
 			&& discipline == other.discipline
 			&& category == other.category
-			&& index == other.index
+			&& id == other.id
 
 	override fun hashCode(): Int {
 		var result = discipline.hashCode()
 		result = 31 * result + category.hashCode()
-		result = 31 * result + index
+		result = 31 * result + id
 		return result
 	}
 
-	override fun toString() = "Grib2Parameter(discipline=${discipline}, category=${category}, index=${index}," +
-			" code='${code}', description='${description}', units='${units}')"
+	override fun toString() = "{${discipline}:${category}}${id}:${code}:${description} [${units}]"
 }

@@ -11,6 +11,7 @@
 package mt.edu.um.cf2.jgribx.grib1
 
 import mt.edu.um.cf2.jgribx.*
+import mt.edu.um.cf2.jgribx.api.GribProductDefinitionSection
 import java.util.*
 
 /**
@@ -106,7 +107,7 @@ class Grib1RecordPDS internal constructor(val tableVersion: Int,
 										  val numberMissing: Int,
 										  val subCenterId: Int,
 										  val decimalScale: Int,
-										  private val additionalBytes: Int) : Grib1Section {
+										  private val additionalBytes: Int) : Grib1Section, GribProductDefinitionSection {
 
 	companion object {
 		internal fun calculateForecastTime(referenceTime: Calendar, timeUnit: Int, p1Input: Int, p2Input: Int,
@@ -309,7 +310,7 @@ class Grib1RecordPDS internal constructor(val tableVersion: Int,
 	internal val bmsExists: Boolean
 		get() = flag and 64 == 64
 
-	private val parameter: Grib1Parameter = if (tableVersion == 255) {
+	override val parameter: Grib1Parameter = if (tableVersion == 255) {
 		// paramTable = null
 		Grib1Parameter(255, "missing", "missing parameter", "")
 	} else {
@@ -321,53 +322,21 @@ class Grib1RecordPDS internal constructor(val tableVersion: Int,
 				?: throw NotSupportedException("Unsupported Parameter $parameterId in Table $tableVersion")
 	}
 
-	/** The type of the parameter. */
-	val parameterAbbreviation: String
-		get() = parameter.abbreviation
-
-	/** Descritpion of the parameter. */
-	val parameterDescription: String
-		get() = parameter.description
-
-	/** Name of the unit of the parameter. */
-	val parameterUnits: String
-		get() = parameter.units
-
 	/**
 	 * Containing the information about the level. This helps to actually use the data, otherwise the string for
 	 * level will have to be parsed.
 	 */
-	internal val level: Grib1Level? = Grib1Level.getLevel(levelType, levelData)
-
-	/** Name for the type of level for this forecast/analysis. */
-	val levelName: String?
-		get() = level?.name
-
-	/** The long description for this level of the forecast/analysis. */
-	val levelDesc: String?
-		get() = level?.description
-
-	/** The units for the level of the forecast/analysis. */
-	val levelUnits: String?
-		get() = level?.units
-
-	/** Get the numeric value for this level. */
-	val levelValue: Float?
-		get() = level?.value1
-
-	/** Get value 2 (if it exists) for this level (height or pressure) */
-	val levelValue2: Float?
-		get() = level?.value2
+	override val level: Grib1Level? = Grib1Level.getLevel(levelType, levelData)
 
 	/** Forecast time. Also used as starting time when times represent a period */
-	val localForecastTime: Calendar
+	override val forecastTime: Calendar
 
 	/** Ending time when times represent a period */
 	private val forecastTime2: Calendar
 
 	init {
 		calculateForecastTime(referenceTime, timeUnit, p1, p2, timeRangeId).also { (f1, f2) ->
-			localForecastTime = f1
+			forecastTime = f1
 			forecastTime2 = f2
 		}
 	}
@@ -395,7 +364,7 @@ class Grib1RecordPDS internal constructor(val tableVersion: Int,
 	 */
 	val gMTForecastTime: Calendar
 		get() {
-			val gmtTime = localForecastTime.clone() as Calendar
+			val gmtTime = forecastTime.clone() as Calendar
 			Logger.debug("forecast time = ${gmtTime.time}")
 			// hopefully this DST offset adjusts to DST automatically
 			val dstOffset = gmtTime[Calendar.DST_OFFSET] / 3600000
@@ -450,7 +419,7 @@ class Grib1RecordPDS internal constructor(val tableVersion: Int,
 		// check if pds is less; if not, then pds is greater
 		if (gridId > pds.gridId) return -1
 		if (referenceTime.time.time > pds.referenceTime.time.time) return -1
-		if (localForecastTime.time.time > pds.localForecastTime.time.time) return -1
+		if (forecastTime.time.time > pds.forecastTime.time.time) return -1
 		if (forecastTime2.time.time > pds.forecastTime2.time.time) return -1
 		if (centre > pds.centre) return -1
 		if (subCenterId > pds.subCenterId) return -1
@@ -517,16 +486,16 @@ class Grib1RecordPDS internal constructor(val tableVersion: Int,
 			}
 		}
 
-		val time1 = (localForecastTime[Calendar.DAY_OF_MONTH].toString() + "."
-				+ (localForecastTime[Calendar.MONTH] + 1) + "."
-				+ localForecastTime[Calendar.YEAR] + "  "
-				+ localForecastTime[Calendar.HOUR_OF_DAY] + ":"
-				+ localForecastTime[Calendar.MINUTE])
+		val time1 = (forecastTime[Calendar.DAY_OF_MONTH].toString() + "."
+				+ (forecastTime[Calendar.MONTH] + 1) + "."
+				+ forecastTime[Calendar.YEAR] + "  "
+				+ forecastTime[Calendar.HOUR_OF_DAY] + ":"
+				+ forecastTime[Calendar.MINUTE])
 		val time2 = (forecastTime2[Calendar.DAY_OF_MONTH].toString() + "."
-				+ (localForecastTime[Calendar.MONTH] + 1) + "."
-				+ localForecastTime[Calendar.YEAR] + "  "
-				+ localForecastTime[Calendar.HOUR_OF_DAY] + ":"
-				+ localForecastTime[Calendar.MINUTE])
+				+ (forecastTime[Calendar.MONTH] + 1) + "."
+				+ forecastTime[Calendar.YEAR] + "  "
+				+ forecastTime[Calendar.HOUR_OF_DAY] + ":"
+				+ forecastTime[Calendar.MINUTE])
 		return if (timeRange == null) time1 else "${timeRange}${time1}${connector}${time2}"
 	}
 
@@ -537,9 +506,9 @@ class Grib1RecordPDS internal constructor(val tableVersion: Int,
 			"\tTable: ${tableVersion}",
 			"\tGrid ID: ${gridId}",
 			"\tTime: ${timeString()} (dd.mm.yyyy hh:mm)",
-			"\tType: ${parameterAbbreviation}",
-			"\tDescription: ${parameterDescription}",
-			"\tUnit: ${parameterUnits}",
+			"\tType: ${parameter.code}",
+			"\tDescription: ${parameter.description}",
+			"\tUnit: ${parameter.units}",
 			"\tTable version: ${tableVersion}",
 			"\t${level} decimal scale: ${decimalScale}",
 			(if (gdsExists) "\tGDS exists" else null),

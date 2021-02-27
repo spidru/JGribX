@@ -10,12 +10,14 @@
  */
 package mt.edu.um.cf2.jgribx.grib2
 
+import mt.edu.um.cf2.jgribx.api.GribLevel
+
 /**
  * ### [Code Table 4.5: Fixed surface types and units](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table4-5.shtml)
  *
  * See also [weather level on nimbus.com.uy](http://nimbus.com.uy/weather/grads/grib_levels.html)
  *
- * @param index Level ID/index (code figure)
+ * @param id Level ID/index (code figure)
  * @param code A unique codename for the level
  * @param name A generic name for the level
  * @param value Parameter value
@@ -24,12 +26,12 @@ package mt.edu.um.cf2.jgribx.grib2
  *
  * @author Jan Kubovy [jan@kubovy.eu]
  */
-class Grib2Level private constructor(val index: Int,
-									 val code: String,
-									 val name: String,
-									 internal val value: Float,
-									 val units: String = "",
-									 description: String? = null) {
+class Grib2Level private constructor(override val id: Int,
+									 override val code: String,
+									 override val name: String,
+									 override val value: Float,
+									 private val units: String = "",
+									 description: String? = null) : GribLevel {
 
 	companion object {
 		fun getLevel(type: Int, value: Float): Grib2Level? = when (type) {
@@ -182,15 +184,12 @@ class Grib2Level private constructor(val index: Int,
 		}
 	}
 
-	val description: String = description ?: name
-
-	val levelIdentifier: String
-		get() = "$code:$value"
+	override val description: String = description ?: name
 
 	override fun equals(other: Any?) = this === other
 			|| other is Grib2Level
-			&& index == other.index
+			&& id == other.id
 			&& value == other.value
 
-	override fun hashCode() = 31 * index + value.hashCode()
+	override fun hashCode() = 31 * id + value.hashCode()
 }

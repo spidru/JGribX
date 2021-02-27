@@ -14,6 +14,8 @@ import mt.edu.um.cf2.jgribx.GribInputStream
 import mt.edu.um.cf2.jgribx.GribOutputStream
 import mt.edu.um.cf2.jgribx.NoValidGribException
 import mt.edu.um.cf2.jgribx.NotSupportedException
+import mt.edu.um.cf2.jgribx.api.GribLevel
+import mt.edu.um.cf2.jgribx.api.GribProductDefinitionSection
 import java.util.*
 
 /**
@@ -37,8 +39,9 @@ import java.util.*
  * @throws NotSupportedException
  */
 abstract class Grib2RecordPDS protected constructor(val numberOfCoordinates: Int,
-													val parameter: Grib2Parameter,
-													internal val processId: Int) : Grib2Section {
+													override val parameter: Grib2Parameter,
+													internal val processId: Int) :
+		Grib2Section, GribProductDefinitionSection {
 
 	companion object {
 		internal fun readFromStream(gribInputStream: GribInputStream,
@@ -69,31 +72,13 @@ abstract class Grib2RecordPDS protected constructor(val numberOfCoordinates: Int
 	 *  [Table 4.0](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table4-0.shtml)) */
 	protected abstract val templateId: Int
 
-	abstract val forecastTime: Calendar
 	abstract val level1: Grib2Level
 	abstract val level2: Grib2Level?
 
+	override val level: GribLevel?
+		get() = level1
+
 	internal val dataSections = mutableListOf<Grib2RecordDS<*>>()
-
-	/** The abbreviation representing the parameter. */
-	val parameterAbbrev: String
-		get() = parameter.code
-
-	/** Description of the parameter. */
-	val parameterDescription: String
-		get() = parameter.description
-
-	val parameterUnits: String
-		get() = parameter.units
-
-	val levelCode: String
-		get() = level1.code
-
-	val levelDescription: String
-		get() = level1.description
-
-	val levelIdentifier: String
-		get() = level1.levelIdentifier
 
 	override fun writeTo(outputStream: GribOutputStream) {
 		super.writeTo(outputStream) // [1-5] length, section number

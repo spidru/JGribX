@@ -77,6 +77,7 @@ class GribInputStream(inputStream: InputStream?, private val onRead: (Long) -> U
 		mark(bytes)
 		read(peekBuffer)
 		reset()
+		resetBitCounter()
 		return peekBuffer
 	}
 

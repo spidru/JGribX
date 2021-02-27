@@ -17,7 +17,21 @@ import mt.edu.um.cf2.jgribx.api.GribSection
  */
 interface Grib2Section : GribSection {
 	companion object {
-		fun readFromStream(gribInputStream: GribInputStream, sectionNumber: Int): Int {
+		internal fun peekFromStream(gribInputStream: GribInputStream): Pair<Int, Int> {
+			gribInputStream.mark(5)
+
+			/* [1-4] Section Length */
+			val length = gribInputStream.readUINT(4)
+
+			/* [5] Section Number */
+			val number = gribInputStream.readUINT(1)
+
+			gribInputStream.reset()
+			gribInputStream.resetBitCounter()
+			return length to number
+		}
+
+		internal fun readFromStream(gribInputStream: GribInputStream, sectionNumber: Int): Int {
 			/* [1-4] Section Length */
 			val length = gribInputStream.readUINT(4)
 

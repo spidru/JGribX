@@ -11,7 +11,8 @@ import mt.edu.um.cf2.jgribx.grib2.Grib2Message
  */
 interface GribMessage {
 	companion object {
-		internal fun readFromStream(gribInputStream: GribInputStream): GribMessage {
+		internal fun readFromStream(gribInputStream: GribInputStream,
+									parameterFilter: (String) -> Boolean): GribMessage {
 			// There may be data on the beginning of the file, e.g. when using get_gfs.pl script
 			// (https://www.cpc.ncep.noaa.gov/products/wesley/get_gfs.html)
 			GribRecordIS.seekNext(gribInputStream)
@@ -23,9 +24,9 @@ interface GribMessage {
 					initial = indicatorSection.length.toLong(),
 					length = indicatorSection.recordLength).use {
 				val message = when (indicatorSection.gribEdition) {
-					1 -> Grib1Message.readFromStream(gribInputStream, indicatorSection)
+					1 -> Grib1Message.readFromStream(gribInputStream, indicatorSection, parameterFilter)
 					2 -> indicatorSection.discipline?.let { discipline ->
-						Grib2Message.readFromStream(gribInputStream, indicatorSection, discipline)
+						Grib2Message.readFromStream(gribInputStream, indicatorSection, discipline, parameterFilter)
 					} ?: throw NoValidGribException("Missing discipline for GRIB2 edition")
 					else -> throw NoValidGribException("Unsupported GRIB edition ${indicatorSection.gribEdition}")
 				}

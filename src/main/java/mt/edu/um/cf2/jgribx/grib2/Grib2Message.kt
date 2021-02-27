@@ -35,7 +35,7 @@ import mt.edu.um.cf2.jgribx.api.GribMessage
  *
  * This results into possibly multiple [GRIB2 records][Grib2Record] per one [GRIB2 message][Grib2Message] and therefore
  * the implementations are split (in contrast to GRIB1 where one [GRIB1 message][mt.edu.um.cf2.jgribx.grib1.Grib1Message]
- * contains exactly one [GRIB record][GribRecord] only)
+ * contains exactly one [GRIB record][mt.edu.um.cf2.jgribx.api.GribRecord] only)
  *
  * @author AVLAB-USER3
  * @author Jan Kubovy [jan@kubovy.eu]
@@ -48,6 +48,7 @@ class Grib2Message(private val indicatorSection: GribRecordIS,
 		fun readFromStream(gribInputStream: GribInputStream,
 						   indicatorSection: GribRecordIS,
 						   discipline: ProductDiscipline,
+						   parameterFilter: (String) -> Boolean,
 						   readEntire: Boolean = false): Grib2Message {
 			var messageLength = indicatorSection.recordLength - indicatorSection.length
 			var identificationSection: Grib2RecordIDS? = null
@@ -62,14 +63,12 @@ class Grib2Message(private val indicatorSection: GribRecordIS,
 
 			while (messageLength > 4) {
 				if (messageLength == 4L) break
-				gribInputStream.mark(5)
-				val sectionLength = gribInputStream.readUINT(4)
+
+				val (sectionLength, section) = Grib2Section.peekFromStream(gribInputStream)
 				if (sectionLength > messageLength) {
 					Logger.error("Section appears to be larger than the remaining length in the GRIB message")
 				}
-				val section = gribInputStream.readUINT(1)
-				gribInputStream.reset()
-				gribInputStream.resetBitCounter()
+
 				when (section) {
 					1 -> identificationSection = Grib2RecordIDS.readFromStream(gribInputStream, readEntire)
 					2 -> localUseSection = Grib2RecordLUS.readFromStream(gribInputStream, readEntire)
@@ -84,6 +83,17 @@ class Grib2Message(private val indicatorSection: GribRecordIS,
 								discipline,
 								identificationSection.referenceTime)
 								.also { gridDefinitionSection.productDefinitionSections.add(it) }
+						if (!parameterFilter(productDefinitionSection.parameter.code)) {
+							fun getSkipBytes() = Grib2Section.peekFromStream(gribInputStream)
+									.takeIf { (_, section) -> section in 5..7 }
+									?.first
+
+							var skipBytes = getSkipBytes()
+							while (skipBytes != null) {
+								gribInputStream.skip(skipBytes.toLong())
+								skipBytes = getSkipBytes()
+							}
+						}
 					}
 					5 -> dataRepresentationSection = Grib2RecordDRS.readFromStream(gribInputStream)
 					6 -> bitmapSection = Grib2RecordBMS.readFromStream(gribInputStream)

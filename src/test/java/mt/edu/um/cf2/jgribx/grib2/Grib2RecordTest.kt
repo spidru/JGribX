@@ -20,7 +20,7 @@ class Grib2RecordTest {
 		val (northCalc, eastCalc, southCalc, westCalc) = listOf(58.5, 3.6875, 57.75, 1.75)
 		assertNotEquals(file.records[0], file.records[1]) // 14
 		file.records.forEach { record ->
-			val expectedCoords = record.gridDefinitionSection.coords
+			val expectedCoords = record.gridDefinition.coords
 					.filter { (lon, lat) -> lat in (southCalc..northCalc) && lon in (westCalc..eastCalc) }
 			val expectedData = expectedCoords
 					.map { (lon, lat) -> Triple(lon, lat, record.getValue(lat, lon)) }
@@ -31,7 +31,7 @@ class Grib2RecordTest {
 
 			val coordinatesMatch = expectedCoords
 					.asSequence()
-					.mapIndexed { i, c -> c to record.gridDefinitionSection.coords[i] }
+					.mapIndexed { i, c -> c to record.gridDefinition.coords[i] }
 					.map { (a, b) -> abs(a[0] - b[0]) to abs(a[1] - b[1]) }
 					.map { (dLng, dLat) -> dLng + dLat }
 					.onEach { assertEquals(0.0, it, 0.0) }
@@ -61,7 +61,7 @@ class Grib2RecordTest {
 		val (northInput, eastInput, southInput, westInput) = listOf(58.493725, 3.633039, 57.807050, 1.759022)
 		val (northCalc, eastCalc, southCalc, westCalc) = listOf(58.5, 3.6875, 57.75, 1.75)
 		assertNotEquals(file.records[0], file.records[1]) // 14
-		val expectedCoords = file.records[0].gridDefinitionSection.coords
+		val expectedCoords = file.records[0].gridDefinition.coords
 				.filter { (lon, lat) -> lat in (southCalc..northCalc) && lon in (westCalc..eastCalc) }
 		val expectedData = mutableListOf<List<Float>>()
 		file.records.forEach { record ->
@@ -76,7 +76,7 @@ class Grib2RecordTest {
 		file.records.forEachIndexed { index, record ->
 			val coordinatesMatch = expectedCoords
 					.asSequence()
-					.mapIndexed { i, c -> c to record.gridDefinitionSection.coords[i] }
+					.mapIndexed { i, c -> c to record.gridDefinition.coords[i] }
 					.map { (a, b) -> abs(a[0] - b[0]) to abs(a[1] - b[1]) }
 					.map { (dLng, dLat) -> dLng + dLat }
 					.onEach { assertEquals(0.0, it, 0.0) }
