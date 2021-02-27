@@ -11,33 +11,39 @@
 package mt.edu.um.cf2.jgribx.grib2
 
 /**
- * Constructor for an instance of [Grib2Level] matching the specified type and value
+ * ### [Code Table 4.5: Fixed surface types and units](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table4-5.shtml)
  *
- * - [https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table4-5.shtml]
- * - [http://nimbus.com.uy/weather/grads/grib_levels.html]
+ * See also [weather level on nimbus.com.uy](http://nimbus.com.uy/weather/grads/grib_levels.html)
+ *
+ * @param index Level ID/index (code figure)
+ * @param code A unique codename for the level
+ * @param name A generic name for the level
+ * @param value Parameter value
+ * @param units Value units
+ * @param description Describes the level together with any specified values
+ *
+ * @author Jan Kubovy [jan@kubovy.eu]
  */
-class Grib2Level(
-		var index: Int,
-		var code: String, // provides a unique codename for the level
-		var name: String,  // provides a generic name for the level
-		var units: String = "",
-		internal var value1: Float = 0f,
-		internal var value2: Float = 0f,
-		description: String? = null) { // describes the level together with any specified values
+class Grib2Level private constructor(val index: Int,
+									 val code: String,
+									 val name: String,
+									 internal val value: Float,
+									 val units: String = "",
+									 description: String? = null) {
 
 	companion object {
 		fun getLevel(type: Int, value: Float): Grib2Level? = when (type) {
 			//0 -> Grib2Level(type, "RES", "reserved")
-			1 -> Grib2Level(type, "SFC", "ground or water surface")
-			2 -> Grib2Level(type, "CBL", "cloud base level")
-			3 -> Grib2Level(type, "CTL", "level of cloud tops")
-			4 -> Grib2Level(type, "0DEG", "level of 0 degC isotherm")
-			5 -> Grib2Level(type, "ADCL", "level of adiabatic condensation lifted from the surface")
-			6 -> Grib2Level(type, "MWSL", "maximum wind level")
-			7 -> Grib2Level(type, "TRO", "tropopause")
-			8 -> Grib2Level(type, "NTAT", "nominal top of the atmosphere")
-			9 -> Grib2Level(type, "SEAB", "sea bottom")
-			10 -> Grib2Level(type, "EATM", "entire atmosphere")
+			1 -> Grib2Level(type, "SFC", "ground or water surface", value)
+			2 -> Grib2Level(type, "CBL", "cloud base level", value)
+			3 -> Grib2Level(type, "CTL", "level of cloud tops", value)
+			4 -> Grib2Level(type, "0DEG", "level of 0 degC isotherm", value)
+			5 -> Grib2Level(type, "ADCL", "level of adiabatic condensation lifted from the surface", value)
+			6 -> Grib2Level(type, "MWSL", "maximum wind level", value)
+			7 -> Grib2Level(type, "TRO", "tropopause", value)
+			8 -> Grib2Level(type, "NTAT", "nominal top of the atmosphere", value)
+			9 -> Grib2Level(type, "SEAB", "sea bottom", value)
+			10 -> Grib2Level(type, "EATM", "entire atmosphere", value)
 			//11 -> Grib2Level(type, "", "cumulonimbus Base (CB)",
 			//		units = "m",
 			//		value1 = value)
@@ -51,9 +57,7 @@ class Grib2Level(
 			//15  -> Grib2Level(type, "", "convection condensation level (CCL)")
 			//16 -> Grib2Level(type, "", "level of neutral buoyancy or equilibrium (LNB)")
 			//in 17..19 -> Grib2Level(type, "", "reserved")
-			20 -> Grib2Level(type, "TMPL", "isothermal level",
-					units = "K",
-					value1 = value,
+			20 -> Grib2Level(type, "TMPL", "isothermal level", value, units = "K",
 					description = "${value}K isoterm")
 			//21 -> Grib2Level(type, "", "lowest level where mass density exceeds the specified value (base for a given threshold of mass density)",
 			//		units = "kg m-3",
@@ -71,37 +75,25 @@ class Grib2Level(
 			//		units = "dBZ",
 			//		value1 = value)
 			//in 26..99 -> Grib2Level(type, "", "Reserved")
-			100 -> Grib2Level(type, "ISBL", "isobaric surface",
-					units = "hPa",
-					value1 = value / 100,
+			100 -> Grib2Level(type, "ISBL", "isobaric surface", value, units = "Pa",
 					description = "pressure at ${(value / 100).toInt()}hPa")
-			101 -> Grib2Level(type, "MSL", "mean sea level")
-			102 -> Grib2Level(type, "GPML", "specified altitude above MSL",
-					units = "m",
-					value1 = value,
+			101 -> Grib2Level(type, "MSL", "mean sea level", value)
+			102 -> Grib2Level(type, "GPML", "specified altitude above MSL", value, units = "m",
 					description = "${value}m above MSL")
-			103 -> Grib2Level(type, "TGL", "specified height level above ground",
-					units = "m",
-					value1 = value,
+			103 -> Grib2Level(type, "TGL", "specified height level above ground", value, units = "m",
 					description = "${value}m above ground")
-			104 -> Grib2Level(type, "SIGM", "sigma level",
-					value1 = value,
+			104 -> Grib2Level(type, "SIGM", "sigma level", value,
 					description = "${value} sigma level")
-			105 -> Grib2Level(type, "HYBL", "Hybrid level",
-					value1 = value,
+			105 -> Grib2Level(type, "HYBL", "Hybrid level", value,
 					description = "${value} hybrid level(s)")
-			106 -> Grib2Level(type, "DBLL", "depth below land surface",
-					units = "m")
+			106 -> Grib2Level(type, "DBLL", "depth below land surface", value, units = "m")
 			//107 -> Grib2Level(type, "", "isentropic (theta) level")
 			108 -> Grib2Level(type, "SPDL", "level at specified pressure difference from ground to level",
-					units = "hPa",
-					value1 = value,
+					value, units = "hPa",
 					description = "${value}hPa pressure difference from ground")
-			109 -> Grib2Level(type, "PVL", "potential vorticity surface",
-					units = "K m2 kg-1 s-1",
-					value1 = value)
+			109 -> Grib2Level(type, "PVL", "potential vorticity surface", value, units = "K m2 kg-1 s-1")
 			//110 -> Grib2Level(type, "", "Reserved")
-			111 -> Grib2Level(type, "ETAL", "eta Level")
+			111 -> Grib2Level(type, "ETAL", "eta Level", value)
 			//112 -> Grib2Level(type, "", "Reserved")
 			//113 -> Grib2Level(type, "", "logarithmic hybrid level")
 			//114 -> Grib2Level(type, "", "snow Level",
@@ -155,17 +147,17 @@ class Grib2Level(
 			//184  -> Grib2Level(type, "", "grid tile glacier ice and inland ice fraction as a model surface")
 			//in 185..191 -> Grib2Level(type, "", "Reserved")
 			//in 192..254 -> Grib2Level(type, "", "Reserved for Local Use")
-			200 -> Grib2Level(type, "EATM", "entire atmosphere (considered as a single layer)")
-			201 -> Grib2Level(type, "EOCN", "entire ocean (considered as a single layer)")
-			204 -> Grib2Level(type, "HTFL", "highest tropospheric freezing level")
+			200 -> Grib2Level(type, "EATM", "entire atmosphere (considered as a single layer)", value)
+			201 -> Grib2Level(type, "EOCN", "entire ocean (considered as a single layer)", value)
+			204 -> Grib2Level(type, "HTFL", "highest tropospheric freezing level", value)
 			//206 -> Grib2Level(type, "", "grid scale cloud bottom level")
 			//207 -> Grib2Level(type, "", "grid scale cloud top level")
-			209 -> Grib2Level(type, "BCBL", "boundary layer cloud bottom level")
-			210 -> Grib2Level(type, "BCTL", "boundary layer cloud top level")
-			211 -> Grib2Level(type, "BCY", "boundary layer cloud layer")
-			212 -> Grib2Level(type, "LCBL", "low cloud bottom level")
-			213 -> Grib2Level(type, "LCTL", "low cloud top level")
-			214 -> Grib2Level(type, "LCY", "low cloud layer")
+			209 -> Grib2Level(type, "BCBL", "boundary layer cloud bottom level", value)
+			210 -> Grib2Level(type, "BCTL", "boundary layer cloud top level", value)
+			211 -> Grib2Level(type, "BCY", "boundary layer cloud layer", value)
+			212 -> Grib2Level(type, "LCBL", "low cloud bottom level", value)
+			213 -> Grib2Level(type, "LCTL", "low cloud top level", value)
+			214 -> Grib2Level(type, "LCY", "low cloud layer", value)
 			//215 -> Grib2Level(type, "", "cloud ceiling")
 			//216 -> Grib2Level(type, "", "effective layer top level",
 			//		units = "m",
@@ -176,16 +168,16 @@ class Grib2Level(
 			//218 -> Grib2Level(type, "", "effective layer",
 			//		units = "m",
 			//		value1 = value)
-			220 -> Grib2Level(type, "PBL", "planetary boundary layer")
-			222 -> Grib2Level(type, "MCBL", "Middle cloud bottom level")
-			223 -> Grib2Level(type, "MCTL", "Middle cloud top level")
-			224 -> Grib2Level(type, "MCY", "Middle cloud layer")
-			232 -> Grib2Level(type, "HCBL", "High cloud bottom level")
-			233 -> Grib2Level(type, "HCTL", "High cloud top level")
-			234 -> Grib2Level(type, "HCY", "High cloud layer")
-			242 -> Grib2Level(type, "CCBL", "Convective cloud bottom level")
-			243 -> Grib2Level(type, "CCTL", "Convective cloud top level")
-			244 -> Grib2Level(type, "CCY", "Convective cloud layer")
+			220 -> Grib2Level(type, "PBL", "planetary boundary layer", value)
+			222 -> Grib2Level(type, "MCBL", "Middle cloud bottom level", value)
+			223 -> Grib2Level(type, "MCTL", "Middle cloud top level", value)
+			224 -> Grib2Level(type, "MCY", "Middle cloud layer", value)
+			232 -> Grib2Level(type, "HCBL", "High cloud bottom level", value)
+			233 -> Grib2Level(type, "HCTL", "High cloud top level", value)
+			234 -> Grib2Level(type, "HCY", "High cloud layer", value)
+			242 -> Grib2Level(type, "CCBL", "Convective cloud bottom level", value)
+			243 -> Grib2Level(type, "CCTL", "Convective cloud top level", value)
+			244 -> Grib2Level(type, "CCY", "Convective cloud layer", value)
 			else -> null
 		}
 	}
@@ -193,8 +185,12 @@ class Grib2Level(
 	val description: String = description ?: name
 
 	val levelIdentifier: String
-		get() = "$code:$value1"
+		get() = "$code:$value"
 
-	val values: FloatArray
-		get() = floatArrayOf(value1, value2)
+	override fun equals(other: Any?) = this === other
+			|| other is Grib2Level
+			&& index == other.index
+			&& value == other.value
+
+	override fun hashCode() = 31 * index + value.hashCode()
 }

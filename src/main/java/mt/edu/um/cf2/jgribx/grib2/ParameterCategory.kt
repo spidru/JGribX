@@ -2,7 +2,7 @@ package mt.edu.um.cf2.jgribx.grib2
 
 import mt.edu.um.cf2.jgribx.Logger
 
-abstract class ParameterCategory(internal val value: Int, private val name: String) {
+abstract class ParameterCategory private constructor(internal val value: Int, private val name: String) {
 	class Meteorological private constructor(categoryId: Int, name: String) : ParameterCategory(categoryId, name) {
 		companion object {
 			val CATEGORIES: List<ParameterCategory> = mapOf(
@@ -70,7 +70,10 @@ abstract class ParameterCategory(internal val value: Int, private val name: Stri
 		}
 	}
 
-	override fun equals(other: Any?): Boolean = other != null && other is ParameterCategory && other.value == value
+	override fun equals(other: Any?): Boolean = this === other
+			|| other is ParameterCategory
+			&& value == other.value
+			&& name == other.name
 
 	override fun hashCode(): Int = 31 * value + name.hashCode()
 

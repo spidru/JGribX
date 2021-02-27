@@ -131,6 +131,10 @@ class GribFile(gribInputStream: GribInputStream) {
 		//GribPDSParamTable.readParameterTableLookup(); done in static initializer
 		var count = 0
 		while (gribInputStream.available() > 0) {
+			// There may be data on the beginning of the file, e.g. when using get_gfs.pl script
+			// (https://www.cpc.ncep.noaa.gov/products/wesley/get_gfs.html)
+			GribRecordIS.seekNext(gribInputStream)
+
 			count++
 			try {
 				val record = GribRecord.readFromStream(gribInputStream)
@@ -139,6 +143,10 @@ class GribFile(gribInputStream: GribInputStream) {
 				Logger.info("\tParameter: ${record.parameterCode} (${record.parameterDescription})")
 				Logger.info("\tLevel: ${record.levelCode} (${record.levelDescription})")
 				recordsInternal.add(record)
+			} catch (e: NotImplementedError) {
+				Logger.warning("Skipping GRIB record ${count} (${e.message})", e)
+				recordsSkippedCount++
+				continue
 			} catch (e: NotSupportedException) {
 				Logger.warning("Skipping GRIB record ${count} (${e.message})", e)
 				recordsSkippedCount++

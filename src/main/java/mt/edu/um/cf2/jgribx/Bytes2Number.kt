@@ -12,7 +12,6 @@ package mt.edu.um.cf2.jgribx
 
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import java.util.*
 import kotlin.math.pow
 
 /**
@@ -39,36 +38,55 @@ object Bytes2Number {
 
 	fun bytesToUint(bytes: ByteArray): Int {
 		val nBytes = bytes.size
-		require(nBytes <= /*Integer.BYTES*/4) { "nBytes cannot be larger than 4" }
+		require(nBytes <= Int.SIZE_BYTES) { "nBytes cannot be larger than ${Int.SIZE_BYTES} bytes" }
 		var value = 0
-		for (i in 0 until nBytes) {
+		repeat(nBytes) { i ->
 			value = value or (bytes[i].toInt() and 0xFF shl (nBytes - i - 1) * 8)
 		}
 		return value
 	}
 
+	fun uintToBytes(value: Int, nBytes: Int = Int.SIZE_BYTES): ByteArray {
+		require(nBytes <= Int.SIZE_BYTES) { "nBytes cannot be larger than ${Int.SIZE_BYTES} bytes" }
+		val bytes = ByteArray(nBytes)
+		repeat(nBytes) { i ->
+			bytes[i] = ((value shr ((nBytes - i - 1) * 8)) and 0xFF).toByte()
+		}
+		return bytes
+	}
+
 	fun bytesToLong(bytes: ByteArray): Long {
 		val nBytes = bytes.size
-		require(nBytes <= /*Long.BYTES*/8) { "nBytes cannot be larger than 8 bytes" }
-		var value = 0
-		for (i in 0 until nBytes) {
-			value = value or (bytes[i].toInt() and 0xFF shl (nBytes - i - 1) * 8)
+		require(nBytes <= Long.SIZE_BYTES) { "nBytes cannot be larger than ${Long.SIZE_BYTES} bytes" }
+		var value = 0L
+		repeat(nBytes) { i ->
+			value = value or (bytes[i].toLong() and 0xFF shl ((nBytes - i - 1) * 8))
 		}
-		return value.toLong()
+		return value
+	}
+
+	fun longToBytes(value: Long, nBytes: Int = Long.SIZE_BYTES): ByteArray {
+		require(nBytes <= Long.SIZE_BYTES) { "nBytes cannot be larger than ${Long.SIZE_BYTES} bytes" }
+		val bytes = ByteArray(nBytes)
+		repeat(nBytes) { i ->
+			bytes[i] = ((value shr ((nBytes - i - 1) * 8)) and 0xFF).toByte()
+		}
+		return bytes
 	}
 
 	fun bytesToInt(bytes: ByteArray, mode: Int): Int {
-		val negative: Boolean
 		var value = 0
-		val nBytes = bytes.size
-		if (mode == INT_SM) {
-			negative = bytes[0].toInt() and 0x80 == 0x80
-			bytes[0] = (bytes[0].toInt() and 0x7F).toByte()
-			value = bytesToUint(bytes)
-			if (negative) value *= -1
-		} else if (mode == INT_TC) {
-			for (i in 0 until nBytes) {
-				value = value or (bytes[i].toInt() shl (nBytes - i - 1) * 8)
+		when (mode) {
+			INT_SM -> {
+				val negative = bytes[0].toInt() and 0x80 == 0x80
+				bytes[0] = (bytes[0].toInt() and 0x7F).toByte()
+				value = bytesToUint(bytes)
+				if (negative) value *= -1
+			}
+			INT_TC -> {
+				for (i in bytes.indices) {
+					value = value or (bytes[i].toInt() shl (bytes.size - i - 1) * 8)
+				}
 			}
 		}
 		return value
@@ -90,8 +108,10 @@ object Bytes2Number {
 				val mantissa = bytesToUint(bytes.copyOfRange(1, 4))
 				(sign * 16.0.pow((exponent - 6).toDouble()) * mantissa).toFloat()
 			}
-			FLOAT_IEEE754 -> ByteBuffer.wrap(bytes)
-					.order(ByteOrder.BIG_ENDIAN).float
+			FLOAT_IEEE754 -> ByteBuffer
+					.wrap(bytes)
+					.order(ByteOrder.BIG_ENDIAN)
+					.float
 			else -> throw IllegalArgumentException("Invalid format specified")
 		}
 	}
