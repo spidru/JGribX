@@ -10,32 +10,25 @@
  */
 package mt.edu.um.cf2.jgribx.grib2
 
-import mt.edu.um.cf2.jgribx.GribInputStream
-import mt.edu.um.cf2.jgribx.GribRecord
-import mt.edu.um.cf2.jgribx.GribRecordIS
-import mt.edu.um.cf2.jgribx.Logger
-import mt.edu.um.cf2.jgribx.NoValidGribException
-import mt.edu.um.cf2.jgribx.grib2.Grib2RecordDS.Companion.readFromStream
+import mt.edu.um.cf2.jgribx.*
 import java.util.*
 import kotlin.math.roundToInt
 
 /**
- *
  * @author AVLAB-USER3
  */
-class Grib2Record(indicatorSection: GribRecordIS,
-				  private var identificationSection: Grib2RecordIDS,
-				  protected var localUseSection: List<Grib2RecordLUS>,
-				  var gridDefinitionSection: List<Grib2RecordGDS>,
-				  private var productDefinitionSection: List<Grib2RecordPDS>,
-				  private var dataRepresentationSection: List<Grib2RecordDRS>,
-				  private var bitmapSection: List<Grib2RecordBMS>,
-				  var dataSection: List<Grib2RecordDS>) : GribRecord(indicatorSection) {
+class Grib2Record private constructor(indicatorSection: GribRecordIS,
+									  private val identificationSection: Grib2RecordIDS,
+									  private val localUseSection: List<Grib2RecordLUS>,
+									  private val gridDefinitionSection: List<Grib2RecordGDS>,
+									  private val productDefinitionSection: List<Grib2RecordPDS>,
+									  private val dataRepresentationSection: List<Grib2RecordDRS>,
+									  private val bitmapSection: List<Grib2RecordBMS>,
+									  private val dataSection: List<Grib2RecordDS>) : GribRecord(indicatorSection) {
 	companion object {
 		fun readFromStream(gribInputStream: GribInputStream,
 						   indicatorSection: GribRecordIS,
 						   discipline: ProductDiscipline): Grib2Record {
-			//val record = Grib2Record()
 			var recordLength = indicatorSection.recordLength - indicatorSection.length
 			var identificationSection: Grib2RecordIDS? = null
 			var dataRepresentationSection: Grib2RecordDRS? = null
@@ -76,13 +69,14 @@ class Grib2Record(indicatorSection: GribRecordIS,
 							?.also { bitmapSectionList.add(it) }
 					7 -> if (dataRepresentationSection != null
 							&& gridDefinitionSection != null
-							&& bitmapSection != null)
-						readFromStream(
+							&& bitmapSection != null) {
+						Grib2RecordDS.readFromStream(
 								gribInputStream,
-								dataRepresentationSection,
 								gridDefinitionSection,
+								dataRepresentationSection,
 								bitmapSection)
 								?.also { dataSectionList.add(it) }
+					}
 					else -> throw NoValidGribException("Invalid section ${section} encountered")
 				}
 				if (gribInputStream.byteCounter != sectionLength) Logger.error(
