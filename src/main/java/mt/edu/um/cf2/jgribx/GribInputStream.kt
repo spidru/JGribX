@@ -26,6 +26,19 @@ import kotlin.math.ceil
  * @version 1.0
  */
 class GribInputStream(inputStream: InputStream?, private val onRead: (Long) -> Unit = {}) : FilterInputStream(inputStream) {
+	inner class ByteCounter internal constructor(private val gribInputStream: GribInputStream,
+												 private val length: Long? = null,
+												 internal var read: Long = 0,
+												 private val onClose: () -> Unit = {}) : AutoCloseable {
+		override fun close() {
+			length?.also { length ->
+				gribInputStream.skip(length - read)
+				byteCounters.remove(this)
+			}
+			onClose()
+		}
+	}
+
 	/** Buffer for one byte which will be processed bit by bit. */
 	private var bitBuf = 0
 
@@ -44,6 +57,29 @@ class GribInputStream(inputStream: InputStream?, private val onRead: (Long) -> U
 	private var readBytes = 0L
 	private var markedBytes = 0L
 
+	private val byteCounters = mutableSetOf<ByteCounter>()
+
+	fun createByteCounter(length: Long? = null, initial: Long = 0, onClose: () -> Unit = {}) =
+			ByteCounter(this, length, initial, onClose).also { byteCounters.add(it) }
+
+	fun destroyByteCounter(byteCounter: ByteCounter) = byteCounters.remove(byteCounter)
+
+	private fun incrementByteCounters(increment: Number = 1): Long {
+		byteCounters.forEach { it.read += increment.toLong() }
+		readBytes += increment.toLong()
+		return readBytes
+	}
+
+	private var peekBuffer: ByteArray = ByteArray(4) // Minimize recreation
+
+	internal fun peek(bytes: Int): ByteArray {
+		if (peekBuffer.size != bytes) peekBuffer = ByteArray(bytes)
+		mark(bytes)
+		read(peekBuffer)
+		reset()
+		return peekBuffer
+	}
+
 	@Synchronized
 	override fun mark(readLimit: Int) {
 		super.mark(readLimit)
@@ -54,7 +90,7 @@ class GribInputStream(inputStream: InputStream?, private val onRead: (Long) -> U
 	@Synchronized
 	override fun reset() {
 		super.reset()
-		readBytes -= (readBytes - markedBytes)
+		incrementByteCounters(-(readBytes - markedBytes))
 		bitCounter = markedCountBits
 	}
 
@@ -65,7 +101,6 @@ class GribInputStream(inputStream: InputStream?, private val onRead: (Long) -> U
 	fun seekNextByte() {
 		if (bitPos != 0) {
 			bitCounter += bitPos.toLong()
-			// System.out.println("countBits += "+bitPos);
 			bitPos = 0
 		}
 	}
@@ -100,7 +135,7 @@ class GribInputStream(inputStream: InputStream?, private val onRead: (Long) -> U
 	fun readUI8(): Int {
 		val ui8 = `in`.read()
 		if (ui8 < 0) throw IOException("End of input.")
-		onRead(++readBytes)
+		onRead(incrementByteCounters())
 		return ui8
 	}
 
@@ -116,7 +151,7 @@ class GribInputStream(inputStream: InputStream?, private val onRead: (Long) -> U
 		var read = 0
 		var i = 0
 		while (i < length && read >= 0) {
-			read = this.read()
+			read = read()
 			data[i] = read
 			i++
 		}
@@ -133,10 +168,10 @@ class GribInputStream(inputStream: InputStream?, private val onRead: (Long) -> U
 	 */
 	fun read(length: Int): ByteArray {
 		val data = ByteArray(length)
-		val numRead = this.read(data)
+		val numRead = read(data)
 		if (numRead < length) {
 			// retry reading
-			val numReadRetry = this.read(data, numRead, data.size - numRead)
+			val numReadRetry = read(data, numRead, data.size - numRead)
 			if (numRead + numReadRetry < length) throw IOException("Unexpected end of input.")
 		}
 		return data
@@ -145,15 +180,14 @@ class GribInputStream(inputStream: InputStream?, private val onRead: (Long) -> U
 	override fun read(): Int {
 		val value = super.read()
 		bitCounter += 8
-		onRead(++readBytes)
+		onRead(incrementByteCounters())
 		return value
 	}
 
 	override fun read(b: ByteArray, off: Int, len: Int): Int {
 		val i = super.read(b, off, len)
 		bitCounter += (len * 8).toLong()
-		readBytes += len
-		onRead(readBytes)
+		onRead(incrementByteCounters(len))
 		return i
 	}
 
@@ -161,8 +195,7 @@ class GribInputStream(inputStream: InputStream?, private val onRead: (Long) -> U
 		var skipped = 0L
 		while (skipped < n) skipped += super.skip(n - skipped)
 		bitCounter += n * 8
-		readBytes += n
-		onRead(readBytes)
+		onRead(incrementByteCounters(n))
 		return n
 	}
 
@@ -180,6 +213,7 @@ class GribInputStream(inputStream: InputStream?, private val onRead: (Long) -> U
 		var result: Long = 0
 		if (bitPos == 0) {
 			bitBuf = `in`.read()
+			onRead(incrementByteCounters())
 			bitPos = 8
 		}
 		while (true) {
@@ -190,13 +224,12 @@ class GribInputStream(inputStream: InputStream?, private val onRead: (Long) -> U
 
 				// Get the next byte from the input stream
 				bitBuf = `in`.read()
+				onRead(incrementByteCounters())
 				bitPos = 8
 			} else { // Consume a portion of the buffer
 				result = result or (bitBuf shr -shift).toLong()
 				bitPos -= bitsLeft
 				bitBuf = bitBuf and (0xff shr 8 - bitPos) // mask off consumed bits
-				readBytes += (numBits / 8)
-				onRead(readBytes)
 				return result
 			}
 		}

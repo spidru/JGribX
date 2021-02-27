@@ -102,16 +102,9 @@ class GribRecordIS internal constructor(var gribEdition: Int,
 		 * @throws IOException
 		 */
 		fun seekNext(gribInputStream: GribInputStream) {
-			val code = ByteArray(4)
 			var bytesSkipped = 0
 			while (gribInputStream.available() > 0) {
-				gribInputStream.mark(4)
-				gribInputStream.read(code)
-				if (code.contentEquals("GRIB".toByteArray())) {
-					gribInputStream.reset()
-					break
-				}
-				gribInputStream.reset()
+				if (gribInputStream.peek(4).contentEquals("GRIB".toByteArray())) break
 				gribInputStream.read(1) // skip 1 byte
 				bytesSkipped++
 			}
