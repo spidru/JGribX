@@ -14,6 +14,7 @@ import mt.edu.um.cf2.jgribx.GribInputStream
 import mt.edu.um.cf2.jgribx.GribOutputStream
 import mt.edu.um.cf2.jgribx.Logger
 import mt.edu.um.cf2.jgribx.NoValidGribException
+import java.util.*
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -265,29 +266,21 @@ open class Grib1GDSLatLon(numberOfVerticalCoordinateValues: Int,
 		outputStream.write(ByteArray(4)) // [29-32]
 	}
 
-	/** @see Grib1RecordGDS.compare     */
-	override fun compare(gds: Grib1RecordGDS): Int {
-		if (this == gds) return 0
-		// not equal, so either less than or greater than.
-		// check if gds is less, if not, then gds is greater
-
-		if (dataRepresentationType > gds.dataRepresentationType) return -1
-		if (gds !is Grib1GDSLatLon) return dataRepresentationType.compareTo(gds.dataRepresentationType)
-		if (resolutionAndComponentFlags > gds.resolutionAndComponentFlags) return -1
-		if (scanningMode > gds.scanningMode) return -1
-		if (gridNi > gds.gridNi) return -1
-		if (gridNj > gds.gridNj) return -1
-		if (iDirectionIncrement > gds.iDirectionIncrement) return -1
-		if (jDirectionIncrement > gds.jDirectionIncrement) return -1
-		if (latitudeOfFirstGridPoint > gds.latitudeOfFirstGridPoint) return -1
-		if (latitudeOfLastGridPoint > gds.latitudeOfLastGridPoint) return -1
-		//if (gridLatSP > gds.gridLatSP) return -1
-		if (longitudeOfFirstGridPoint > gds.longitudeOfFirstGridPoint) return -1
-		return if (longitudeOfLastGridPoint > gds.longitudeOfLastGridPoint) return -1 else 1
-		//if (gridLngSP > gds.gridLngSP) return -1
-		//return if (gridRotAngle > gds.gridRotAngle) -1 else 1
-		// if here, then something must be greater than something else - doesn't matter what
-	}
+	/** @see Grib1RecordGDS.compareTo */
+	override fun compareTo(other: Grib1RecordGDS): Int = if (other is Grib1GDSLatLon) Comparator
+			.comparingInt<Grib1GDSLatLon>(Grib1RecordGDS::dataRepresentationType)
+			.thenComparingInt(Grib1GDSLatLon::resolutionAndComponentFlags)
+			.thenComparingInt(Grib1GDSLatLon::scanningMode)
+			.thenComparingInt(Grib1GDSLatLon::gridNi)
+			.thenComparingInt(Grib1GDSLatLon::gridNj)
+			.thenComparingDouble(Grib1GDSLatLon::iDirectionIncrement)
+			.thenComparingDouble(Grib1GDSLatLon::jDirectionIncrement)
+			.thenComparingDouble(Grib1GDSLatLon::latitudeOfFirstGridPoint)
+			.thenComparingDouble(Grib1GDSLatLon::latitudeOfLastGridPoint)
+			.thenComparingDouble(Grib1GDSLatLon::longitudeOfFirstGridPoint)
+			.thenComparingDouble(Grib1GDSLatLon::longitudeOfLastGridPoint)
+			.compare(this, other)
+	else super.compareTo(other)
 
 	override fun equals(other: Any?) = this === other
 			|| other is Grib1GDSLatLon

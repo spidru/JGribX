@@ -37,6 +37,7 @@ import mt.edu.um.cf2.jgribx.GribInputStream
 import mt.edu.um.cf2.jgribx.GribOutputStream
 import mt.edu.um.cf2.jgribx.Logger
 import mt.edu.um.cf2.jgribx.NoValidGribException
+import java.util.*
 import kotlin.math.*
 
 /**
@@ -403,31 +404,22 @@ class Grib1GDSLambert(numberOfVerticalCoordinateValues: Int,
 
 	override fun writeTo(outputStream: GribOutputStream) = TODO()
 
-	override fun compare(gds: Grib1RecordGDS): Int {
-		if (this == gds) {
-			return 0
-		}
-
-		// not equal, so either less than or greater than.
-		// check if gds is less, if not, then gds is greater
-		if (dataRepresentationType > gds.dataRepresentationType) return -1
-		if (gds !is Grib1GDSLambert) return -1
-		if (resolutionAndComponentFlags > gds.resolutionAndComponentFlags) return -1
-		if (scanningMode > gds.scanningMode) return -1
-		if (gridNx > gds.gridNx) return -1
-		if (gridNy > gds.gridNy) return -1
-		if (dxInMetres > gds.dxInMetres) return -1
-		if (dyInMetres > gds.dyInMetres) return -1
-		if (latitudeOfFirstGridPoint > gds.latitudeOfFirstGridPoint) return -1
-		//if (gridLat2 > gds.gridLat2) return -1
-		if (latitudeOfSouthernPole > gds.latitudeOfSouthernPole) return -1
-		if (longitudeOfFirstGridPoint > gds.longitudeOfFirstGridPoint) return -1
-		if (loV > gds.loV) return -1
-		return if (longitudeOfSouthernPole > gds.longitudeOfSouthernPole) return -1 else 1
-		//return if (gridRotAngle > gds.gridRotAngle) -1 else 1
-
-		// if here, then something must be greater than something else - doesn't matter what
-	}
+	/** @see Grib1RecordGDS.compareTo */
+	override fun compareTo(other: Grib1RecordGDS): Int = if (other is Grib1GDSLambert) Comparator
+			.comparingInt<Grib1GDSLambert>(Grib1RecordGDS::dataRepresentationType)
+			.thenComparingInt(Grib1GDSLambert::resolutionAndComponentFlags)
+			.thenComparingInt(Grib1GDSLambert::scanningMode)
+			.thenComparingInt(Grib1GDSLambert::gridNx)
+			.thenComparingInt(Grib1GDSLambert::gridNy)
+			.thenComparingDouble(Grib1GDSLambert::dxInMetres)
+			.thenComparingDouble(Grib1GDSLambert::dyInMetres)
+			.thenComparingDouble(Grib1GDSLambert::latitudeOfFirstGridPoint)
+			.thenComparingDouble(Grib1GDSLambert::latitudeOfSouthernPole)
+			.thenComparingDouble(Grib1GDSLambert::longitudeOfFirstGridPoint)
+			.thenComparingDouble(Grib1GDSLambert::loV)
+			.thenComparingDouble(Grib1GDSLambert::longitudeOfSouthernPole)
+			.compare(this, other)
+	else super.compareTo(other)
 
 	override fun equals(other: Any?) = this === other
 			|| other is Grib1GDSLambert

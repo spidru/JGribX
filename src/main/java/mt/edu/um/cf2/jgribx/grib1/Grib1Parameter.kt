@@ -29,7 +29,7 @@ import mt.edu.um.cf2.jgribx.api.GribParameter
 class Grib1Parameter(override val id: Int,
 					 override val code: String = "",
 					 override val description: String = "",
-					 internal val units: String = "") : GribParameter {
+					 internal val units: String = "") : GribParameter, Comparable<Grib1Parameter> {
 
 	companion object {
 		// As of Nov 2017, all Table Versions make use of Table 2 for Parameter IDs between 0 and 128
@@ -1810,17 +1810,22 @@ class Grib1Parameter(override val id: Int,
 	/**
 	 * rdg - added this method to be used in a comparator for sorting while
 	 * extracting records.
-	 * @param param to compare
+	 *
+	 * TODO JK: Should this be part of the default API (not consistent with GRIB2), other solutions:
+	 *   - Define comparators outside this class (utility) - different comparators for one class possible
+	 *   - Leave definition of custom comparators to users of this library (remove it here)
+	 *   - Implement [Comparable] interface across the library (e.g. as a part of
+	 *     [GribParameter][mt.edu.um.cf2.jgribx.api.GribParameter]).
+	 *
+	 * @param other to compare
 	 * @return - -1 if level is "less than" this, 0 if equal, 1 if level is "greater than" this.
 	 */
-	fun compare(param: Grib1Parameter): Int {
-		if (this == param) return 0
-
-		// check if param is less than this
-		// really only one thing to compare because parameter table sets info
-		// compare tables in GribRecordPDS
-		return if (id > id) -1 else 1
-	}
+	override fun compareTo(other: Grib1Parameter): Int = Comparator
+			// check if param is less than this
+			// really only one thing to compare because parameter table sets info
+			// compare tables in GribRecordPDS
+			.comparingInt(Grib1Parameter::id)
+			.compare(this, other)
 
 	override fun equals(other: Any?): Boolean {
 		if (other !is Grib1Parameter) return false

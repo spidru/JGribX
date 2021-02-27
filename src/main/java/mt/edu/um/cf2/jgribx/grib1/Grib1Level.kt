@@ -55,7 +55,7 @@ class Grib1Level(override val id: Int,
 				 private val value2: Float = Float.NaN,
 				 private val isNumeric: Boolean = false,
 				 private val isSingleLayer: Boolean = true,
-				 private val isIncreasingUp: Boolean = true) : GribLevel {
+				 private val isIncreasingUp: Boolean = true) : GribLevel, Comparable<Grib1Level> {
 
 	companion object {
 		fun getLevel(levelType: Int, levelData: Int): Grib1Level? {
@@ -217,20 +217,22 @@ class Grib1Level(override val id: Int,
 	 * rdg - added this method to be used in a comparator for sorting while
 	 * extracting records.
 	 *
-	 * @param level
+	 * TODO JK: Should this be part of the default API (not consistent with GRIB2), other solutions:
+	 *   - Define comparators outside this class (utility) - different comparators for one class possible
+	 *   - Leave definition of custom comparators to users of this library (remove it here)
+	 *   - Implement [Comparable] interface across the library (e.g. as a part of
+	 *     [GribLevel][mt.edu.um.cf2.jgribx.api.GribLevel]).
+	 *
+	 * @param other
 	 *
 	 * @return - -1 if level is "less than" this, 0 if equal, 1 if level is
 	 * "greater than" this.
 	 */
-	fun compare(level: Grib1Level?): Int {
-		if (this == level) return 0
-		if (level == null) return -1
-
-		// check if level is less than this
-		if (id > level.id) return -1
-		if (value1 > level.value1) return -1
-		return if (value2 > level.value2) -1 else 1
-	}
+	override fun compareTo(other: Grib1Level): Int = Comparator
+			.comparingInt(Grib1Level::id)
+			.thenComparing(Grib1Level::value1)
+			.thenComparing(Grib1Level::value2)
+			.compare(this, other)
 
 	override fun equals(other: Any?) = this === other
 			|| other is Grib1Level

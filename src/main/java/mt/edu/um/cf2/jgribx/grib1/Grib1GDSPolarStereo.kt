@@ -13,6 +13,7 @@ import mt.edu.um.cf2.jgribx.GribInputStream
 import mt.edu.um.cf2.jgribx.GribOutputStream
 import mt.edu.um.cf2.jgribx.Logger
 import mt.edu.um.cf2.jgribx.NotSupportedException
+import java.util.*
 import kotlin.math.*
 
 /**
@@ -283,28 +284,19 @@ class Grib1GDSPolarStereo(numberOfVerticalCoordinateValues: Int,
 
 	override fun writeTo(outputStream: GribOutputStream) = TODO()
 
-	/** @see Grib1RecordGDS.compare */
-	override fun compare(gds: Grib1RecordGDS): Int {
-		if (this == gds) return 0
-		if (gds !is Grib1GDSPolarStereo) return -1
-		// not equal, so either less than or greater than.
-		// check if gds is less, if not, then gds is greater
-		if (dataRepresentationType > gds.dataRepresentationType) return -1
-		if (resolutionAndComponentFlags > gds.resolutionAndComponentFlags) return -1
-		if (scanningMode > gds.scanningMode) return -1
-		if (gridNx > gds.gridNx) return -1
-		if (gridNy > gds.gridNy) return -1
-		if (dxInMetres > gds.dxInMetres) return -1
-		if (dyInMetres > gds.dyInMetres) return -1
-		if (latitudeOfFirstGridPoint > gds.latitudeOfFirstGridPoint) return -1
-		//if (gridLat2 > gds.gridLat2) return -1
-		//if (gridLatSP > gds.gridLatSP) return -1
-		return if (longitudeOfFirstGridPoint > gds.longitudeOfFirstGridPoint) return -1 else 1
-		//if (gridLng2 > gds.gridLng2) return -1
-		//if (gridLngSP > gds.gridLngSP) return -1
-		//return if (gridRotAngle > gds.gridRotAngle) -1 else 1
-		// if here, then something must be greater than something else - doesn't matter what
-	}
+	/** @see Grib1RecordGDS.compareTo */
+	override fun compareTo(other: Grib1RecordGDS): Int = if (other is Grib1GDSPolarStereo) Comparator
+			.comparingInt<Grib1GDSPolarStereo>(Grib1RecordGDS::dataRepresentationType)
+			.thenComparingInt(Grib1GDSPolarStereo::resolutionAndComponentFlags)
+			.thenComparingInt(Grib1GDSPolarStereo::scanningMode)
+			.thenComparingInt(Grib1GDSPolarStereo::gridNx)
+			.thenComparingInt(Grib1GDSPolarStereo::gridNy)
+			.thenComparingDouble(Grib1GDSPolarStereo::dxInMetres)
+			.thenComparingDouble(Grib1GDSPolarStereo::dyInMetres)
+			.thenComparingDouble(Grib1GDSPolarStereo::latitudeOfFirstGridPoint)
+			.thenComparingDouble(Grib1GDSPolarStereo::longitudeOfFirstGridPoint)
+			.compare(this, other)
+	else super.compareTo(other)
 
 	override fun equals(other: Any?) = this === other
 			|| other is Grib1GDSPolarStereo

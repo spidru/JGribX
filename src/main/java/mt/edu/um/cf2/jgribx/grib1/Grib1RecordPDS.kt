@@ -107,7 +107,10 @@ class Grib1RecordPDS internal constructor(val tableVersion: Int,
 										  val numberMissing: Int,
 										  val subCenterId: Int,
 										  val decimalScale: Int,
-										  private val additionalBytes: Int) : Grib1Section, GribProductDefinitionSection {
+										  private val additionalBytes: Int) :
+		Grib1Section,
+		GribProductDefinitionSection,
+		Comparable<Grib1RecordPDS> {
 
 	companion object {
 		internal fun calculateForecastTime(referenceTime: Calendar, timeUnit: Int, p1Input: Int, p2Input: Int,
@@ -410,26 +413,28 @@ class Grib1RecordPDS internal constructor(val tableVersion: Int,
 	 * the PDS information to sort according to a time, level, level-type,
 	 * y-axis, x-axis order
 	 *
-	 * @param pds - GribRecordPDS object
+	 * TODO JK: Should this be part of the default API (not consistent with GRIB2), other solutions:
+	 *   - Define comparators outside this class (utility) - different comparators for one class possible
+	 *   - Leave definition of custom comparators to users of this library (remove it here)
+	 *   - Implement [Comparable] interface across the library (e.g. as a part of
+	 *     [GribSection][mt.edu.um.cf2.jgribx.api.GribSection] and [mt.edu.um.cf2.jgribx.api.GribRecord]).
+	 *
+	 * @param other - GribRecordPDS object
 	 * @return - -1 if pds is "less than" this, 0 if equal, 1 if pds is "greater than" this.
 	 */
-	fun compare(pds: Grib1RecordPDS): Int {
-		if (this == pds) return 0
-		// not equal, so either less than or greater than.
-		// check if pds is less; if not, then pds is greater
-		if (gridId > pds.gridId) return -1
-		if (referenceTime.time.time > pds.referenceTime.time.time) return -1
-		if (forecastTime.time.time > pds.forecastTime.time.time) return -1
-		if (forecastTime2.time.time > pds.forecastTime2.time.time) return -1
-		if (centre > pds.centre) return -1
-		if (subCenterId > pds.subCenterId) return -1
-		if (tableVersion > pds.tableVersion) return -1
-		if (decimalScale > pds.decimalScale) return -1
-		if (length > pds.length) return -1
-		if (parameter.compare(pds.parameter) < 0) return -1
-		return level?.compare(pds.level) ?: 1
-		// if here, then something must be greater than something else - doesn't matter what
-	}
+	override fun compareTo(other: Grib1RecordPDS): Int = Comparator
+			.comparingInt(Grib1RecordPDS::gridId)
+			.thenComparing(Grib1RecordPDS::referenceTime)
+			.thenComparing(Grib1RecordPDS::forecastTime)
+			.thenComparing(Grib1RecordPDS::forecastTime2)
+			.thenComparing(Grib1RecordPDS::centre)
+			.thenComparing(Grib1RecordPDS::subCenterId)
+			.thenComparing(Grib1RecordPDS::tableVersion)
+			.thenComparing(Grib1RecordPDS::decimalScale)
+			.thenComparing(Grib1RecordPDS::length)
+			.thenComparing(Grib1RecordPDS::parameter)
+			.thenComparing(Grib1RecordPDS::level, nullsFirst())
+			.compare(this, other)
 
 	override fun equals(other: Any?) = this === other
 			|| other is Grib1RecordPDS
