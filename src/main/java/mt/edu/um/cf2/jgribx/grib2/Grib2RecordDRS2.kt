@@ -85,23 +85,23 @@ open class Grib2RecordDRS2 protected constructor(nDataPoints: Int,
 	companion object {
 		internal fun readFromStream(gribInputStream: GribInputStream, nDataPoints: Int): Grib2RecordDRS2 {
 			val drs0 = Grib2RecordDRS0.readFromStream(gribInputStream, nDataPoints)
-			val splitMethod = gribInputStream.readUINT(1)
-			val missingValueManagement = gribInputStream.readUINT(1)
-			val missing1 = gribInputStream.readUINT(4)
-			val missing2 = gribInputStream.readUINT(4)
+			val splitMethod = gribInputStream.readUInt(1)
+			val missingValueManagement = gribInputStream.readUInt(1)
+			val missing1 = gribInputStream.readUInt(4)
+			val missing2 = gribInputStream.readUInt(4)
 			val missingValue = when (missingValueManagement) {
 				0 -> floatArrayOf(Float.NaN, Float.NaN)
 				1 -> floatArrayOf(missing1.toFloat(), Float.NaN)
 				2 -> floatArrayOf(missing1.toFloat(), missing2.toFloat()) // FIXME not sure about this
 				else -> floatArrayOf(Float.NaN, Float.NaN)
 			}
-			val nGroups = gribInputStream.readUINT(4)
-			val refGroupWidths = gribInputStream.readUINT(1)
-			val groupWidthBits = gribInputStream.readUINT(1)
-			val refGroupLengths = gribInputStream.readUINT(4)
-			val groupLengthIncrement = gribInputStream.readUINT(1)
-			val lastGroupLength = gribInputStream.readUINT(4)
-			val nBitsScaledGroupLengths = gribInputStream.readUINT(1)
+			val nGroups = gribInputStream.readUInt(4)
+			val refGroupWidths = gribInputStream.readUInt(1)
+			val groupWidthBits = gribInputStream.readUInt(1)
+			val refGroupLengths = gribInputStream.readUInt(4)
+			val groupLengthIncrement = gribInputStream.readUInt(1)
+			val lastGroupLength = gribInputStream.readUInt(4)
+			val nBitsScaledGroupLengths = gribInputStream.readUInt(1)
 
 			return Grib2RecordDRS2(drs0, splitMethod, missingValueManagement, missingValue, nGroups, refGroupWidths,
 					groupWidthBits, refGroupLengths, groupLengthIncrement, lastGroupLength, nBitsScaledGroupLengths)

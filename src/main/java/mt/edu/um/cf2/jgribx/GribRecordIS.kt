@@ -10,7 +10,6 @@
  */
 package mt.edu.um.cf2.jgribx
 
-import mt.edu.um.cf2.jgribx.Bytes2Number.bytesToLong
 import mt.edu.um.cf2.jgribx.api.GribSection
 import mt.edu.um.cf2.jgribx.grib2.ProductDiscipline
 import java.io.IOException
@@ -43,11 +42,6 @@ import java.io.IOException
  * @param gribEdition Edition of GRIB specification used.
  * @param discipline Discipline – GRIB Master Table Number (see [Code Table 0.0](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table0-0.shtml))
  * @param recordLength Length in bytes of GRIB record.
- *
- * @author Benjamin Stark
- * @author Richard D. Gonzalez
- * @author Andrew Spiteri
- * @author Jan Kubovy [jan@kubovy.eu]
  */
 class GribRecordIS internal constructor(var gribEdition: Int,
 										var discipline: ProductDiscipline?,
@@ -64,27 +58,28 @@ class GribRecordIS internal constructor(var gribEdition: Int,
 		 * @throws IOException           if stream can not be opened etc.
 		 */
 		fun readFromStream(gribInputStream: GribInputStream): GribRecordIS {
-			val octets = ByteArray(16)
-			gribInputStream.read(octets, 0, 8)
-			val startCode = String(octets.copyOfRange(0, 4))
+			val startCode = gribInputStream.readString(4) // [1-4]
 			if (startCode != "GRIB") {
 				Logger.info("Start code not recognised: ${startCode}")
 				throw NoValidGribException("Record does not have a valid GRIB header")
 			}
 
 			// check GRIB edition number
-			val gribEdition = octets[7].toInt()
+			val octets = gribInputStream.peek(4)
+			val gribEdition = octets[3].toInt()
 			val discipline: ProductDiscipline?
 			val recordLength: Long
 			when (gribEdition) {
 				1 -> {
 					discipline = null
-					recordLength = bytesToLong(octets.copyOfRange(4, 7))
+					recordLength = gribInputStream.readLong(3) // [5-7]
+					gribInputStream.skip(1) // [8]
 				}
 				2 -> {
-					discipline = ProductDiscipline.VALUES.getOrNull(octets[6].toInt())
-					gribInputStream.read(octets, 8, 8)
-					recordLength = bytesToLong(octets.copyOfRange(8, 16))
+					gribInputStream.skip(2) // [5-6]
+					discipline = gribInputStream.readUInt(1).let { ProductDiscipline.VALUES.getOrNull(it) } // [7]
+					gribInputStream.skip(1) // [8]
+					recordLength = gribInputStream.readLong(8) // [9-16]
 				}
 				else -> throw NotSupportedException("GRIB edition ${gribEdition} is not yet supported")
 			}

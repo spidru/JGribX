@@ -98,52 +98,52 @@ class Grib2RecordPDS0 internal constructor(numberOfCoordinates: Int,
 						   referenceTime: Calendar,
 						   numberOfCoordinates: Int): Grib2RecordPDS0 {
 			/* [10] Parameter category */
-			val paramCategory = gribInputStream.readUINT(1)
+			val paramCategory = gribInputStream.readUInt(1)
 
 			/* [11] Parameter number */
-			val paramNumber = gribInputStream.readUINT(1)
+			val paramNumber = gribInputStream.readUInt(1)
 			if (!Grib2Parameter.isDefaultLoaded) Grib2Parameter.loadDefaultParameters()
 			val parameter = Grib2Parameter.getParameter(discipline, paramCategory, paramNumber)
 					?: throw NotSupportedException("Unsupported parameter: D:${discipline} C:${paramCategory} N:${paramNumber}")
 
 			/* [12] Type of generating process */
-			val genProcessType = gribInputStream.readUINT(1)
+			val genProcessType = gribInputStream.readUInt(1)
 
 			/* [13] Background generating process identifier (defined by originating centre) */
-			val backgroundGeneratingProcessId = gribInputStream.readUINT(1)
+			val backgroundGeneratingProcessId = gribInputStream.readUInt(1)
 
 			/* [14] Analysis or forecast generating process identifier */
-			val processId = gribInputStream.readUINT(1)
+			val processId = gribInputStream.readUInt(1)
 
 			/* [15-16] Hours of observational data cutoff after reference time (see Note) */
-			val observationalHours = gribInputStream.readUINT(2)
+			val observationalHours = gribInputStream.readUInt(2)
 
 			/* [17] Minutes of observational data cutoff after reference time (see Note) */
-			val cutoffMinutes = gribInputStream.readUINT(1)
+			val cutoffMinutes = gribInputStream.readUInt(1)
 
 			/* [18] Indicator of unit of time range (see Code table 4.4) */
-			val timeRangeUnitIndicator = gribInputStream.readUINT(1)
+			val timeRangeUnitIndicator = gribInputStream.readUInt(1)
 
 			/* [19-22] Forecast time in units defined in octet 18 */
-			val forecastTimeAhead = gribInputStream.readUINT(4)
+			val forecastTimeAhead = gribInputStream.readUInt(4)
 
 			/* [23] Type of first fixed surface (see Code table 4.5) */
-			val level1Type = gribInputStream.readUINT(1)
+			val level1Type = gribInputStream.readUInt(1)
 
 			/* [24] Scale factor of first fixed surface */
-			val level1ScaleFactor = gribInputStream.readUINT(1)
+			val level1ScaleFactor = gribInputStream.readUInt(1)
 
 			/* [25-28] Scaled value of first fixed surface */
-			val level1ScaledValue = gribInputStream.readUINT(4)
+			val level1ScaledValue = gribInputStream.readUInt(4)
 
 			/* [29] Type of second fixed surface */
-			val level2Type = gribInputStream.readUINT(1)
+			val level2Type = gribInputStream.readUInt(1)
 
 			/* [30] Scale factor of second fixed surface */
-			val level2ScaleFactor = gribInputStream.readUINT(1)
+			val level2ScaleFactor = gribInputStream.readUInt(1)
 
 			/* [31-34] Scaled value of second fixed surface */
-			val level2ScaledValue = gribInputStream.readUINT(4)
+			val level2ScaledValue = gribInputStream.readUInt(4)
 			if (level2Type != 255) Logger.error("Second surface is not yet supported")
 
 			return Grib2RecordPDS0(numberOfCoordinates, parameter, genProcessType,

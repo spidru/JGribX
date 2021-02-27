@@ -132,36 +132,36 @@ class Grib1GDSPolarStereo(numberOfVerticalCoordinateValues: Int,
 			Logger.debug("Discovered GDS type: PolarStereo")
 
 			// [7-8] (Nx - number of points along x-axis)
-			val gridNx = gribInputStream.readUINT(2)
+			val gridNx = gribInputStream.readUInt(2)
 
 			// [9-10] (Ny - number of points along y-axis)
-			val gridNy = gribInputStream.readUINT(2)
+			val gridNy = gribInputStream.readUInt(2)
 
 			// [11-13] (La1 - latitude of first grid point)
-			val latitudeOfFirstGridPoint = gribInputStream.readUINT(3) / 1000.0
+			val latitudeOfFirstGridPoint = gribInputStream.readUInt(3) / 1000.0
 
 			// [14-16] (Lo1 - longitude of first grid point)
-			val longitudeOfFirstGridPoint = gribInputStream.readUINT(3) / 1000.0
+			val longitudeOfFirstGridPoint = gribInputStream.readUInt(3) / 1000.0
 
 			// [17] (resolution and component flags).  See Table 7
-			val resolutionAndComponentFlags = gribInputStream.readUINT(1)
+			val resolutionAndComponentFlags = gribInputStream.readUInt(1)
 
 			// [18-20] (Lov - Orientation of the grid - east lon parallel to y axis)
-			val orientationOfTheGrid = gribInputStream.readUINT(3) / 1000.0
+			val orientationOfTheGrid = gribInputStream.readUInt(3) / 1000.0
 
 			// [21-23] (Dx - the X-direction grid length) See Note 2 of Table D
-			var dxInMetres = gribInputStream.readUINT(3).toDouble()
+			var dxInMetres = gribInputStream.readUInt(3).toDouble()
 
 			// [24-26] (Dy - the Y-direction grid length) See Note 2 of Table D
-			var dyInMetres = gribInputStream.readUINT(3).toDouble()
+			var dyInMetres = gribInputStream.readUInt(3).toDouble()
 
 			// [27] (Projection Center flag) See Note 5 of Table D
-			val projectionCenterFlag = gribInputStream.readUINT(1)
+			val projectionCenterFlag = gribInputStream.readUInt(1)
 			// if bit 1 set to 1, SP is on proj plane
 			val latitudeTrueScale = if (projectionCenterFlag and 128 == 128) -60.0 else 60.0
 
 			// [28] (Scanning mode)  See Table 8
-			val scanningMode = gribInputStream.readUINT(1)
+			val scanningMode = gribInputStream.readUInt(1)
 			if (scanningMode and 63 != 0) {
 				throw NotSupportedException("GribRecordGDS: This scanning mode (" +
 						scanningMode + ") is not supported.")

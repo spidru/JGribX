@@ -104,15 +104,15 @@ abstract class Grib1RecordGDS(
 			val length = Grib1Section.readFromStream(gribInputStream)
 
 			// [4] NV -- number of vertical coordinate parameters */
-			val numberOfVerticalCoordinateValues = gribInputStream.readUINT(1)
+			val numberOfVerticalCoordinateValues = gribInputStream.readUInt(1)
 
 			// [5] PV -- location (octet number) of the list of vertical coordinate parameters, if present; or
 			//     PL -- location (octet number) of the list of numbers of points in each row (if no vertical coordinate parameters are present), if present; or
 			//     255 (all bits set to 1) if neither are present
-			val pvlLocation = gribInputStream.readUINT(1)
+			val pvlLocation = gribInputStream.readUInt(1)
 
 			// [6] Data representation type
-			val dataRepresentationType = gribInputStream.readUINT(1)
+			val dataRepresentationType = gribInputStream.readUInt(1)
 			return when (dataRepresentationType) {
 				0 -> Grib1GDSLatLon.readFromStream(gribInputStream, numberOfVerticalCoordinateValues, pvlLocation)
 				1 -> throw NotSupportedException("Mercator projection is not yet supported")

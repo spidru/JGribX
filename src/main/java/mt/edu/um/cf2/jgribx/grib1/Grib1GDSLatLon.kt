@@ -10,7 +10,10 @@
  */
 package mt.edu.um.cf2.jgribx.grib1
 
-import mt.edu.um.cf2.jgribx.*
+import mt.edu.um.cf2.jgribx.GribInputStream
+import mt.edu.um.cf2.jgribx.GribOutputStream
+import mt.edu.um.cf2.jgribx.Logger
+import mt.edu.um.cf2.jgribx.NoValidGribException
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -81,16 +84,16 @@ open class Grib1GDSLatLon(numberOfVerticalCoordinateValues: Int,
 									numberOfVerticalCoordinateValues: Int,
 									pvlLocation: Int): Grib1GDSLatLon {
 			// [7-8] Ni number of points along a parallel
-			val gridNi = gribInputStream.readUINT(2)
+			val gridNi = gribInputStream.readUInt(2)
 
 			// [9-10] Nj number of points along a meridian
-			val gridNj = gribInputStream.readUINT(2)
+			val gridNj = gribInputStream.readUInt(2)
 
 			// [11-13] La1 latitude of first grid point
-			val latitudeOfFirstGridPoint = gribInputStream.readINT(3, Bytes2Number.INT_SM) / 1000.0
+			val latitudeOfFirstGridPoint = gribInputStream.readSMInt(3) / 1000.0
 
 			// [14-16] Lo1 longitude of first grid point
-			val longitudeOfFirstGridPoint = gribInputStream.readINT(3, Bytes2Number.INT_SM) / 1000.0
+			val longitudeOfFirstGridPoint = gribInputStream.readSMInt(3) / 1000.0
 
 			// [17] Resolution and component flags (see Code table 7)
 			// TABLE 7 - RESOLUTION AND COMPONENT FLAGS (GDS Octet 17)
@@ -105,7 +108,7 @@ open class Grib1GDSLatLon(numberOfVerticalCoordinateValues: Int,
 			//       1   u- and v-components of vector quantities resolved relative to the defined grid in the direction
 			//           of increasing x and y (or i and j) coordinates respectively
 			// 6-8       reserved (set to 0)
-			val resolutionAndComponentFlags = gribInputStream.readUINT(1)
+			val resolutionAndComponentFlags = gribInputStream.readUInt(1)
 			val incrementsGiven = resolutionAndComponentFlags and 0x80 == 0x80
 			val earthShapeSpheroid = resolutionAndComponentFlags and 0x40 == 0x40
 			if (earthShapeSpheroid) {
@@ -118,16 +121,16 @@ open class Grib1GDSLatLon(numberOfVerticalCoordinateValues: Int,
 			}
 
 			// [18-20] La2 latitude of last grid point
-			val latitudeOfLastGridPoint = gribInputStream.readINT(3, Bytes2Number.INT_SM) / 1000.0
+			val latitudeOfLastGridPoint = gribInputStream.readSMInt(3) / 1000.0
 
 			// [21-23] Lo2 longitude of last grid point
-			val longitudeOfLastGridPoint = gribInputStream.readINT(3, Bytes2Number.INT_SM) / 1000.0
+			val longitudeOfLastGridPoint = gribInputStream.readSMInt(3) / 1000.0
 
 			var iDirectionIncrement: Double
 			var jDirectionIncrement: Double
 			if (incrementsGiven) { // MSB seems to indicate signedness, but this is taken care of by scanMode, so we use abs()
-				iDirectionIncrement = abs(gribInputStream.readINT(2, Bytes2Number.INT_SM) / 1000.0)
-				jDirectionIncrement = abs(gribInputStream.readINT(2, Bytes2Number.INT_SM) / 1000.0)
+				iDirectionIncrement = abs(gribInputStream.readSMInt(2) / 1000.0)
+				jDirectionIncrement = abs(gribInputStream.readSMInt(2) / 1000.0)
 			} else { // calculate increments
 				gribInputStream.skip(4)
 				iDirectionIncrement = (longitudeOfLastGridPoint - longitudeOfFirstGridPoint) / gridNi
@@ -135,7 +138,7 @@ open class Grib1GDSLatLon(numberOfVerticalCoordinateValues: Int,
 			}
 
 			// [28] Scan Mode
-			val scanningMode = gribInputStream.readUINT(1)
+			val scanningMode = gribInputStream.readUInt(1)
 
 			// [29-32] Set to zero (reserved)
 			gribInputStream.skip(4)

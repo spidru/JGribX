@@ -28,15 +28,22 @@ class GribOutputStream(outputStream: OutputStream) : FilterOutputStream(outputSt
 
 	fun writeByte(value: Byte) = out.write(value.toInt())
 
-	fun writeUInt(value: Int, bytes: Int = 1) = out.write(Bytes2Number.uintToBytes(value, bytes))
+	fun writeUInt(value: Int, bytes: Int = 1) = out.write(uintToBytes(value, bytes))
 
 	fun writeSMInt(value: Int, bytes: Int = 1) {
-		val data = Bytes2Number.uintToBytes(abs(value), bytes)
+		val data = uintToBytes(abs(value), bytes)
 		data[0] = if (value < 0) data[0] or 0x80.toByte() else data[0] and 0x7F.toByte()
 		out.write(data)
 	}
 
-	fun writeLong(value: Long, bytes: Int = 1) = out.write(Bytes2Number.longToBytes(value, bytes))
+	fun writeLong(value: Long, bytes: Int = 1) {
+		require(bytes <= Long.SIZE_BYTES) { "nBytes cannot be larger than ${Long.SIZE_BYTES} bytes" }
+		val data = ByteArray(bytes)
+		repeat(bytes) { i ->
+			data[i] = ((value shr ((bytes - i - 1) * 8)) and 0xFF).toByte()
+		}
+		out.write(data)
+	}
 
 	fun writeFloatIEEE754(value: Float, bytes: Int = 4) {
 		val data = ByteBuffer.allocate(bytes).order(ByteOrder.BIG_ENDIAN).putFloat(value).array()
@@ -92,5 +99,14 @@ class GribOutputStream(outputStream: OutputStream) : FilterOutputStream(outputSt
 			byteToWrite = 0
 			bitsWritten = 0
 		}
+	}
+
+	private fun uintToBytes(value: Int, nBytes: Int = Int.SIZE_BYTES): ByteArray {
+		require(nBytes <= Int.SIZE_BYTES) { "nBytes cannot be larger than ${Int.SIZE_BYTES} bytes" }
+		val bytes = ByteArray(nBytes)
+		repeat(nBytes) { i ->
+			bytes[i] = ((value shr ((nBytes - i - 1) * 8)) and 0xFF).toByte()
+		}
+		return bytes
 	}
 }

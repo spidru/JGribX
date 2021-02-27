@@ -117,39 +117,39 @@ class Grib2RecordGDSLatLon internal constructor(gridDefinitionSource: Int,
 									nBytes: Int,
 									interpolation: Int): Grib2RecordGDSLatLon {
 			/* [15] Grid Definition Template Number */
-			val earthShape = gribInputStream.readUINT(1)
+			val earthShape = gribInputStream.readUInt(1)
 			/* [16] Scale Factor of radius of spherical Earth */
-			val radiusScaleFactor = gribInputStream.readUINT(1)
+			val radiusScaleFactor = gribInputStream.readUInt(1)
 			/* [17-20] Scale value of radius of spherical Earth */
-			val radiusScaledValue = gribInputStream.readUINT(4)
+			val radiusScaledValue = gribInputStream.readUInt(4)
 			/* [21] Scale factor of major axis of oblate spheroid Earth */
-			val majorScaleFactor = gribInputStream.readUINT(1)
+			val majorScaleFactor = gribInputStream.readUInt(1)
 			/* [22-25] Scaled value of major axis of oblate spheroid Earth */
-			val majorScaledValue = gribInputStream.readUINT(4)
+			val majorScaledValue = gribInputStream.readUInt(4)
 			/* [26] Scale factor of minor axis of oblate spheroid Earth */
-			val minorScaleFactor = gribInputStream.readUINT(1)
+			val minorScaleFactor = gribInputStream.readUInt(1)
 			/* [27-30] Scaled value of minor axis of oblate spheroid Earth */
-			val minorScaledValue = gribInputStream.readUINT(4)
+			val minorScaledValue = gribInputStream.readUInt(4)
 			/* [31-34] Ni — number of points along a parallel */
-			val gridNi = gribInputStream.readUINT(4)
+			val gridNi = gribInputStream.readUInt(4)
 			/* [35-38] Nj — number of points along a meridian */
-			val gridNj = gribInputStream.readUINT(4)
+			val gridNj = gribInputStream.readUInt(4)
 			/* [39-42] Basic angle of the initial production domain (see Note 1) */
-			val basicAngle = gribInputStream.readUINT(4)
+			val basicAngle = gribInputStream.readUInt(4)
 			/* [43-46] Subdivisions of basic angle used to define extreme longitudes and latitudes, and direction increments */
-			val basicAngleSubdiv = gribInputStream.readUINT(4)
+			val basicAngleSubdiv = gribInputStream.readUInt(4)
 
 			/* [47-50] La1 — latitude of first grid point (see Note 1) */
 			val lat1: Double
 			/* [51-54] Lo1 — longitude of first grid point (see Note 1) */
 			val lon1: Double
 			if (basicAngle == 0) {
-				lat1 = gribInputStream.readINT(4, Bytes2Number.INT_SM) / 1.0e6
-				lon1 = gribInputStream.readINT(4, Bytes2Number.INT_SM) / 1.0e6
+				lat1 = gribInputStream.readSMInt(4) / 1.0e6
+				lon1 = gribInputStream.readSMInt(4) / 1.0e6
 			} else TODO("Not implemented")
 
 			/* [55] Resolution and component flags */
-			val flags = gribInputStream.readUINT(1)
+			val flags = gribInputStream.readUInt(1)
 			val iDirectionIncrementsGiven = flags and 0x20 == 0x20
 			val jDirectionIncrementsGiven = flags and 0x10 == 0x10
 
@@ -158,26 +158,26 @@ class Grib2RecordGDSLatLon internal constructor(gridDefinitionSource: Int,
 			/* [60-63] Lo2 — longitude of last grid point (see Note 1) */
 			val lon2: Double
 			if (basicAngle == 0) {
-				lat2 = gribInputStream.readINT(4, Bytes2Number.INT_SM) / 1.0e6
-				lon2 = gribInputStream.readINT(4, Bytes2Number.INT_SM) / 1.0e6
+				lat2 = gribInputStream.readSMInt(4) / 1.0e6
+				lon2 = gribInputStream.readSMInt(4) / 1.0e6
 			} else TODO("Not implemented")
 
 			/* [64-67] i-Direction Increment Di */
 			var gridDi = 0.0
 			if (iDirectionIncrementsGiven) {
 				if (basicAngle == 0) {
-					gridDi = gribInputStream.readUINT(4) / 1.0e6
+					gridDi = gribInputStream.readUInt(4) / 1.0e6
 				} else TODO("Not implemented")
 			}
 			/* [68-71] j-Direction Increment Dj */
 			var gridDj = 0.0
 			if (jDirectionIncrementsGiven) {
 				if (basicAngle == 0) {
-					gridDj = gribInputStream.readUINT(4) / 1.0e6
+					gridDj = gribInputStream.readUInt(4) / 1.0e6
 				} else TODO("Not implemented")
 			}
 			/* [72] Scanning Mode */
-			val scanMode = ScanMode(gribInputStream.readUINT(1).toByte()).also { scanMode ->
+			val scanMode = ScanMode(gribInputStream.readUInt(1).toByte()).also { scanMode ->
 				// boolean iPositiveDirection = (scanMode & 0x80) != 0x80;
 				// boolean jPositiveDirection = (scanMode & 0x40) == 0x40;
 				// iDirectionConsecutive = (scanMode & 0x20) != 0x20;

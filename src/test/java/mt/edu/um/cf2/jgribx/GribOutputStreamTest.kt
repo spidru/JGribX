@@ -51,7 +51,7 @@ class GribOutputStreamTest {
 			gos.writeFloatIBM(expected)
 
 			val gis = GribInputStream(ByteArrayInputStream(bos.toByteArray()))
-			val actual = gis.readFloat(4, Bytes2Number.FLOAT_IBM)
+			val actual = gis.readFloatIBM()
 
 			// Then
 			assertTrue("${expected} ?= ${actual} = ${expected - actual} (${abs(expected - actual) < FLOAT_PRECISION})",

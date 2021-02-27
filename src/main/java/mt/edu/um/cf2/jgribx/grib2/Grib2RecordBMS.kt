@@ -66,7 +66,7 @@ class Grib2RecordBMS internal constructor(private val indicatorValue: Int) : Gri
 			val length = Grib2Section.readFromStream(gribInputStream, 6)
 
 			/* [6] Bitmap indicator */
-			val indicatorValue = gribInputStream.readUINT(1)
+			val indicatorValue = gribInputStream.readUInt(1)
 			if (indicatorValue != MISSING) throw TODO("BMS bitmap not yet supported (indicator: ${indicatorValue})")
 			return Grib2RecordBMS(indicatorValue)
 					.takeIf { it.length == length }

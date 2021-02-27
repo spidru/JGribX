@@ -38,10 +38,10 @@ abstract class Grib2RecordDRS protected constructor(internal val nDataPoints: In
 			val length = Grib2Section.readFromStream(gribInputStream, 5)
 
 			/* [6-9] Number of data points */
-			val nDataPoints = gribInputStream.readUINT(4)
+			val nDataPoints = gribInputStream.readUInt(4)
 
 			/* [10-11] Data representation template number */
-			val templateNumber = gribInputStream.readUINT(2)
+			val templateNumber = gribInputStream.readUInt(2)
 			return when (templateNumber) {
 				0 -> Grib2RecordDRS0.readFromStream(gribInputStream, nDataPoints)
 				2 -> Grib2RecordDRS2.readFromStream(gribInputStream, nDataPoints)

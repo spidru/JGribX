@@ -10,13 +10,13 @@
  */
 package mt.edu.um.cf2.jgribx
 
-import mt.edu.um.cf2.jgribx.Bytes2Number.bytesToFloat
-import mt.edu.um.cf2.jgribx.Bytes2Number.bytesToInt
-import mt.edu.um.cf2.jgribx.Bytes2Number.bytesToUint
 import java.io.FilterInputStream
 import java.io.IOException
 import java.io.InputStream
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import kotlin.math.ceil
+import kotlin.math.pow
 
 /**
  * This class is an input stream wrapper that can read a specific number of bytes and bits from an input stream.
@@ -112,52 +112,41 @@ class GribInputStream(inputStream: InputStream?, private val onRead: (Long) -> U
 	 * @return the unsigned integer value corresponding to the byte array
 	 * @throws IOException
 	 */
-	fun readUINT(nBytes: Int): Int {
+	fun readUInt(nBytes: Int): Int {
 		val data = read(nBytes)
 		return bytesToUint(data)
 	}
 
-	fun readINT(nBytes: Int, format: Int): Int {
-		val data = read(nBytes)
-		return bytesToInt(data, format)
+	fun readSMInt(bytes: Int = 1): Int {
+		val data = read(bytes)
+		val negative = data[0].toInt() and 0x80 == 0x80
+		data[0] = (data[0].toInt() and 0x7F).toByte()
+		var value = bytesToUint(data)
+		if (negative) value *= -1
+		return value
 	}
 
-	fun readFloat(nBytes: Int, format: Int): Float {
-		val data = read(nBytes)
-		return bytesToFloat(data, format)
-	}
-
-	/**
-	 * Read an unsigned 8 bit value.
-	 *
-	 * @return unsigned 8 bit value as integer
-	 * @throws IOException
-	 */
-	fun readUI8(): Int {
-		val ui8 = `in`.read()
-		if (ui8 < 0) throw IOException("End of input.")
-		onRead(incrementByteCounters())
-		return ui8
-	}
-
-	/**
-	 * Read specific number of unsigned bytes from the input stream.
-	 *
-	 * @param length number of bytes to read and return as integers
-	 * @return unsigned bytes as integer values
-	 * @throws IOException
-	 */
-	fun readUI8(length: Int): IntArray {
-		val data = IntArray(length)
-		var read = 0
-		var i = 0
-		while (i < length && read >= 0) {
-			read = read()
-			data[i] = read
-			i++
+	fun readLong(bytes: Int = 4): Long {
+		val data = read(bytes)
+		require(bytes <= Long.SIZE_BYTES) { "nBytes cannot be larger than ${Long.SIZE_BYTES} bytes" }
+		var value = 0L
+		repeat(bytes) { i ->
+			value = value or (data[i].toLong() and 0xFF shl ((bytes - i - 1) * 8))
 		}
-		if (read < 0) throw IOException("End of input.")
-		return data
+		return value
+	}
+
+	fun readFloatIEEE754(bytes: Int = 4) = ByteBuffer
+			.wrap(read(bytes))
+			.order(ByteOrder.BIG_ENDIAN)
+			.float
+
+	fun readFloatIBM(): Float {
+		val data = read(4)
+		val sign = if (data[0].toInt() and 0x80 == 0x80) -1 else 1
+		val exponent: Int = (data[0].toInt() and 0x7F) - 64
+		val mantissa = bytesToUint(data.copyOfRange(1, 4))
+		return (sign * 16.0.pow((exponent - 6).toDouble()) * mantissa).toFloat()
 	}
 
 	/**
@@ -183,6 +172,12 @@ class GribInputStream(inputStream: InputStream?, private val onRead: (Long) -> U
 		bitCounter += 8
 		onRead(incrementByteCounters())
 		return value
+	}
+
+	override fun read(b: ByteArray): Int {
+		val read = super.read(b)
+		onRead(incrementByteCounters(read))
+		return read
 	}
 
 	override fun read(b: ByteArray, off: Int, len: Int): Int {
@@ -236,23 +231,19 @@ class GribInputStream(inputStream: InputStream?, private val onRead: (Long) -> U
 		}
 	}
 
-	/**
-	 * Read a signed value from the given number of bits
-	 *
-	 * @param numBits number of bits used for the signed value
-	 * @return value read from <tt>numBits</tt> bits as integer
-	 * @throws IOException
-	 */
-	fun readSBits(numBits: Int): Int {
-		// Get the number as an unsigned value.
-		var uBits = readUBits(numBits)
+	fun readString(bytes: Int = 1): String {
+		if (peekBuffer.size != bytes) peekBuffer = ByteArray(bytes)
+		read(peekBuffer)
+		return String(peekBuffer)
+	}
 
-		// Is the number negative?
-		if (uBits and (1L shl numBits - 1) != 0L) {
-
-			// Yes. Extend the sign.
-			uBits = uBits or (-1L shl numBits)
+	private fun bytesToUint(bytes: ByteArray): Int {
+		val nBytes = bytes.size
+		require(nBytes <= Int.SIZE_BYTES) { "nBytes cannot be larger than ${Int.SIZE_BYTES} bytes" }
+		var value = 0
+		repeat(nBytes) { i ->
+			value = value or (bytes[i].toInt() and 0xFF shl (nBytes - i - 1) * 8)
 		}
-		return uBits.toInt()
+		return value
 	}
 }

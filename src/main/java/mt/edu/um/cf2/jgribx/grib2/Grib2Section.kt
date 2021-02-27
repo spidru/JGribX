@@ -21,10 +21,10 @@ interface Grib2Section : GribSection {
 			gribInputStream.mark(5)
 
 			/* [1-4] Section Length */
-			val length = gribInputStream.readUINT(4)
+			val length = gribInputStream.readUInt(4)
 
 			/* [5] Section Number */
-			val number = gribInputStream.readUINT(1)
+			val number = gribInputStream.readUInt(1)
 
 			gribInputStream.reset()
 			gribInputStream.resetBitCounter()
@@ -33,10 +33,10 @@ interface Grib2Section : GribSection {
 
 		internal fun readFromStream(gribInputStream: GribInputStream, sectionNumber: Int): Int {
 			/* [1-4] Section Length */
-			val length = gribInputStream.readUINT(4)
+			val length = gribInputStream.readUInt(4)
 
 			/* [5] Section Number */
-			val number = gribInputStream.readUINT(1)
+			val number = gribInputStream.readUInt(1)
 			if (number != sectionNumber) throw Exception("Incorrect section number ${number}")
 			return length
 		}

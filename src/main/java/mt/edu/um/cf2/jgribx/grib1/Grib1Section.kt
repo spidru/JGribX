@@ -18,7 +18,7 @@ interface Grib1Section : GribSection {
 	companion object {
 		fun readFromStream(gribInputStream: GribInputStream): Int {
 			/* [1-3] Section Length */
-			return gribInputStream.readUINT(3)
+			return gribInputStream.readUInt(3)
 		}
 	}
 

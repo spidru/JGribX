@@ -51,11 +51,11 @@ abstract class Grib2RecordPDS protected constructor(val numberOfCoordinates: Int
 			val length = Grib2Section.readFromStream(gribInputStream, 4)
 
 			/* [6-7] Number of coordinate values after template */
-			val numberOfCoordinates = gribInputStream.readUINT(2)
+			val numberOfCoordinates = gribInputStream.readUInt(2)
 			if (numberOfCoordinates > 0) throw NotSupportedException("Hybrid coordinate values are not yet supported")
 
 			/* [8-9] Template number */
-			val templateId = gribInputStream.readUINT(2)
+			val templateId = gribInputStream.readUInt(2)
 			return when (templateId) {
 				0 -> Grib2RecordPDS0.readFromStream(gribInputStream, discipline, referenceTime, numberOfCoordinates)
 				else -> {

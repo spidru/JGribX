@@ -58,11 +58,11 @@ class Grib1RecordBMS(private val numberOfUnusedBitsAtEndOfSection3: Int,
 			val length = Grib1Section.readFromStream(gribInputStream)
 
 			// [4] Number of unused bits at end of Section 3
-			val numberOfUnusedBitsAtEndOfSection3 = gribInputStream.readUINT(1)
+			val numberOfUnusedBitsAtEndOfSection3 = gribInputStream.readUInt(1)
 
 			// [5-6] Table reference: If the octets contain zero, a bit-map follows If the octets contain a number,
 			//       it refers to a predetermined bit-map provided by the centre
-			val tableReference = gribInputStream.readUINT(2)
+			val tableReference = gribInputStream.readUInt(2)
 			if (tableReference != 0) throw NoValidGribException("BMS: No bit map defined here.")
 
 			// [7-nn]

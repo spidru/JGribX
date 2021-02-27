@@ -62,20 +62,20 @@ abstract class Grib2RecordGDS protected constructor(protected var gridDefinition
 			val length = Grib2Section.readFromStream(gribInputStream, 3)
 
 			/* [6] Grid Definition Source */
-			val gridDefinitionSource = gribInputStream.readUINT(1)
+			val gridDefinitionSource = gribInputStream.readUInt(1)
 			if (gridDefinitionSource != 0) Logger.error("Unsupported grid definition source")
 
 			/* [7-10] Number of Data Points */
-			val numberOfDataPoints = gribInputStream.readUINT(4)
+			val numberOfDataPoints = gribInputStream.readUInt(4)
 
 			/* [11] Number of Octets (for optional list of numbers defining number of points) */
-			val nBytes = gribInputStream.readUINT(1)
+			val nBytes = gribInputStream.readUInt(1)
 
 			/* [12] Interpretation */
-			val interpretation = gribInputStream.readUINT(1)
+			val interpretation = gribInputStream.readUInt(1)
 
 			/* [13-14] Grid Definition Template Number */
-			val gridType = gribInputStream.readUINT(2)
+			val gridType = gribInputStream.readUInt(2)
 			return when (gridType) {
 				// Latitude/Longitude (also called Equidistant Cylindrical or Plate Caree)
 				0 -> Grib2RecordGDSLatLon.readFromStream(gribInputStream, length, gridDefinitionSource,
