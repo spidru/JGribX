@@ -79,7 +79,10 @@ jobs:
             command: |
                 sudo apt-get install gcc
                 wget ftp://ftp.cpc.ncep.noaa.gov/wd51we/wgrib/wgrib.c
+                gcc --version
                 gcc wgrib.c -o wgrib
+                ./wgrib
+                mv ./wgrib /usr/local/bin/
 
       # run tests!
       - run: gradle test
