@@ -77,6 +77,7 @@ jobs:
       - run:
             name: Install wgrib
             command: |
+                sudo apt-get install gcc
                 wget ftp://ftp.cpc.ncep.noaa.gov/wd51we/wgrib/wgrib.c
                 gcc wgrib.c -o wgrib
 
