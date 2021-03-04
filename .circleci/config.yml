@@ -82,7 +82,7 @@ jobs:
                 gcc --version
                 gcc wgrib.c -o wgrib
                 ./wgrib || echo
-                mv ./wgrib /usr/local/bin/
+                sudo mv ./wgrib /usr/local/bin/
 
       # run tests!
       - run: gradle test
