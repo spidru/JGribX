@@ -3,7 +3,8 @@ package mt.edu.um.cf2.jgribx;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.IOException;
+import java.io.*;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -59,6 +61,73 @@ public class GribTest
         assertEquals("GRIB edition", GRIB_EDITION, gribFile.getEdition());
         assertArrayEquals("Weather centres", WEATHER_CENTRES, gribFile.getCentreIDs());
         assertArrayEquals("Generating processes", GENERATING_PROCESSES, gribFile.getProcessIDs());
+
+        // Compare values in each record against a "gold standard" (wgrib)
+        for (int i_record = 0; i_record < gribFile.getRecordCount(); i_record++)
+        {
+            // Get values from GRIB file using JGribX
+            GribRecord record = gribFile.getRecords().get(i_record);
+            float[] obtainedValues = record.getValues();
+
+            String gribFilepath = "";
+            try {
+                gribFilepath = new File(url.toURI()).getAbsolutePath();
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+            ProcessBuilder pb = new ProcessBuilder(
+                    "wgrib",
+                    "\"" + gribFilepath + "\"",
+                    "-d", String.valueOf(i_record + 1),
+                    "-text"
+            );
+            String cmd = "";
+            for (String word : pb.command())
+            {
+                cmd += word + " ";
+            }
+            System.out.println("Executing: " + cmd);
+            try
+            {
+                Process process = pb.start();
+                boolean exited = process.waitFor(2, TimeUnit.SECONDS);
+                assertTrue("Process exited with code 0", exited && process.exitValue() == 0);
+            } catch (IOException | InterruptedException e)
+            {
+                System.err.println("Exception: " + e.getMessage());
+            }
+
+            // Read dump file
+            try (BufferedReader reader = new BufferedReader(new FileReader("dump"));)
+            {
+                String line;
+                // Skip first line
+                reader.readLine();
+
+                int i = 0;
+                while ((line = reader.readLine()) != null)
+                {
+                    double tolerance = 0.1;
+                    float expectedValue = Float.parseFloat(line);
+
+                    /* WORKAROUND
+                     * It seems that wgrib occasionally outputs values as integers for some reason.
+                     * To avoid false positive assertions, we increase the tolerance to 0.5
+                     */
+                    int expectedValueAsInt = (int) expectedValue;
+                    if (expectedValue - expectedValueAsInt == 0)
+                    {
+                        tolerance = 0.5;
+                    }
+
+                    assertEquals(String.format("Record %d entry %d", i_record, i),
+                            expectedValue, obtainedValues[i], tolerance);
+                    i++;
+                }
+            } catch (IOException e) {
+                System.out.println("Exception: " + e.getMessage());
+            }
+        }
     }
 
     @Test

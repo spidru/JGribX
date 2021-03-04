@@ -211,6 +211,13 @@ public class Grib2Record extends GribRecord
         return value;
     }
 
+    @Override
+    public float[] getValues()
+    {
+        // TODO To be implemented
+        return null;
+    }
+
     /**
      * Access to grid definition section (GDS) records.
      * @return GDS records

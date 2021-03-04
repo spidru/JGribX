@@ -82,4 +82,5 @@ public abstract class GribRecord
     public abstract int getProcessId();
     public abstract Calendar getReferenceTime();
     public abstract double getValue(double latitude, double longitude);
+    public abstract float[] getValues();
 }

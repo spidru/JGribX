@@ -72,6 +72,13 @@ jobs:
           paths:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
+      
+      # Download and install wgrib
+      - run:
+            name: Install wgrib
+            command: |
+                wget ftp://ftp.cpc.ncep.noaa.gov/wd51we/wgrib/wgrib.c
+                gcc wgrib.c -o wgrib
 
       # run tests!
       - run: gradle test
