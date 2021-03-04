@@ -81,7 +81,7 @@ jobs:
                 wget ftp://ftp.cpc.ncep.noaa.gov/wd51we/wgrib/wgrib.c
                 gcc --version
                 gcc wgrib.c -o wgrib
-                ./wgrib
+                ./wgrib || echo
                 mv ./wgrib /usr/local/bin/
 
       # run tests!
