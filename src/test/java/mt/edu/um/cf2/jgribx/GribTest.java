@@ -81,12 +81,13 @@ public class GribTest
                     "-d", String.valueOf(i_record + 1),
                     "-text"
             );
+            pb.inheritIO();
             String cmd = "";
             for (String word : pb.command())
             {
                 cmd += word + " ";
             }
-            System.out.println("Executing: " + cmd);
+            System.out.println(String.format("Executing in %s: %s", pb.directory().getAbsolutePath(), cmd));
             try
             {
                 Process process = pb.start();
