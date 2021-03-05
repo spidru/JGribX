@@ -91,7 +91,8 @@ public class GribTest
             {
                 Process process = pb.start();
                 boolean exited = process.waitFor(2, TimeUnit.SECONDS);
-                assertTrue("Process exited with code 0", exited && process.exitValue() == 0);
+                assertTrue("wgrib has not exited", exited);
+                assertTrue(String.format("wgrib has returned error code %d", process.exitValue()), process.exitValue() == 0);
             } catch (IOException | InterruptedException e)
             {
                 System.err.println("Exception: " + e.getMessage());
