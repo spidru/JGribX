@@ -77,7 +77,7 @@ public class GribTest
             }
             ProcessBuilder pb = new ProcessBuilder(
                     "wgrib",
-                    "\"" + gribFilepath + "\"",
+                    gribFilepath,
                     "-d", String.valueOf(i_record + 1),
                     "-text"
             );
@@ -87,7 +87,17 @@ public class GribTest
             {
                 cmd += word + " ";
             }
-            System.out.println(String.format("Executing in %s: %s", pb.directory().getAbsolutePath(), cmd));
+            File wgribDir = pb.directory();
+            String wgribCwd;
+            if (wgribDir == null)
+            {
+                wgribCwd = System.getProperty("user.dir");
+            }
+            else
+            {
+                wgribCwd = wgribDir.getAbsolutePath();
+            }
+            System.out.println(String.format("Executing in %s: %s", wgribCwd, cmd));
             try
             {
                 Process process = pb.start();
