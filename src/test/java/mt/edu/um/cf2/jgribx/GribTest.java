@@ -79,9 +79,9 @@ public class GribTest
                     "wgrib",
                     gribFilepath,
                     "-d", String.valueOf(i_record + 1),
-                    "-text"
+                    "-text",
+                    "-nh"
             );
-            pb.inheritIO();
             String cmd = "";
             for (String word : pb.command())
             {
@@ -113,8 +113,6 @@ public class GribTest
             try (BufferedReader reader = new BufferedReader(new FileReader("dump"));)
             {
                 String line;
-                // Skip first line
-                reader.readLine();
 
                 int i = 0;
                 while ((line = reader.readLine()) != null)
