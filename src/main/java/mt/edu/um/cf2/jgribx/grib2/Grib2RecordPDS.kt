@@ -70,7 +70,7 @@ abstract class Grib2RecordPDS protected constructor(val numberOfCoordinates: Int
 	abstract val level1: Grib2Level
 	abstract val level2: Grib2Level?
 
-	override val level: GribLevel?
+	override val level: GribLevel
 		get() = level1
 
 	internal val dataSections = mutableListOf<Grib2RecordDS<*>>()

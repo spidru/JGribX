@@ -12,6 +12,7 @@ package mt.edu.um.cf2.jgribx.grib1
 
 import mt.edu.um.cf2.jgribx.*
 import mt.edu.um.cf2.jgribx.api.GribMessage
+import mt.edu.um.cf2.jgribx.api.GribProductDefinitionSection
 import mt.edu.um.cf2.jgribx.api.GribRecord
 import java.io.IOException
 import java.util.*
@@ -57,14 +58,14 @@ class Grib1Message private constructor(override val indicator: GribRecordIS,
 		internal fun readFromStream(gribInputStream: GribInputStream,
 									indicatorSection: GribRecordIS,
 									messageIndex: Int,
-									parameterFilter: (String) -> Boolean): Grib1Message {
+									parameterFilter: (GribProductDefinitionSection) -> Boolean): Grib1Message {
 			gribInputStream.resetBitCounter()
 			val productDefinitionSection = Grib1RecordPDS.readFromStream(gribInputStream)
 			if (gribInputStream.byteCounter != productDefinitionSection.length)
 				throw NoValidGribException("Incorrect PDS length")
 			productDefinitionSection.log(messageIndex, 0)
 
-			if (!parameterFilter(productDefinitionSection.parameter.code)) {
+			if (!parameterFilter(productDefinitionSection)) {
 				throw SkipException("Parameter: ${productDefinitionSection.parameter.code} filtered out")
 			}
 

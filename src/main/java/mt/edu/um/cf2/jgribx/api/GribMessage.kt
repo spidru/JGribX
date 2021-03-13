@@ -13,7 +13,7 @@ interface GribMessage {
 	companion object {
 		internal fun readFromStream(gribInputStream: GribInputStream,
 									messageIndex: Int,
-									parameterFilter: (String) -> Boolean): GribMessage {
+									parameterFilter: (GribProductDefinitionSection) -> Boolean): GribMessage {
 			val indicatorSection = GribRecordIS.readFromStream(gribInputStream)
 
 			// In case of an error skip the whole message to speed up reading (GribRecordIS is slow)

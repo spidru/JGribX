@@ -1061,8 +1061,7 @@ class Grib1Parameter(override val id: Int,
 		/**
 		 * Returns the parameter in Parameter Table 128 corresponding to the specified ID.
 		 * <br></br><br></br>
-		 * Reference: [
- * http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html](http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html#TABLE128)
+		 * Reference: [http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html](http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html#TABLE128)
 		 * @param id
 		 * @return the parameter in Parameter Table 128 corresponding to the specified ID
 		 */
@@ -1293,8 +1292,7 @@ class Grib1Parameter(override val id: Int,
 		/**
 		 * Returns the parameter in Parameter Table 129 corresponding to the specified ID.
 		 * <br></br><br></br>
-		 * Reference: [
- * http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html](http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html#TABLE129)
+		 * Reference: [http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html](http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html#TABLE129)
 		 * @param id
 		 * @return the parameter in Parameter Table 129 corresponding to the specified ID
 		 */

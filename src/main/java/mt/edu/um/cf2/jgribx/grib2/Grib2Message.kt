@@ -12,6 +12,7 @@ package mt.edu.um.cf2.jgribx.grib2
 
 import mt.edu.um.cf2.jgribx.*
 import mt.edu.um.cf2.jgribx.api.GribMessage
+import mt.edu.um.cf2.jgribx.api.GribProductDefinitionSection
 import kotlin.reflect.KClass
 
 /**
@@ -50,7 +51,7 @@ class Grib2Message(private val indicatorSection: GribRecordIS,
 						   indicatorSection: GribRecordIS,
 						   discipline: ProductDiscipline,
 						   messageIndex: Int,
-						   parameterFilter: (String) -> Boolean,
+						   parameterFilter: (GribProductDefinitionSection) -> Boolean,
 						   readEntire: Boolean = false): Grib2Message {
 			var messageLength = indicatorSection.messageLength - indicatorSection.length
 			var identificationSection: Grib2RecordIDS? = null
@@ -91,7 +92,7 @@ class Grib2Message(private val indicatorSection: GribRecordIS,
 									identificationSection.referenceTime)
 									.also { gridDefinitionSection.productDefinitionSections.add(it) }
 							productDefinitionSection.log(messageIndex, records.size)
-							if (!parameterFilter(productDefinitionSection.parameter.code)) {
+							if (!parameterFilter(productDefinitionSection)) {
 								throw SkipException("Parameter filter applied")
 							}
 						}

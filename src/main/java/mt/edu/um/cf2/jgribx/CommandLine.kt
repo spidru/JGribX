@@ -1,10 +1,9 @@
 package mt.edu.um.cf2.jgribx
 
 import mt.edu.um.cf2.jgribx.JGribX.setLoggingLevel
-import mt.edu.um.cf2.jgribx.grib2.Grib2Record
-import mt.edu.um.cf2.jgribx.grib2.Grib2RecordDRS0
-import mt.edu.um.cf2.jgribx.grib2.Grib2RecordDRS2
-import mt.edu.um.cf2.jgribx.grib2.Grib2RecordDRS3
+import mt.edu.um.cf2.jgribx.grib1.Grib1Level
+import mt.edu.um.cf2.jgribx.grib1.Grib1Parameter
+import mt.edu.um.cf2.jgribx.grib2.*
 import org.apache.commons.cli.*
 import org.apache.commons.cli.CommandLine
 import java.io.File
@@ -27,12 +26,17 @@ object CommandLine {
 					.apply { argName = "template-num" })
 			addOption(Option("h", "help", false, "Show this screen")
 					.apply { argName = "file" })
-			addOption(Option("i", "input", true, "Specify an input file"))
+			addOption(Option("i", "input", true, "Specify an input file")
+					.apply { argName = "file" })
 			addOption(Option("l", "loglevel", true, "Specify the logging level")
 					.apply { argName = "level" })
+			addOption(Option(null, "list-parameters", true, "List recognized parameters of a GRIB edition")
+					.apply { argName = "grib-edition" })
+			addOption(Option(null, "list-levels", true, "List recognized levels of a GRIB edition")
+					.apply { argName = "grib-edition" })
 			addOption(Option("o", "output", true, "Specify an outout file")
 					.apply { argName = "file" })
-			addOption(Option("p", "params", true, "A comma separated list of parameters to filter")
+			addOption(Option("p", "params", true, "A comma separated list of parameters to filter. The parameter can contain levels and values in the format: PARAM[:LEVEL[:VALUE]].")
 					.apply { argName = "p1,p2,..." })
 			addOption(Option("s", "summary", false, "Print a file summary"))
 			addOption(Option("v", "version", false, "Show version information"))
@@ -68,48 +72,95 @@ object CommandLine {
 			}
 		}
 
-		if (cmd.hasOption("i")) {
-			val inputFile = File(cmd.getOptionValue("i"))
-			val filter = cmd.getOptionValue("p")?.split(",")?.map { it.toUpperCase() }
-			val drs = when (cmd.getOptionValue("drs")?.toInt()) {
-				null -> null
-				0 -> Grib2RecordDRS0::class
-				2 -> Grib2RecordDRS2::class
-				3 -> Grib2RecordDRS3::class
-				else -> {
-					System.err.println("Converting to Data Representation Template 0, 2 and 3 is supported")
-					formatter.printHelp(usage, options)
-					exitProcess(1)
+		when {
+			cmd.hasOption("list-parameters") -> when (cmd.getOptionValue("list-parameters").toInt()) {
+				1 -> listOf(0, 128, 129).asSequence()
+						.flatMap { ver -> (0..255).map { Grib1Parameter.getParameter(ver, it, 0) } }
+						.mapNotNull { it?.let { Triple(it.code, it.description, it.units) } }
+						.map { (c, d, u) -> "  %7s: %s [%s]".format(c, d, u.takeUnless { it.isBlank() } ?: "-") }
+						.joinToString("\n", "List of parameters for GRIB 1:\n")
+						.also { println(it) }
+				2 -> {
+					Grib2Parameter.loadDefaultParameters()
+					ProductDiscipline.VALUES.values.forEach { discipline ->
+						discipline.parameterCategories?.forEach { category ->
+							println("List of parameters for GRIB 2 [dicipline: ${discipline.name}, category: ${category.name}]:")
+							(0..255).mapNotNull { Grib2Parameter.getParameter(discipline, category.value, it) }
+									.map { Triple(it.code, it.description, it.units) }
+									.map { (c, d, u) ->
+										"  %8s: %s [%s]".format(c, d, u.takeUnless { it.isBlank() } ?: "-")
+									}
+									.joinToString("\n")
+									.also { println(it) }
+							println()
+						}
+					}
 				}
+				else -> throw NoValidGribException("Invalid GRIB edition")
 			}
-			val cutOutRegion = cmd.getOptionValue("c")
-					?.split(",")
-					?.mapNotNull { it.toDoubleOrNull() }
-					?.takeIf { it.size == 4 }
-			val outputFile = cmd.getOptionValue("o")?.let { File(it) }
-
-			try {
-				val gribFile = GribFile(inputFile, { filter == null || filter.contains(it.toUpperCase()) })
-
-				if (drs != null) gribFile.records.filterIsInstance<Grib2Record>().forEach {
-					it.convertDataRepresentationTo(drs)
+			cmd.hasOption("list-levels") -> when (cmd.getOptionValue("list-levels").toInt()) {
+				1 -> (0..255).asSequence()
+						.map { Grib1Level.getLevel(it, 0) }
+						.mapNotNull { it?.let { it.code to it.name } }
+						.map { (code, name) -> "  %4s: %s".format(code, name) }
+						.joinToString("\n", "List of levels for GRIB 1:\n")
+						.also { println(it) }
+				2 -> (0..255).asSequence()
+						.map { Grib2Level.getLevel(it, 0f) }
+						.mapNotNull { it?.let { it.code to it.name } }
+						.map { (code, name) -> "  %4s: %s".format(code, name) }
+						.joinToString("\n", "List of levels for GRIB 2:\n")
+						.also { println(it) }
+				else -> throw NoValidGribException("Invalid GRIB edition")
+			}
+			cmd.hasOption("i") -> {
+				val inputFile = File(cmd.getOptionValue("i"))
+				val filters = cmd
+						.getOptionValue("p")
+						?.split(",")
+						?.map { it.toUpperCase() }
+						?.map { it.split(":") }
+						?.map { Triple(it[0], it.getOrNull(1), it.getOrNull(2)?.toIntOrNull()) }
+				val drs = when (cmd.getOptionValue("drs")?.toInt()) {
+					null -> null
+					0 -> Grib2RecordDRS0::class
+					2 -> Grib2RecordDRS2::class
+					3 -> Grib2RecordDRS3::class
+					else -> {
+						System.err.println("Converting to Data Representation Template 0, 2 and 3 is supported")
+						formatter.printHelp(usage, options)
+						exitProcess(1)
+					}
 				}
+				val cutOutRegion = cmd.getOptionValue("c")
+						?.split(",")
+						?.mapNotNull { it.toDoubleOrNull() }
+						?.takeIf { it.size == 4 }
+				val outputFile = cmd.getOptionValue("o")?.let { File(it) }
 
-				cutOutRegion?.also { (north, east, south, west) -> gribFile.cutOut(north, east, south, west) }
+				try {
+					val gribFile = GribFile(inputFile, colonSeparatedParameterLevelValueFilter(filters))
 
-				if (outputFile != null) GribOutputStream(outputFile.outputStream()).use { outputStream ->
-					gribFile.writeTo(outputStream)
+					if (drs != null) gribFile.records.filterIsInstance<Grib2Record>().forEach {
+						it.convertDataRepresentationTo(drs)
+					}
+
+					cutOutRegion?.also { (north, east, south, west) -> gribFile.cutOut(north, east, south, west) }
+
+					if (outputFile != null) GribOutputStream(outputFile.outputStream()).use { outputStream ->
+						gribFile.writeTo(outputStream)
+					}
+
+					if (cmd.hasOption("s")) gribFile.getSummary(System.out) // Print out generic GRIB file info
+				} catch (e: FileNotFoundException) {
+					System.err.println("Cannot find file: ${inputFile.absolutePath}")
+				} catch (e: IOException) {
+					System.err.println("Could not open file: ${inputFile.absolutePath}")
+				} catch (e: NotSupportedException) {
+					System.err.println("GRIB file contains unsupported features: ${e}")
+				} catch (e: NoValidGribException) {
+					System.err.println("GRIB file is invalid: ${e}")
 				}
-
-				if (cmd.hasOption("s")) gribFile.getSummary(System.out) // Print out generic GRIB file info
-			} catch (e: FileNotFoundException) {
-				System.err.println("Cannot find file: ${inputFile.absolutePath}")
-			} catch (e: IOException) {
-				System.err.println("Could not open file: ${inputFile.absolutePath}")
-			} catch (e: NotSupportedException) {
-				System.err.println("GRIB file contains unsupported features: ${e}")
-			} catch (e: NoValidGribException) {
-				System.err.println("GRIB file is invalid: ${e}")
 			}
 		}
 		if (cmd.hasOption("v")) println("JGribX ${JGribX.VERSION}")

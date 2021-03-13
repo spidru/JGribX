@@ -30,4 +30,18 @@ internal fun GribProductDefinitionSection.log(messageIndex: Int, recordIndex: In
 				ISO_DATE_FORMAT.format(referenceTime.time),
 				ISO_DATE_FORMAT.format(forecastTime.time),
 				parameter.let { "${it.description} [${it.code}]" },
-				level.let { "${it?.identifier} (${it?.description})" }))
+				level.let { "${it.identifier} (${it.description})" }))
+
+/**
+ * Creates a filter out of a list of parameter, level, value combinations.
+ *
+ * @param filters a list of parameter, level, value combinations.
+ */
+fun colonSeparatedParameterLevelValueFilter(filters: List<Triple<String, String?, Int?>>?):
+		(GribProductDefinitionSection) -> Boolean = { pds ->
+	filters == null || filters.any { (param, level, value) ->
+		pds.parameter.code.equals(param, ignoreCase = true)
+				&& (level == null || pds.level.code.equals(level, ignoreCase = true))
+				&& (value == null || pds.level.value.toInt() == value)
+	}
+}

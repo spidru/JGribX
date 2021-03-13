@@ -12,6 +12,7 @@ package mt.edu.um.cf2.jgribx
 
 import mt.edu.um.cf2.jgribx.api.GribMessage
 import mt.edu.um.cf2.jgribx.api.GribParameter
+import mt.edu.um.cf2.jgribx.api.GribProductDefinitionSection
 import mt.edu.um.cf2.jgribx.api.GribRecord
 import java.io.*
 import java.util.*
@@ -34,7 +35,7 @@ import kotlin.math.abs
  * @throws NotSupportedException if file contains features not yet supported
  * @throws NoValidGribException  if stream does not contain a valid GRIB file
  */
-class GribFile(gribInputStream: GribInputStream, parameterFilter: (String) -> Boolean = { true }) {
+class GribFile(gribInputStream: GribInputStream, parameterFilter: (GribProductDefinitionSection) -> Boolean = { true }) {
 	/** Returns the GRIB filename. */
 	internal var filename: String? = null
 		private set
@@ -82,7 +83,7 @@ class GribFile(gribInputStream: GribInputStream, parameterFilter: (String) -> Bo
 
 	/** Sorted list of different parameter levels as textual descriptions. */
 	val parameterLevelDescriptions: List<String>
-		get() = records.asSequence().map { it.productDefinition.level?.description ?: "" }.distinct().sorted().toList()
+		get() = records.asSequence().map { it.productDefinition.level.description }.distinct().sorted().toList()
 
 	/** The different generating process IDs found in the GRIB file. */
 	val processIDs: IntArray
@@ -109,13 +110,13 @@ class GribFile(gribInputStream: GribInputStream, parameterFilter: (String) -> Bo
 	 * @throws NoValidGribException  if file is no valid GRIB file
 	 */
 	constructor(filename: String,
-				parameterFilter: (String) -> Boolean = { true },
+				parameterFilter: (GribProductDefinitionSection) -> Boolean = { true },
 				onRead: (Long) -> Unit = {}) : this(FileInputStream(filename), parameterFilter, onRead) {
 		this.filename = filename
 	}
 
 	constructor(file: File,
-				parameterFilter: (String) -> Boolean = { true },
+				parameterFilter: (GribProductDefinitionSection) -> Boolean = { true },
 				onRead: (Long) -> Unit = {}) : this(file.inputStream(), parameterFilter, onRead) {
 		this.filename = file.absolutePath
 	}
@@ -131,7 +132,7 @@ class GribFile(gribInputStream: GribInputStream, parameterFilter: (String) -> Bo
 	 * @throws NoValidGribException  if stream does not contain a valid GRIB file
 	 */
 	constructor(inputStream: InputStream,
-				parameterFilter: (String) -> Boolean = { true },
+				parameterFilter: (GribProductDefinitionSection) -> Boolean = { true },
 				onRead: (Long) -> Unit = {}) :
 			this(GribInputStream(BufferedInputStream(inputStream), onRead), parameterFilter)
 
@@ -174,7 +175,7 @@ class GribFile(gribInputStream: GribInputStream, parameterFilter: (String) -> Bo
 				.asSequence()
 				.flatMap(GribMessage::records)
 				.filter { it.productDefinition.parameter.code == paramCode }
-				.map { record -> record.productDefinition.level.let { it?.identifier to it?.description } }
+				.map { record -> record.productDefinition.level.let { it.identifier to it.description } }
 				.groupBy(Pair<String?, String?>::first)
 				.mapValues { it.value.map(Pair<String?, String?>::second) }
 
@@ -186,7 +187,7 @@ class GribFile(gribInputStream: GribInputStream, parameterFilter: (String) -> Bo
 			.asSequence()
 			.flatMap { it.records }
 			.filter { it.productDefinition.parameter.code == paramCode }
-			.map { it.productDefinition.level?.identifier }
+			.map { it.productDefinition.level.identifier }
 			.distinct()
 			.toList()
 
@@ -220,8 +221,8 @@ class GribFile(gribInputStream: GribInputStream, parameterFilter: (String) -> Bo
 					.flatMap { it.records }
 					.filter { it.forecastTime == closestForecastTime }
 					.filter { it.productDefinition.parameter.code == parameterCode }
-					.filter { it.productDefinition.level?.code == levelCode }
-					.filter { levelValue == null || it.productDefinition.level?.value?.toInt() == levelValue }
+					.filter { it.productDefinition.level.code == levelCode }
+					.filter { levelValue == null || it.productDefinition.level.value.toInt() == levelValue }
 					.firstOrNull()
 		}
 		return null

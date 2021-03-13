@@ -61,7 +61,7 @@
 60		:	Snow Depth Water Equivalent																							:	kg m^-2			:	SDWE
 61		:	Snow Density																										:	kg m^-3			:	SDEN
 62		:	Snow Evaporation																									:	kg m^-2			:	SEVAP
-63		:	Reserved																											:					:
+63		:	Reserved																											:					:	RESERVED
 64		:	Total Column Integrated Water Vapour																				:	kg m^-2			:	TCIWV
 65		:	Rain Precipitation Rate																								:	kg m^-2 s^-1	:	RPRATE
 66		:	Snow Precipitation Rate																								:	kg m^-2 s^-1	:	SPRATE
@@ -87,7 +87,7 @@
 86		:	Specific Snow Water Content																							:	kg kg^-1		:	SSNOWW
 87		:	Stratiform Precipitation Rate																						:	kg m^-2 s^-1	:	STRPRATE
 88		:	Categorical Convective Precipitation																				:					:	CATCP
-89		:	Reserved																											:					:
+89		:	Reserved																											:					:	RESERVED
 90		:	Total Kinematic Moisture Flux																						:	kg kg^-1 m s^-1	:	TKMFLX
 91		:	U-component (zonal) Kinematic Moisture Flux																			:	kg kg^-1 m s^-1	:	UKMFLX
 92		:	V-component (meridional) Kinematic Moisture Flux																	:	kg kg^-1 m s^-1	:	VKMFLX

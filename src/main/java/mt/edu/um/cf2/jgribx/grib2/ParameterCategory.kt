@@ -5,7 +5,7 @@ import mt.edu.um.cf2.jgribx.Logger
 /**
  * [Parameter category by product discipline](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table4-1.shtml)
  */
-abstract class ParameterCategory private constructor(internal val value: Int, private val name: String) {
+abstract class ParameterCategory private constructor(internal val value: Int, internal val name: String) {
 	class Meteorological private constructor(categoryId: Int, name: String) : ParameterCategory(categoryId, name) {
 		companion object {
 			val CATEGORIES: List<ParameterCategory> = mapOf(

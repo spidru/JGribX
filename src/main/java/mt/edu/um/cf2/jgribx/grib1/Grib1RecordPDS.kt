@@ -329,7 +329,8 @@ class Grib1RecordPDS internal constructor(val tableVersion: Int,
 	 * Containing the information about the level. This helps to actually use the data, otherwise the string for
 	 * level will have to be parsed.
 	 */
-	override val level: Grib1Level? = Grib1Level.getLevel(levelType, levelData)
+	override val level: Grib1Level = Grib1Level.getLevel(levelType, levelData)
+			?: TODO("Unknown level type=${levelType}, data=${"0x%04X".format(levelData)}")
 
 	/** Forecast time. Also used as starting time when times represent a period */
 	override val forecastTime: Calendar
@@ -434,7 +435,7 @@ class Grib1RecordPDS internal constructor(val tableVersion: Int,
 			.thenComparing(Grib1RecordPDS::decimalScale)
 			.thenComparing(Grib1RecordPDS::length)
 			.thenComparing(Grib1RecordPDS::parameter)
-			.thenComparing(Grib1RecordPDS::level, nullsFirst())
+			.thenComparing(Grib1RecordPDS::level)
 			.compare(this, other)
 
 	override fun equals(other: Any?) = this === other

@@ -9,7 +9,7 @@ import java.util.*
  */
 interface GribProductDefinitionSection {
 	val parameter: GribParameter
-	val level: GribLevel?
+	val level: GribLevel
 	val referenceTime: Calendar
 	val forecastTime: Calendar
 }

@@ -2,7 +2,7 @@ package mt.edu.um.cf2.jgribx.grib2
 
 import mt.edu.um.cf2.jgribx.grib2.ParameterCategory.Companion.getCategories
 
-class ProductDiscipline private constructor(internal val value: Int, private val name: String = "") {
+class ProductDiscipline private constructor(internal val value: Int, internal val name: String = "") {
 	companion object {
 		val MISSING = 255
 		val VALUES = mapOf(
