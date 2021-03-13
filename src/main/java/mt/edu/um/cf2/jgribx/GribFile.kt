@@ -35,7 +35,9 @@ import kotlin.math.abs
  * @throws NotSupportedException if file contains features not yet supported
  * @throws NoValidGribException  if stream does not contain a valid GRIB file
  */
-class GribFile(gribInputStream: GribInputStream, parameterFilter: (GribProductDefinitionSection) -> Boolean = { true }) {
+class GribFile(gribInputStream: GribInputStream,
+			   recordFilter: (Int, Int?) -> Boolean = { _, _ -> true },
+			   parameterFilter: (GribProductDefinitionSection) -> Boolean = { true }) {
 	/** Returns the GRIB filename. */
 	internal var filename: String? = null
 		private set
@@ -110,14 +112,16 @@ class GribFile(gribInputStream: GribInputStream, parameterFilter: (GribProductDe
 	 * @throws NoValidGribException  if file is no valid GRIB file
 	 */
 	constructor(filename: String,
+				recordFilter: (Int, Int?) -> Boolean = { _, _ -> true },
 				parameterFilter: (GribProductDefinitionSection) -> Boolean = { true },
-				onRead: (Long) -> Unit = {}) : this(FileInputStream(filename), parameterFilter, onRead) {
+				onRead: (Long) -> Unit = {}) : this(FileInputStream(filename), recordFilter, parameterFilter, onRead) {
 		this.filename = filename
 	}
 
 	constructor(file: File,
+				recordFilter: (Int, Int?) -> Boolean = { _, _ -> true },
 				parameterFilter: (GribProductDefinitionSection) -> Boolean = { true },
-				onRead: (Long) -> Unit = {}) : this(file.inputStream(), parameterFilter, onRead) {
+				onRead: (Long) -> Unit = {}) : this(file.inputStream(), recordFilter, parameterFilter, onRead) {
 		this.filename = file.absolutePath
 	}
 
@@ -132,9 +136,10 @@ class GribFile(gribInputStream: GribInputStream, parameterFilter: (GribProductDe
 	 * @throws NoValidGribException  if stream does not contain a valid GRIB file
 	 */
 	constructor(inputStream: InputStream,
+				recordFilter: (Int, Int?) -> Boolean = { _, _ -> true },
 				parameterFilter: (GribProductDefinitionSection) -> Boolean = { true },
 				onRead: (Long) -> Unit = {}) :
-			this(GribInputStream(BufferedInputStream(inputStream), onRead), parameterFilter)
+			this(GribInputStream(BufferedInputStream(inputStream), onRead), recordFilter, parameterFilter)
 
 	init {
 		/**
@@ -146,20 +151,20 @@ class GribFile(gribInputStream: GribInputStream, parameterFilter: (GribProductDe
 			// There may be non-GRIB data on the beginning of the file or between GRIB messages, e.g. when using
 			// get_gfs.pl script (https://www.cpc.ncep.noaa.gov/products/wesley/get_gfs.html)
 			if (GribRecordIS.seekNext(gribInputStream)) try {
-				val message = GribMessage.readFromStream(gribInputStream, count, parameterFilter)
+				val message = GribMessage.readFromStream(gribInputStream, count, recordFilter, parameterFilter)
 				messages.add(message)
 			} catch (e: SkipException) {
-				Logger.info("Skipping GRIB message ${count} (${e.message})", e)
+				Logger.debug("Skipping GRIB message ${count}: ${e.message}")
 				messagesSkippedCount++
 				continue
 			} catch (e: NotImplementedError) {
-				Logger.warning("Skipping GRIB message ${count} (${e.message})", e)
+				Logger.warning("Skipping GRIB message ${count}: ${e.message}", e)
 				messagesSkippedCount++
 			} catch (e: NotSupportedException) {
-				Logger.warning("Skipping GRIB message ${count} (${e.message})", e)
+				Logger.warning("Skipping GRIB message ${count}: ${e.message}", e)
 				messagesSkippedCount++
 			} catch (e: NoValidGribException) {
-				Logger.warning("Skipping GRIB message ${count} (${e.message})", e)
+				Logger.warning("Skipping GRIB message ${count}: ${e.message}", e)
 				messagesSkippedCount++
 			} finally {
 				count++

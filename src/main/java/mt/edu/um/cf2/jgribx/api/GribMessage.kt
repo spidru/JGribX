@@ -13,6 +13,7 @@ interface GribMessage {
 	companion object {
 		internal fun readFromStream(gribInputStream: GribInputStream,
 									messageIndex: Int,
+									recordFilter: (Int, Int?) -> Boolean,
 									parameterFilter: (GribProductDefinitionSection) -> Boolean): GribMessage {
 			val indicatorSection = GribRecordIS.readFromStream(gribInputStream)
 
@@ -20,10 +21,11 @@ interface GribMessage {
 			gribInputStream.createByteCounter(
 					initial = indicatorSection.length.toLong(),
 					length = indicatorSection.messageLength).use {
+				if (!recordFilter(messageIndex, null)) throw SkipException("Message filtered out")
 				val message = when (indicatorSection.gribEdition) {
 					1 -> Grib1Message.readFromStream(gribInputStream, indicatorSection, messageIndex, parameterFilter)
 					2 -> indicatorSection.discipline?.let { discipline ->
-						Grib2Message.readFromStream(gribInputStream, indicatorSection, discipline, messageIndex, parameterFilter)
+						Grib2Message.readFromStream(gribInputStream, indicatorSection, discipline, messageIndex, recordFilter, parameterFilter)
 					} ?: throw NoValidGribException("Missing discipline for GRIB2 edition")
 					else -> throw NoValidGribException("Unsupported GRIB edition ${indicatorSection.gribEdition}")
 				}

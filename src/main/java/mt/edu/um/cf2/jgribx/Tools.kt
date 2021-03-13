@@ -45,3 +45,7 @@ fun colonSeparatedParameterLevelValueFilter(filters: List<Triple<String, String?
 				&& (value == null || pds.level.value.toInt() == value)
 	}
 }
+
+fun colonSeparatedMessageRecordFilter(filters: List<Pair<Int, Int?>>?): (Int, Int?) -> Boolean = { mIndex, rIndex ->
+	filters == null || filters.any { (m, r) -> mIndex == m && (r == null || rIndex == null) }
+}

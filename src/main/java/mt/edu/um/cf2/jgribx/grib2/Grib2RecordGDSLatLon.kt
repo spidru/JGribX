@@ -282,7 +282,7 @@ class Grib2RecordGDSLatLon internal constructor(gridDefinitionSource: Int,
 		get() = min(lon1, lon2)
 
 	override val dataIndices: Sequence<Int>
-		get() = generateSequence(0 to 0) { (i, _) -> (i + 1) to getDataIndex(i + 1) }
+		get() = generateSequence(0 to getDataIndex(0)) { (i, _) -> (i + 1) to getDataIndex(i + 1) }
 				.take(gridNi * gridNj)
 				.map { (_, index) -> index }
 
@@ -310,7 +310,13 @@ class Grib2RecordGDSLatLon internal constructor(gridDefinitionSource: Int,
 
 	internal fun jPointsCount(lat1: Double, lat2: Double): Int = ceil(abs(lat2 - lat1) / deltaY).toInt() + 1
 
-	override fun getDataIndex(sequence: Int): Int = getDataIndex(sequence % gridNi, sequence / gridNi)
+	override fun getDataIndex(sequence: Int): Int {
+		var i = sequence % gridNi
+		var j = sequence / gridNi
+		i = if (scanMode.iDirectionPositive) i else gridNi - i - 1
+		j = if (scanMode.jDirectionPositive) j else gridNj - j - 1
+		return getDataIndex(i, j)
+	}
 
 	override fun getDataIndex(latitude: Double, longitude: Double): Int {
 		// double[] xcoords = gds.getGridXCoords();
@@ -333,6 +339,14 @@ class Grib2RecordGDSLatLon internal constructor(gridDefinitionSource: Int,
 		}
 		return if (scanMode.iDirectionConsecutive) gridNi * j + i else gridNj * i + j
 	}
+
+//	override fun convertRawData(data: FloatArray): FloatArray {
+//		var matrix = data.toList().windowed(gridSizeX, gridSizeX)
+//		if (!scanMode.iDirectionConsecutive) matrix = matrix.transpose()
+//		if (!scanMode.iDirectionPositive) matrix = matrix.map { it.reversed() }
+//		if (!scanMode.jDirectionPositive) matrix = matrix.reversed()
+//		return matrix.flatten().toFloatArray()
+//	}
 
 	override fun cutOut(north: Double, east: Double, south: Double, west: Double) {
 		val inputLat1 = if (gridDj >= 0) south else north

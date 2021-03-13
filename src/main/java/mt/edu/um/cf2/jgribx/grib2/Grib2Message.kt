@@ -51,6 +51,7 @@ class Grib2Message(private val indicatorSection: GribRecordIS,
 						   indicatorSection: GribRecordIS,
 						   discipline: ProductDiscipline,
 						   messageIndex: Int,
+						   recordFilter: (Int, Int?) -> Boolean,
 						   parameterFilter: (GribProductDefinitionSection) -> Boolean,
 						   readEntire: Boolean = false): Grib2Message {
 			var messageLength = indicatorSection.messageLength - indicatorSection.length
@@ -70,13 +71,16 @@ class Grib2Message(private val indicatorSection: GribRecordIS,
 				if (messageLength == 4L) break
 
 				val (sectionLength, sectionNumber) = Grib2Section.peekFromStream(gribInputStream)
-				if (sectionNumber == 1) recordCount++
 				if (sectionLength > messageLength) {
 					Logger.error("Section appears to be larger than the remaining length in the GRIB message")
 				}
 
 				val byteCounter = gribInputStream.createByteCounter(length = sectionLength.toLong())
 				try {
+					if (!recordFilter(messageIndex, recordCount)) {
+						throw SkipException("Record ${recordCount} filtered out")
+					}
+
 					when (sectionNumber) {
 						1 -> identificationSection = Grib2RecordIDS.readFromStream(gribInputStream, readEntire)
 						2 -> localUseSection = Grib2RecordLUS.readFromStream(gribInputStream, readEntire)
@@ -148,6 +152,8 @@ class Grib2Message(private val indicatorSection: GribRecordIS,
 						messageLength -= length.toLong()
 						if (messageLength == 4L) break
 					}
+				} finally {
+					if (sectionNumber == 1) recordCount++
 				}
 			}
 			if (identificationSection == null) throw NoValidGribException("Missing IDS section")

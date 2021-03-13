@@ -5,7 +5,6 @@ import mt.edu.um.cf2.jgribx.grib1.Grib1Level
 import mt.edu.um.cf2.jgribx.grib1.Grib1Parameter
 import mt.edu.um.cf2.jgribx.grib2.*
 import org.apache.commons.cli.*
-import org.apache.commons.cli.CommandLine
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -38,13 +37,14 @@ object CommandLine {
 					.apply { argName = "file" })
 			addOption(Option("p", "params", true, "A comma separated list of parameters to filter. The parameter can contain levels and values in the format: PARAM[:LEVEL[:VALUE]].")
 					.apply { argName = "p1,p2,..." })
+			addOption(Option("r", "records", true, "A comma separated list of message records to filter. The parameter can contain message indices and records indices in format: MESSAGE_INDEX[:RECORD_INDEX]."))
 			addOption(Option("s", "summary", false, "Print a file summary"))
 			addOption(Option("v", "version", false, "Show version information"))
 		}
 
 		val parser: CommandLineParser = DefaultParser()
 		val formatter = HelpFormatter().apply { width = 120 }
-		val cmd: CommandLine
+		val cmd: org.apache.commons.cli.CommandLine
 		try {
 			cmd = parser.parse(options, args)
 		} catch (e: ParseException) {
@@ -115,7 +115,12 @@ object CommandLine {
 			}
 			cmd.hasOption("i") -> {
 				val inputFile = File(cmd.getOptionValue("i"))
-				val filters = cmd
+				val recordFilter = cmd
+						.getOptionValue("r")
+						?.split(",")
+						?.mapNotNull { it.split(":").map(String::toIntOrNull).takeUnless(List<*>::isEmpty) }
+						?.mapNotNull { pair -> pair.getOrNull(0)?.let { Pair(it, pair.getOrNull(1)) } }
+				val paramFilter = cmd
 						.getOptionValue("p")
 						?.split(",")
 						?.map { it.toUpperCase() }
@@ -139,7 +144,9 @@ object CommandLine {
 				val outputFile = cmd.getOptionValue("o")?.let { File(it) }
 
 				try {
-					val gribFile = GribFile(inputFile, colonSeparatedParameterLevelValueFilter(filters))
+					val gribFile = GribFile(inputFile,
+							recordFilter = colonSeparatedMessageRecordFilter(recordFilter),
+							parameterFilter = colonSeparatedParameterLevelValueFilter(paramFilter))
 
 					if (drs != null) gribFile.records.filterIsInstance<Grib2Record>().forEach {
 						it.convertDataRepresentationTo(drs)
