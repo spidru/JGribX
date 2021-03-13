@@ -4,13 +4,8 @@ import mt.edu.um.cf2.jgribx.JGribX.setLoggingLevel
 import org.junit.Assert.*
 import org.junit.BeforeClass
 import org.junit.Test
-import java.io.BufferedReader
-import java.io.File
-import java.io.FileReader
 import java.io.IOException
-import java.net.URISyntaxException
 import java.util.*
-import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 
 class GribTest {
@@ -45,59 +40,8 @@ class GribTest {
 		assertArrayEquals("Weather centres", intArrayOf(7), gribFile.centreIDs.toIntArray())
 		assertArrayEquals("Generating processes", intArrayOf(81, 96), gribFile.processIDs)
 
-		// Compare values in each record against a "gold standard" (wgrib)
-		for (r in 0 until gribFile.recordCount) {
-			// Get values from GRIB file using JGribX
-			val record = gribFile.records[r]
-			val obtainedValues: FloatArray = record.values
-			var gribFilepath = ""
-			try {
-				gribFilepath = File(url.toURI()).absolutePath
-			} catch (e: URISyntaxException) {
-				e.printStackTrace()
-			}
-			val pb = ProcessBuilder("wgrib", gribFilepath, "-d", "${(r + 1)}", "-text")
-			val cmd = pb.command().joinToString(" ")
-			println("Executing: ${cmd}")
-			try {
-				val process = pb.start()
-				val exited = process.waitFor(2, TimeUnit.SECONDS)
-				assertTrue("Process exited", exited)
-				assertEquals("Process exited with code ${process.exitValue()}", 0, process.exitValue())
-			} catch (e: IOException) {
-				fail("Exception: ${e.message}")
-			} catch (e: InterruptedException) {
-				fail("Exception: ${e.message}")
-			}
-
-			// Read dump file
-			try {
-				BufferedReader(FileReader("dump")).use { reader ->
-					var line = ""
-					// Skip first line
-					reader.readLine()
-					var i = 0
-					while (reader.readLine()?.also { line = it } != null) {
-						var tolerance = 0.1
-						val expectedValue = line.toFloat()
-
-						/* WORKAROUND
-						 * It seems that wgrib occasionally outputs values as integers for some reason.
-						 * To avoid false positive assertions, we increase the tolerance to 0.5
-						 */
-						val expectedValueAsInt = expectedValue.toInt()
-						if (expectedValue - expectedValueAsInt == 0f) {
-							tolerance = 0.5
-						}
-						assertEquals(String.format("Record %d entry %d", r, i),
-								expectedValue.toDouble(), obtainedValues[i].toDouble(), tolerance)
-						i++
-					}
-				}
-			} catch (e: IOException) {
-				fail("Exception: ${e.message}")
-			}
-		}
+		// TODO assertCoordinatesWithGoldStandard(url, gribFile)
+		assertDataWithGoldStandard(url, gribFile)
 	}
 
 	@Test
@@ -111,6 +55,9 @@ class GribTest {
 		assertEquals("Reference time(s)", file.referenceTimes, refTimes)
 		assertArrayEquals("Weather centres", intArrayOf(7), file.centreIDs.toIntArray())
 		assertArrayEquals("Generating processes", intArrayOf(31), file.processIDs)
+
+		// TODO assertCoordinatesWithGoldStandard(url, file)
+		assertDataWithGoldStandard(url, file, skipGribRecords = listOf(438, 445)) // FIXME
 	}
 
 	@Test
@@ -143,6 +90,9 @@ class GribTest {
 		assertEquals("Reference time(s)", file.referenceTimes, refTimes)
 		assertArrayEquals("Weather centres", intArrayOf(7), file.centreIDs.toIntArray())
 		assertArrayEquals("Generating processes", intArrayOf(81), file.processIDs)
+
+		assertCoordinatesWithGoldStandard(url, file)
+		assertDataWithGoldStandard(url, file)
 	}
 
 	@Test
@@ -151,11 +101,18 @@ class GribTest {
 		refTimes.add(GregorianCalendar(2021, Calendar.FEBRUARY, 27, 0, 0, 0)
 				.apply { timeZone = TimeZone.getTimeZone("UTC") })
 		val url = GribTest::class.java.getResource("/North_Sea_NE_ICON_EU_EWAM_20210227-00.grb2")
+		// TODO JK: Data Representation type 40 not supported yet
+		val ignoredIndices = readIgnoredRecordIndices("/North_Sea_NE_ICON_EU_EWAM_20210227-00.grb2.ignore")
+
 		val file = GribFile(url.openStream())
+		assertEquals(ignoredIndices.size, file.messagesSkippedCount)
 		assertEquals("GRIB edition", 2L, file.edition.toLong())
 		assertEquals("Reference time(s)", file.referenceTimes, refTimes)
 		assertArrayEquals("Weather centres", intArrayOf(78), file.centreIDs.toIntArray())
 		assertArrayEquals("Generating processes", intArrayOf(2), file.processIDs)
+
+		assertCoordinatesWithGoldStandard(url, file)
+		assertDataWithGoldStandard(url, file, skipWGribRecords = ignoredIndices)
 	}
 
 	@Test
@@ -164,10 +121,17 @@ class GribTest {
 		refTimes.add(GregorianCalendar(2021, Calendar.FEBRUARY, 27, 0, 0, 0)
 				.apply { timeZone = TimeZone.getTimeZone("UTC") })
 		val url = GribTest::class.java.getResource("/Copenhagen_ICON-D2_EWAM_20210227-00.grb2")
+		// TODO JK: Data Representation type 40 not supported yet
+		val ignoredIndices = readIgnoredRecordIndices("/Copenhagen_ICON-D2_EWAM_20210227-00.grb2.ignore")
+
 		val file = GribFile(url.openStream())
+		//assertEquals(ignoredIndices.size, file.messagesSkippedCount)
 		assertEquals("GRIB edition", 2L, file.edition.toLong())
 		assertEquals("Reference time(s)", file.referenceTimes, refTimes)
 		assertArrayEquals("Weather centres", intArrayOf(78), file.centreIDs.toIntArray())
 		assertArrayEquals("Generating processes", intArrayOf(11), file.processIDs)
+
+		assertCoordinatesWithGoldStandard(url, file)
+		assertDataWithGoldStandard(url, file, skipWGribRecords = ignoredIndices)
 	}
 }

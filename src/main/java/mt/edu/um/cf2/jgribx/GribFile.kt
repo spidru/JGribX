@@ -43,7 +43,8 @@ class GribFile(gribInputStream: GribInputStream,
 		private set
 
 	/** Returns the number of records skipped due to them being invalid or not supported. */
-	var messagesSkippedCount = 0
+	internal var messagesSkippedCount = 0
+		private set
 
 	/** List of GRIB records */
 	val records: List<GribRecord>

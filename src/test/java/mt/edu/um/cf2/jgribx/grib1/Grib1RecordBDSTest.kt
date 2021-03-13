@@ -46,7 +46,7 @@ class Grib1RecordBDSTest {
 				Random.nextInt(1.byteSpace()),
 				Random.nextInt(1.byteSpace()),
 				Random.nextInt(127) + 1,
-				Random.nextInt(10),
+				Random.nextInt(9) + 1,
 				Random.nextInt(2.byteSpace()),
 				referenceTime,
 				Random.nextInt(1.byteSpace()),

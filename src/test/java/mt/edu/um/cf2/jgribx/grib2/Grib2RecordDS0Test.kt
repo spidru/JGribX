@@ -93,8 +93,8 @@ class Grib2RecordDS0Test {
 		Assert.assertEquals(5 + ceil(actual.data.size.toDouble() * drs.nBits.toDouble() / 8.0).toInt(), actual.length)
 		Assert.assertEquals(7, expected.number)
 		Assert.assertEquals(7, actual.number)
-		Assert.assertNotNull(expected.values)
-		Assert.assertNotNull(actual.values)
+		Assert.assertNotNull(expected.data)
+		Assert.assertNotNull(actual.data)
 	}
 
 	private fun generateData(numberOfDataPoints: Int, nBits: Int): ByteArray {
