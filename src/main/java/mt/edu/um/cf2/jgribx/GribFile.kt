@@ -271,7 +271,10 @@ class GribFile(gribInputStream: GribInputStream) {
 		}
 	}
 
-	fun writeTo(gribOutputStream: GribOutputStream) = messages.forEach { it.writeTo(gribOutputStream) }
+	fun writeTo(gribOutputStream: GribOutputStream) = messages.forEachIndexed { i, message ->
+		Logger.info("Writing GRIB${message.records.first().indicatorSection.gribEdition} message ${i}/${messages.size}")
+		message.writeTo(gribOutputStream)
+	}
 
 	override fun toString(): String = "GRIB file (${recordCount} records)"
 }

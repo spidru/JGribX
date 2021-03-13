@@ -1,15 +1,19 @@
-package mt.edu.um.cf2.jgribx.grib2
+package mt.edu.um.cf2.jgribx.grib1
 
-import mt.edu.um.cf2.jgribx.*
+import mt.edu.um.cf2.jgribx.GribInputStream
+import mt.edu.um.cf2.jgribx.GribOutputStream
+import mt.edu.um.cf2.jgribx.JGribX
+import mt.edu.um.cf2.jgribx.Logger
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.BeforeClass
 import org.junit.Test
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import kotlin.math.ceil
 import kotlin.random.Random
 
-class Grib2RecordDRS0Test {
+class Grib1RecordBMSTest {
 	companion object {
 		@BeforeClass
 		@JvmStatic
@@ -22,14 +26,11 @@ class Grib2RecordDRS0Test {
 	@Test
 	fun testWriting() {
 		// Given
-		val nDataPoints = Random.nextInt(5, 1000)
-		val expected = Grib2RecordDRS0(
-				nDataPoints,
-				Random.nextDouble(0.0, 100.0).toFloat(),
-				Random.nextInt(5),
-				Random.nextInt(10),
-				Random.nextInt(3, 8),
-				Random.nextInt(1.byteSpace()))
+		val bits = Random.nextInt(100, 1000)
+		val expected = Grib1RecordBMS(
+				(8 - (bits % 8)) % 8,
+				0,
+				(0 until bits).map { Random.nextBoolean() }.toBooleanArray())
 
 		// When
 		val bos = ByteArrayOutputStream()
@@ -39,13 +40,11 @@ class Grib2RecordDRS0Test {
 		// Then
 		val byteArray = bos.toByteArray()
 		val gis = GribInputStream(ByteArrayInputStream(byteArray))
-		val actual = Grib2RecordDRS.readFromStream(gis)
+		val actual = Grib1RecordBMS.readFromStream(gis)
 
 		assertNotNull(expected)
 		assertEquals(expected, actual)
-		assertEquals(21, expected.length)
-		assertEquals(21, actual.length)
-		assertEquals(5, expected.number)
-		assertEquals(5, actual.number)
+		assertEquals(6 + ceil(bits / 8.0).toInt(), expected.length)
+		assertEquals(6 + ceil(bits / 8.0).toInt(), actual.length)
 	}
 }

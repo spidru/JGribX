@@ -29,29 +29,29 @@ class Grib2RecordDS0Test {
 		val refValue = (data.minOrNull() ?: 0.0f) * 10.0f.pow(decimalScaleFactor)
 		val nBits = 10
 		val gds = Grib2RecordGDSLatLon(
-				Random.nextInt(1.bytesSpace()),
+				Random.nextInt(1.byteSpace()),
 				numberOfDataPoints,
-				Random.nextInt(1.bytesSpace()),
-				Random.nextInt(1.bytesSpace()),
+				Random.nextInt(1.byteSpace()),
+				Random.nextInt(1.byteSpace()),
 
-				Random.nextInt(1.bytesSpace()),
-				Random.nextInt(1.bytesSpace()),
-				Random.nextInt(4.bytesSpace()),
-				Random.nextInt(1.bytesSpace()),
-				Random.nextInt(4.bytesSpace()),
-				Random.nextInt(1.bytesSpace()),
-				Random.nextInt(4.bytesSpace()),
-				Random.nextInt(4.bytesSpace()),
-				Random.nextInt(4.bytesSpace()),
+				Random.nextInt(1.byteSpace()),
+				Random.nextInt(1.byteSpace()),
+				Random.nextInt(4.byteSpace()),
+				Random.nextInt(1.byteSpace()),
+				Random.nextInt(4.byteSpace()),
+				Random.nextInt(1.byteSpace()),
+				Random.nextInt(4.byteSpace()),
+				Random.nextInt(4.byteSpace()),
+				Random.nextInt(4.byteSpace()),
 				0,
-				Random.nextInt(4.bytesSpace()),
-				Random.nextInt(4.bytesSpace()) / 1.0e6,
-				Random.nextInt(4.bytesSpace()) / 1.0e6,
+				Random.nextInt(4.byteSpace()),
+				Random.nextInt(4.byteSpace()) / 1.0e6,
+				Random.nextInt(4.byteSpace()) / 1.0e6,
 				0x10 or 0x20,
-				Random.nextInt(4.bytesSpace()) / 1.0e6,
-				Random.nextInt(4.bytesSpace()) / 1.0e6,
-				Random.nextInt(4.bytesSpace()) / 1.0e6,
-				Random.nextInt(4.bytesSpace()) / 1.0e6,
+				Random.nextInt(4.byteSpace()) / 1.0e6,
+				Random.nextInt(4.byteSpace()) / 1.0e6,
+				Random.nextInt(4.byteSpace()) / 1.0e6,
+				Random.nextInt(4.byteSpace()) / 1.0e6,
 				Grib2RecordGDS.ScanMode(0x40),
 				Random.nextBytes(Random.nextInt(10)))
 		val drs = Grib2RecordDRS0(
@@ -60,7 +60,7 @@ class Grib2RecordDS0Test {
 				binaryScaleFactor,
 				decimalScaleFactor,
 				nBits,
-				Random.nextInt(1.bytesSpace()))
+				Random.nextInt(1.byteSpace()))
 		val bms = Grib2RecordBMS(Grib2RecordBMS.MISSING)
 
 		val expected = Grib2RecordDS0(

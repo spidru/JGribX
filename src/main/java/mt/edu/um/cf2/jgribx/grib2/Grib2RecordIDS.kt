@@ -14,7 +14,6 @@ import mt.edu.um.cf2.jgribx.GribInputStream
 import mt.edu.um.cf2.jgribx.GribOutputStream
 import mt.edu.um.cf2.jgribx.Logger
 import mt.edu.um.cf2.jgribx.NoValidGribException
-import mt.edu.um.cf2.jgribx.api.GribSection
 import java.util.*
 
 /**
@@ -73,12 +72,12 @@ class Grib2RecordIDS internal constructor(val centreId: Int,
 										  val referenceTime: Calendar,
 										  internal val dataProdStatus: Int,
 										  internal val dataType: Int,
-										  internal val reserved: ByteArray?) : GribSection {
+										  internal val reserved: ByteArray?) : Grib2Section {
 
 	companion object {
 		internal fun readFromStream(gribInputStream: GribInputStream, readEntire: Boolean = false): Grib2RecordIDS {
 			/* [1-5] Length, section number */
-			val length = GribSection.readFromStream(gribInputStream, 1)
+			val length = Grib2Section.readFromStream(gribInputStream, 1)
 
 			/* [6-7] Originating Centre ID */
 			val centreId = gribInputStream.readUINT(2)

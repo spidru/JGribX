@@ -28,7 +28,7 @@ package mt.edu.um.cf2.jgribx.grib1
  *
  * @see <a href="http://www.nco.ncep.noaa.gov/pmb/docs/on388/table3.html">Table 3</a>
  *
- * @property index Index number from table 3 - can be used for comparison even if the description of the level changes
+ * @property type Index number from table 3 - can be used for comparison even if the description of the level changes
  * @property code Stores a short name of the level - same as the string "level" in the original GribRecordPDS
  *                implementation
  * @property name Name of the vertical coordinate/level
@@ -44,7 +44,7 @@ package mt.edu.um.cf2.jgribx.grib1
  * @property isIncreasingUp Indicates whether the vertical coordinate increases with height. e.g. false for pressure
  *                          and sigma, true for height above ground or if unknown
  */
-class Grib1Level(val index: Int,
+class Grib1Level(val type: Int,
 				 val code: String,
 				 val name: String,
 				 val description: String? = null,
@@ -204,7 +204,7 @@ class Grib1Level(val index: Int,
 
 	/** true if negative z-value */
 	val isDepth: Boolean
-		get() = index == 111 || index == 160
+		get() = type == 111 || type == 160
 
 	/** Returns a unique ID for the given combination code-value combination. */
 	val identifier: String
@@ -232,7 +232,7 @@ class Grib1Level(val index: Int,
 		if (level == null) return -1
 
 		// check if level is less than this
-		if (index > level.index) return -1
+		if (type > level.type) return -1
 		if (value1 > level.value1) return -1
 		return if (value2 > level.value2) -1 else 1
 	}
@@ -249,13 +249,13 @@ class Grib1Level(val index: Int,
 		if (other !is Grib1Level) return false
 		// quick check to see if same object
 		if (this === other) return true
-		if (index != other.index) return false
+		if (type != other.type) return false
 		if (value1 != other.value1) return false
 		return value2 == other.value2
 	}
 
 	override fun hashCode(): Int {
-		var result = index
+		var result = type
 		result = 31 * result + code.hashCode()
 		result = 31 * result + name.hashCode()
 		result = 31 * result + (description?.hashCode() ?: 0)
@@ -270,7 +270,7 @@ class Grib1Level(val index: Int,
 
 	override fun toString(): String = listOfNotNull(
 			"GRIB1 Level description:",
-			"\tIndex: ${index}",
+			"\tIndex: ${type}",
 			"\tCode: ${code}",
 			"\tName: ${name}",
 			"\tDescription: ${description}",

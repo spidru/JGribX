@@ -591,7 +591,7 @@ class Grib1PDSParamTable(protected var filename: String? = null,
 	 */
 	private fun setParameter(pdsPar: Grib1Parameter?): Boolean {
 		if (pdsPar == null) return false
-		val id = pdsPar.number
+		val id = pdsPar.id
 		if (id < 0 || id >= NPARAMETERS) return false
 		parameters?.set(id, pdsPar)
 		return true
