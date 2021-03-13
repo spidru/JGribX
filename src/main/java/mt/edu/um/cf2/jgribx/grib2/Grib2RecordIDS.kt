@@ -112,8 +112,8 @@ class Grib2RecordIDS internal constructor(val centreId: Int,
 
 			/* [19] Second */
 			val second = gribInputStream.readUINT(1)
-			TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
 			val referenceTime = GregorianCalendar(year, month - 1, day, hour, minute, second)
+					.apply { timeZone = TimeZone.getTimeZone("UTC") }
 
 			/* [20] Data Production Status */
 			val dataProdStatus = gribInputStream.readUINT(1)
