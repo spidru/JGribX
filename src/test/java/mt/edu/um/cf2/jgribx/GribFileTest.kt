@@ -104,7 +104,7 @@ class GribFileTest {
 					}
 				}
 				.onEach { assertEquals(65160, it.gridDefinition.coords.size) }
-				.onEach { assertEquals(65160, it.values.size) }
+				.onEach { assertEquals(65160, it.data.data.size) }
 				.onEach { assertEquals(-90.0, it.gridDefinition.yCoords.minOrNull()) }
 				.onEach { assertEquals(90.0, it.gridDefinition.yCoords.maxOrNull()) }
 				.onEach { assertEquals(-180.0, it.gridDefinition.xCoords.minOrNull()) }
@@ -121,7 +121,7 @@ class GribFileTest {
 					}
 				}
 				.onEach { assertEquals(65160, it.gridDefinition.coords.size) }
-				.onEach { assertEquals(65160, it.values.size) }
+				.onEach { assertEquals(65160, it.data.data.size) }
 				.onEach { assertEquals(-90.0, it.gridDefinition.yCoords.minOrNull()) }
 				.onEach { assertEquals(90.0, it.gridDefinition.yCoords.maxOrNull()) }
 				.onEach { assertEquals(-180.0, it.gridDefinition.xCoords.minOrNull()) }
@@ -135,7 +135,7 @@ class GribFileTest {
 				.asSequence()
 				.filterIsInstance<Grib2Record>()
 				.onEach { assertEquals(65160, it.gridDefinition.coords.size) }
-				.onEach { assertEquals(65160, it.values.size) }
+				.onEach { assertEquals(65160, it.data.data.size) }
 				.onEach { assertEquals(-90.0, it.gridDefinition.yCoords.minOrNull()) }
 				.onEach { assertEquals(90.0, it.gridDefinition.yCoords.maxOrNull()) }
 				.onEach { assertEquals(-180.0, it.gridDefinition.xCoords.minOrNull()) }
@@ -172,5 +172,5 @@ class GribFileTest {
 				.forEach { println("(E) ${it.dump()}") }
 	}
 
-	private fun Grib2Record.dump() = "${parameter}: coords=${gridDefinition.coords.size}, data=${values.size}"
+	private fun Grib2Record.dump() = "${parameter}: coords=${gridDefinition.coords.size}, data=${data.data.size}"
 }

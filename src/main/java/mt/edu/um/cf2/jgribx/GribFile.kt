@@ -10,15 +10,10 @@
  */
 package mt.edu.um.cf2.jgribx
 
-import mt.edu.um.cf2.jgribx.GribCodes.getCentreName
-import mt.edu.um.cf2.jgribx.GribCodes.getProcessName
 import mt.edu.um.cf2.jgribx.api.GribMessage
+import mt.edu.um.cf2.jgribx.api.GribParameter
 import mt.edu.um.cf2.jgribx.api.GribRecord
-import java.io.BufferedInputStream
-import java.io.FileInputStream
-import java.io.InputStream
-import java.io.PrintStream
-import java.text.SimpleDateFormat
+import java.io.*
 import java.util.*
 import java.util.regex.Pattern
 import kotlin.math.abs
@@ -41,7 +36,8 @@ import kotlin.math.abs
  */
 class GribFile(gribInputStream: GribInputStream, parameterFilter: (String) -> Boolean = { true }) {
 	/** Returns the GRIB filename. */
-	private var filename: String? = null
+	internal var filename: String? = null
+		private set
 
 	/** Returns the number of records skipped due to them being invalid or not supported. */
 	var messagesSkippedCount = 0
@@ -50,7 +46,7 @@ class GribFile(gribInputStream: GribInputStream, parameterFilter: (String) -> Bo
 	val records: List<GribRecord>
 		get() = messages.flatMap { it.records }
 
-	private val messages = mutableListOf<GribMessage>()
+	internal val messages = mutableListOf<GribMessage>()
 
 	/** The different originating centre IDs found in the GRIB file. */
 	val centreIDs: List<Int>
@@ -76,6 +72,9 @@ class GribFile(gribInputStream: GribInputStream, parameterFilter: (String) -> Bo
 				.distinctBy { it.time }
 				.sorted()
 				.toList()
+
+	val parameters: List<GribParameter>
+		get() = records.map { it.parameter }
 
 	/** Sorted list of different parameter codes present within the GRIB file. */
 	val parameterCodes: List<String>
@@ -115,6 +114,12 @@ class GribFile(gribInputStream: GribInputStream, parameterFilter: (String) -> Bo
 		this.filename = filename
 	}
 
+	constructor(file: File,
+				parameterFilter: (String) -> Boolean = { true },
+				onRead: (Long) -> Unit = {}) : this(file.inputStream(), parameterFilter, onRead) {
+		this.filename = file.absolutePath
+	}
+
 	/**
 	 * Constructs a [GribFile] object from an input stream.
 	 *
@@ -140,22 +145,23 @@ class GribFile(gribInputStream: GribInputStream, parameterFilter: (String) -> Bo
 			// There may be non-GRIB data on the beginning of the file or between GRIB messages, e.g. when using
 			// get_gfs.pl script (https://www.cpc.ncep.noaa.gov/products/wesley/get_gfs.html)
 			if (GribRecordIS.seekNext(gribInputStream)) try {
-				count++
 				val message = GribMessage.readFromStream(gribInputStream, count, parameterFilter)
 				messages.add(message)
 			} catch (e: SkipException) {
-				Logger.info("Skipping GRIB record ${count} (${e.message})", e)
+				Logger.info("Skipping GRIB message ${count} (${e.message})", e)
 				messagesSkippedCount++
 				continue
 			} catch (e: NotImplementedError) {
-				Logger.warning("Skipping GRIB record ${count} (${e.message})", e)
+				Logger.warning("Skipping GRIB message ${count} (${e.message})", e)
 				messagesSkippedCount++
 			} catch (e: NotSupportedException) {
-				Logger.warning("Skipping GRIB record ${count} (${e.message})", e)
+				Logger.warning("Skipping GRIB message ${count} (${e.message})", e)
 				messagesSkippedCount++
 			} catch (e: NoValidGribException) {
-				Logger.warning("Skipping GRIB record ${count} (${e.message})", e)
+				Logger.warning("Skipping GRIB message ${count} (${e.message})", e)
 				messagesSkippedCount++
+			} finally {
+				count++
 			}
 		}
 		gribInputStream.close()
@@ -219,55 +225,6 @@ class GribFile(gribInputStream: GribInputStream, parameterFilter: (String) -> Bo
 					.firstOrNull()
 		}
 		return null
-	}
-
-	/**
-	 * Prints out a summary of the GRIB file.
-	 * @param out
-	 */
-	fun getSummary(out: PrintStream = System.out) {
-		val simpleDateFormat = SimpleDateFormat("dd-MM-yyyy HH:mm:ss 'UTC'", Locale.ROOT)
-				.apply { timeZone = TimeZone.getTimeZone("UTC") }
-		val centreIds = centreIDs
-		val processIds = processIDs
-		val refDates = referenceTimes
-		val forecastDates = forecastTimes
-
-		// Print out generic GRIB file info
-		out.println("---------------------------------------")
-		out.println("Reading file: ${filename}")
-		out.println("GRIB Edition: ${edition}")
-		out.println("Messages successfully read: ${messages.size} of ${messages.size + messagesSkippedCount}")
-		out.println("Records successfully read: ${recordCount}")
-		out.println("---------------------------------------")
-
-		// Print out originating centre info
-		out.print("Weather Centre(s): ")
-		for (i in centreIds.indices) {
-			out.print("${centreIds[i]} [${getCentreName(centreIds[i])}]")
-			if (i != centreIds.size - 1) out.print(",")
-		}
-		out.println()
-
-		// Print out generating process info
-		out.print("Generating Process(es): ")
-		for (i in processIds.indices) {
-			out.print("${processIds[i]} [${getProcessName(processIds[i])}]")
-			if (i != processIds.size - 1) out.print(",")
-		}
-		out.println()
-
-		// Get reference time
-		out.println("Reference Time: ")
-		for (date in refDates) {
-			out.println("\t${simpleDateFormat.format(date.time)}")
-		}
-
-		// Get forecast times
-		out.println("Forecast Time(s): ")
-		for (date in forecastDates) {
-			out.println("\t${simpleDateFormat.format(date.time)}")
-		}
 	}
 
 	/** @see GribRecord.cutOut */

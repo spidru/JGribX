@@ -1,10 +1,16 @@
 package mt.edu.um.cf2.jgribx
 
 import mt.edu.um.cf2.jgribx.JGribX.setLoggingLevel
+import mt.edu.um.cf2.jgribx.grib2.Grib2Record
+import mt.edu.um.cf2.jgribx.grib2.Grib2RecordDRS0
+import mt.edu.um.cf2.jgribx.grib2.Grib2RecordDRS2
+import mt.edu.um.cf2.jgribx.grib2.Grib2RecordDRS3
 import org.apache.commons.cli.*
 import org.apache.commons.cli.CommandLine
+import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
+import java.io.PrintStream
 import kotlin.system.exitProcess
 
 /**
@@ -13,41 +19,47 @@ import kotlin.system.exitProcess
 object CommandLine {
 	@JvmStatic
 	fun main(args: Array<String>) {
-		val options = Options()
+		val usage = "JGribX [options]"
+		val options = Options().apply {
+			addOption(Option("c", "cutout", true, "Cutout a region")
+					.apply { argName = "north,east,south,west" })
+			addOption(Option("drs", "data-representation", true, "[GRIB2] Convert Data Representation Section to specified templates")
+					.apply { argName = "template-num" })
+			addOption(Option("h", "help", false, "Show this screen")
+					.apply { argName = "file" })
+			addOption(Option("i", "input", true, "Specify an input file"))
+			addOption(Option("l", "loglevel", true, "Specify the logging level")
+					.apply { argName = "level" })
+			addOption(Option("o", "output", true, "Specify an outout file")
+					.apply { argName = "file" })
+			addOption(Option("p", "params", true, "A comma separated list of parameters to filter")
+					.apply { argName = "p1,p2,..." })
+			addOption(Option("s", "summary", false, "Print a file summary"))
+			addOption(Option("v", "version", false, "Show version information"))
+		}
 
-		/* Version Information */
-		val version = Option("v", "version", false, "Show version information")
-		version.isRequired = false
-		options.addOption(version)
-
-		/* File Information */
-		val inputFile = Option("i", "input", true, "Specify an input file")
-		inputFile.isRequired = false
-		options.addOption(inputFile)
-
-		/* Logging Level */
-		val logLevel = Option("l", "loglevel", true, "Specify the logging level")
-		logLevel.isRequired = false
-		options.addOption(logLevel)
 		val parser: CommandLineParser = DefaultParser()
-		val formatter = HelpFormatter()
+		val formatter = HelpFormatter().apply { width = 120 }
 		val cmd: CommandLine
 		try {
 			cmd = parser.parse(options, args)
 		} catch (e: ParseException) {
 			println(e.message)
-			formatter.printHelp("JGribX", options)
+			formatter.printHelp(usage, options)
 			exitProcess(1)
 		}
 
-		/* If no arguments have been specified, display help */
 		if (cmd.options.isEmpty()) {
 			System.err.println("No arguments specified")
-			formatter.printHelp("JGribX", options)
+			formatter.printHelp(usage, options)
 			exitProcess(1)
 		}
 
-		/* Must be first option processed due to logging */
+		if (cmd.hasOption("h")) {
+			formatter.printHelp(usage, options)
+			exitProcess(0)
+		}
+
 		if (cmd.hasOption("l")) {
 			val level = cmd.getOptionValue("l").toInt()
 			if (level in 1..5) {
@@ -55,28 +67,125 @@ object CommandLine {
 				setLoggingLevel(level - 1)
 			}
 		}
-		if (cmd.hasOption("i")) {
-			val inputFilePath = cmd.getOptionValue("i")
-			try {
-				val gribFile = GribFile(inputFilePath)
 
-				// Print out generic GRIB file info
-				gribFile.getSummary(System.out)
-				val params: List<String?> = gribFile.parameterCodes
-				println("Parameters:")
-				for (param in params) {
-					print("$param ")
+		if (cmd.hasOption("i")) {
+			val inputFile = File(cmd.getOptionValue("i"))
+			val filter = cmd.getOptionValue("p")?.split(",")?.map { it.toUpperCase() }
+			val drs = when (cmd.getOptionValue("drs")?.toInt()) {
+				null -> null
+				0 -> Grib2RecordDRS0::class
+				2 -> Grib2RecordDRS2::class
+				3 -> Grib2RecordDRS3::class
+				else -> {
+					System.err.println("Converting to Data Representation Template 0, 2 and 3 is supported")
+					formatter.printHelp(usage, options)
+					exitProcess(1)
 				}
+			}
+			val cutOutRegion = cmd.getOptionValue("c")
+					?.split(",")
+					?.mapNotNull { it.toDoubleOrNull() }
+					?.takeIf { it.size == 4 }
+			val outputFile = cmd.getOptionValue("o")?.let { File(it) }
+
+			try {
+				val gribFile = GribFile(inputFile, { filter == null || filter.contains(it.toUpperCase()) })
+
+				if (drs != null) gribFile.records.filterIsInstance<Grib2Record>().forEach {
+					it.convertDataRepresentationTo(drs)
+				}
+
+				cutOutRegion?.also { (north, east, south, west) -> gribFile.cutOut(north, east, south, west) }
+
+				if (outputFile != null) GribOutputStream(outputFile.outputStream()).use { outputStream ->
+					gribFile.writeTo(outputStream)
+				}
+
+				if (cmd.hasOption("s")) gribFile.getSummary(System.out) // Print out generic GRIB file info
 			} catch (e: FileNotFoundException) {
-				System.err.println("Cannot find file: $inputFilePath")
+				System.err.println("Cannot find file: ${inputFile.absolutePath}")
 			} catch (e: IOException) {
-				System.err.println("Could not open file: $inputFilePath")
+				System.err.println("Could not open file: ${inputFile.absolutePath}")
 			} catch (e: NotSupportedException) {
-				System.err.println("GRIB file contains unsupported features: $e")
+				System.err.println("GRIB file contains unsupported features: ${e}")
 			} catch (e: NoValidGribException) {
-				System.err.println("GRIB file is invalid: $e")
+				System.err.println("GRIB file is invalid: ${e}")
 			}
 		}
-		if (cmd.hasOption("v")) println("JGribX " + JGribX.VERSION)
+		if (cmd.hasOption("v")) println("JGribX ${JGribX.VERSION}")
+	}
+
+	/**
+	 * Prints out a summary of the GRIB file.
+	 * @param out
+	 */
+	private fun GribFile.getSummary(out: PrintStream = System.out) {
+		val centreIds = centreIDs
+		val processIds = processIDs
+		val refDates = referenceTimes
+		val forecastDates = forecastTimes
+
+		// Print out generic GRIB file info
+		out.println("---------------------------------------")
+		out.println("Reading file: ${filename}")
+		out.println("GRIB Edition: ${edition}")
+		out.println("Messages successfully read: ${messages.size} of ${messages.size + messagesSkippedCount}")
+		out.println("Records successfully read: ${recordCount}")
+		out.println("---------------------------------------")
+
+		// Print out originating centre info
+		out.print("Weather Centre(s): ")
+		for (i in centreIds.indices) {
+			out.print("${centreIds[i]} [${GribCodes.getCentreName(centreIds[i])}]")
+			if (i != centreIds.size - 1) out.print(",")
+		}
+		out.println()
+
+		// Print out generating process info
+		out.print("Model(s): ")
+		for (i in processIds.indices) {
+			out.print("${processIds[i]} [${GribCodes.getProcessName(processIds[i])}]")
+			if (i != processIds.size - 1) out.print(",")
+		}
+		out.println()
+
+		// Get reference time
+		out.println("Reference Time: ")
+		for (date in refDates) {
+			out.println("\t${DEFAULT_DATE_FORMAT.format(date.time)}")
+		}
+
+		// Get forecast times
+		out.println("Forecast Time(s) - ${forecastDates.size} dates: ")
+		for (date in forecastDates) {
+			out.println("\t${DEFAULT_DATE_FORMAT.format(date.time)}")
+		}
+
+		println("Available data:")
+		records.distinctBy { "${it.parameter.code}/${it.level?.identifier}" }.forEach {
+			println("\t${it.parameter.description} [${it.parameter.code}]: ${it.level?.description} (${it.level?.identifier})")
+		}
+
+		println("Grid: ")
+		records.asSequence()
+				.map { it.gridDefinition }
+				.map { "${it.cols}x${it.rows}=${it.cols * it.rows} points: ${it.deltaX}°x${it.deltaY}°" }
+				.distinct()
+				.forEach { println("\t${it}") }
+		println("Area: ")
+		records.asSequence()
+				.map { it.gridDefinition }
+				.map { it.xCoords to it.yCoords }
+				.map { (x, y) -> listOfNotNull(x.minOrNull(), y.minOrNull(), x.maxOrNull(), y.maxOrNull()) }
+				.filter { it.size == 4 }
+				.map { (west, south, east, north) ->
+					listOf(west.formatDegrees('E' to 'W', 3),
+							south.formatDegrees('N' to 'S', 2),
+							east.formatDegrees('E' to 'W', 3),
+							north.formatDegrees('N' to 'S', 2))
+				}
+				.map { (west, south, east, north) -> "${south} ${west} -> ${north} ${east}" }
+				.distinct().toList()
+				.forEach { println("\t${it}") }
 	}
 }

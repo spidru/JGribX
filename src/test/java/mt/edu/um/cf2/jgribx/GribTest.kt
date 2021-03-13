@@ -9,7 +9,6 @@ import java.io.File
 import java.io.FileReader
 import java.io.IOException
 import java.net.URISyntaxException
-import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
@@ -19,11 +18,6 @@ class GribTest {
 		@BeforeClass
 		@JvmStatic
 		fun setUpBeforeClass() {
-			// Prepare format for reference times
-			val sdf = SimpleDateFormat("dd-MM-yyyy HH:mm:ss 'UTC'")
-			sdf.timeZone = TimeZone.getTimeZone("UTC")
-
-			// Configure logging
 			Logger.mode = Logger.LoggingMode.CONSOLE
 			setLoggingLevel(Logger.DEBUG)
 		}

@@ -15,8 +15,6 @@ import mt.edu.um.cf2.jgribx.GribCodes.getProcessName
 import mt.edu.um.cf2.jgribx.Logger.level
 import java.io.FileNotFoundException
 import java.io.IOException
-import java.text.SimpleDateFormat
-import java.util.*
 
 /**
  * This example demonstrates how a quick summary of the contents of the GRIB
@@ -70,9 +68,6 @@ object GribExample1 {
 		val gribFilename = "gfsanl_3_20170512_0000_000.grb2"
 
 		// Prepare format for reference times
-		// SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-		val sdf = SimpleDateFormat("dd-MM-yyyy HH:mm:ss 'UTC'")
-		sdf.timeZone = TimeZone.getTimeZone("UTC")
 		try {
 			// System.out.println(GribExample1.class.getClassLoader().getResource(gribFilename));
 			val gribFile = GribFile("src/test/resources/$gribFilename")
@@ -114,13 +109,13 @@ object GribExample1 {
 			// Get forecast times
 			println("Forecast Time(s): ")
 			for (date in forecastDates) {
-				println("\t" + sdf.format(date.time))
+				println("\t${DEFAULT_DATE_FORMAT.format(date.time)}")
 			}
 
 			// Get reference time
 			println("Reference Time: ")
 			for (date in refDates) {
-				println("\t" + sdf.format(date.time))
+				println("\t${DEFAULT_DATE_FORMAT.format(date.time)}")
 			}
 			println("Data: ")
 			for (paramCode in params) {
