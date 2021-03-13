@@ -11,28 +11,37 @@
 package mt.edu.um.cf2.jgribx.grib1
 
 import mt.edu.um.cf2.jgribx.*
+import mt.edu.um.cf2.jgribx.api.GribMessage
 import java.io.IOException
 import java.util.*
 import kotlin.math.roundToInt
 
 /**
- * A class representing a single GRIB record. A record consists of five sections:
- * indicator section (IS), product definition section (PDS), grid definition section
- * (GDS), bitmap section (BMS) and binary data section (BDS). The sections can be
- * obtained using the getIS, getPDS, ... methods.
+ * A class representing a single GRIB message (and record). A GRIB message consists of five sections:
  *
- * @property productDefinitionSection The product definition section.
- * @property gridDefinitionSection The grid definition section.
- * @property bitmapSection The bitmap section.
- * @property binaryDataSection The binary data section.
- * @author  Benjamin Stark
- * @version 1.0
+ * - Indicator Section (IS),
+ * - Product Definition Section (PDS),
+ * - Grid Definition Section (GDS),
+ * - Bit Map Section (BMS), and
+ * - Binary Data Section (BDS).
+ *
+ * For GRIB1 a grib message contains exactly one GRIB records and therefore this class implements both
+ *
+ * @property productDefinitionSection The product definition section (PDS).
+ * @property gridDefinitionSection The grid definition section (GDS).
+ * @property bitmapSection The bitmap section (BMS).
+ * @property binaryDataSection The binary data section (BDS).
+ *
+ * @author Benjamin Stark
+ * @author Jan Kubovy [jan@kubovy.eu]
  */
-class Grib1Record private constructor(indicatorSection: GribRecordIS,
-									  val productDefinitionSection: Grib1RecordPDS,
-									  var gridDefinitionSection: Grib1RecordGDS,
-									  var bitmapSection: Grib1RecordBMS?,
-									  var binaryDataSection: Grib1RecordBDS) : GribRecord(indicatorSection) {
+class Grib1Message private constructor(indicatorSection: GribRecordIS,
+									   private val productDefinitionSection: Grib1RecordPDS,
+									   private var gridDefinitionSection: Grib1RecordGDS,
+									   private var bitmapSection: Grib1RecordBMS?,
+									   private var binaryDataSection: Grib1RecordBDS) :
+		GribRecord(indicatorSection), GribMessage {
+
 	companion object {
 		/**
 		 * Constructs a <tt>GribRecord</tt> object from a bit input stream.
@@ -46,7 +55,7 @@ class Grib1Record private constructor(indicatorSection: GribRecordIS,
 		 * @throws NoValidGribException  if stream contains no valid GRIB file
 		 */
 		internal fun readFromStream(gribInputStream: GribInputStream,
-									indicatorSection: GribRecordIS): Grib1Record {
+									indicatorSection: GribRecordIS): Grib1Message {
 			gribInputStream.resetBitCounter()
 			val productDefinitionSection = Grib1RecordPDS(gribInputStream)
 			if (gribInputStream.byteCounter != productDefinitionSection.length)
@@ -86,7 +95,7 @@ class Grib1Record private constructor(indicatorSection: GribRecordIS,
 						" ${gridDefinitionSection.gridNX * gridDefinitionSection.gridNY} values.")
 				Logger.error("But BDS section delivers only ${binaryDataSection.values.size}.")
 			}
-			return Grib1Record(
+			return Grib1Message(
 					indicatorSection,
 					productDefinitionSection,
 					gridDefinitionSection,
@@ -94,6 +103,9 @@ class Grib1Record private constructor(indicatorSection: GribRecordIS,
 					binaryDataSection)
 		}
 	}
+
+	override val records: List<GribRecord>
+		get() = listOf(this)
 
 	override val centreId: Int
 		get() = productDefinitionSection.centreId
@@ -103,7 +115,7 @@ class Grib1Record private constructor(indicatorSection: GribRecordIS,
 
 	/** Get the byte recordLength of this GRIB record. */
 	val length: Long
-		get() = indicatorSection.recordLength
+		get() = indicatorSection.messageLength
 
 	override val parameterCode: String
 		get() = productDefinitionSection.parameterAbbreviation
@@ -196,4 +208,6 @@ class Grib1Record private constructor(indicatorSection: GribRecordIS,
 			bitmapSection?.toString()?.prependIndent("\t"),
 			binaryDataSection.toString().prependIndent("\t"))
 			.joinToString("\n")
+
+	override fun writeTo(gribOutputStream: GribOutputStream) = TODO("Not yet implemented")
 }

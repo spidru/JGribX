@@ -12,13 +12,13 @@ package mt.edu.um.cf2.jgribx
 
 import mt.edu.um.cf2.jgribx.GribCodes.getCentreName
 import mt.edu.um.cf2.jgribx.GribCodes.getProcessName
+import mt.edu.um.cf2.jgribx.api.GribMessage
 import java.io.BufferedInputStream
 import java.io.FileInputStream
 import java.io.InputStream
 import java.io.PrintStream
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.regex.Matcher
 import java.util.regex.Pattern
 import kotlin.math.abs
 
@@ -43,58 +43,63 @@ class GribFile(gribInputStream: GribInputStream) {
 	private var filename: String? = null
 
 	/** Returns the number of records skipped due to them being invalid or not supported. */
-	var recordsSkippedCount = 0
+	var messagesSkippedCount = 0
 
 	/** List of GRIB records */
 	val records: List<GribRecord>
-		get() = recordsInternal
+		get() = messages.flatMap { it.records }
 
-	private val recordsInternal = mutableListOf<GribRecord>()
+	//private val recordsInternal = mutableListOf<GribRecord>()
+	private val messages = mutableListOf<GribMessage>()
 
 	/** The different originating centre IDs found in the GRIB file. */
 	val centreIDs: List<Int>
-		get() = recordsInternal.map { it.centreId }.distinct()
+		get() = records.asSequence().map { it.centreId }.distinct().toList()
 
 	// Check if GRIB file contains different editions
 	// TODO not sure if different editions within one file should be allowed
 	val edition: Int
 		get() {
-			val edition = recordsInternal[0].indicatorSection.gribEdition
-			for (i in 1 until recordsInternal.size) {
-				if (recordsInternal[i].indicatorSection.gribEdition != edition) {
-					Logger.warning("GRIB file contains different editions")
-					break
-				}
+			val edition = records.firstOrNull()?.indicatorSection?.gribEdition
+					?: throw NoValidGribException("No GRIB edition found")
+			if (records.filterIndexed { i, record -> i > 0 && record.indicatorSection.gribEdition != edition }.any()) {
+				Logger.warning("GRIB file contains different editions")
 			}
 			return edition
 		}
 
 	// Compare dates
 	val forecastTimes: List<Calendar>
-		get() = recordsInternal.map { it.forecastTime }.distinctBy { it.time }.sorted()
+		get() = messages
+				.asSequence()
+				.flatMap { it.records }
+				.map { it.forecastTime }
+				.distinctBy { it.time }
+				.sorted()
+				.toList()
 
 	/** Sorted list of different parameter codes present within the GRIB file. */
 	val parameterCodes: List<String>
-		get() = recordsInternal.map { it.parameterCode }.distinct().sorted()
+		get() = records.asSequence().map { it.parameterCode }.distinct().sorted().toList()
 
 	/** Sorted list of different parameter levels as textual descriptions. */
 	val parameterLevelDescriptions: List<String>
-		get() = recordsInternal.map { it.levelDescription }.distinct().sorted()
+		get() = records.asSequence().map { it.levelDescription }.distinct().sorted().toList()
 
 	/** The different generating process IDs found in the GRIB file. */
 	val processIDs: IntArray
-		get() = recordsInternal.map { it.processId }.distinct().toIntArray()
+		get() = records.asSequence().map { it.processId }.distinct().toList().toIntArray()
 
 	/** Number of records this GRIB file contains. */
 	val recordCount: Int
-		get() = recordsInternal.size
+		get() = messages.sumBy { it.records.size }
 
 	/**
 	 * Return a List of different reference times present in the GRIB file.
 	 * @return a sorted list of different reference times
 	 */
 	val referenceTimes: List<Calendar>
-		get() = recordsInternal.map { it.referenceTime }.distinct().sorted()
+		get() = records.asSequence().map { it.referenceTime }.distinct().sorted().toList()
 
 	/**
 	 * Constructs a [GribFile] object from a file.
@@ -137,44 +142,49 @@ class GribFile(gribInputStream: GribInputStream) {
 
 			count++
 			try {
-				val record = GribRecord.readFromStream(gribInputStream)
-				Logger.info("GRIB Record $count")
-				Logger.info("\tReference Time: ${record.referenceTime.time}")
-				Logger.info("\tParameter: ${record.parameterCode} (${record.parameterDescription})")
-				Logger.info("\tLevel: ${record.levelCode} (${record.levelDescription})")
-				recordsInternal.add(record)
+				val message = GribMessage.readFromStream(gribInputStream)
+				Logger.info("GRIB Message $count")
+				message.records.forEachIndexed { index, record ->
+					Logger.info("\tGRIB Record $index")
+					Logger.info("\t\tReference Time: ${record.referenceTime.time}")
+					Logger.info("\t\tParameter: ${record.parameterCode} (${record.parameterDescription})")
+					Logger.info("\t\tLevel: ${record.levelCode} (${record.levelDescription})")
+				}
+				messages.add(message)
 			} catch (e: NotImplementedError) {
 				Logger.warning("Skipping GRIB record ${count} (${e.message})", e)
-				recordsSkippedCount++
+				messagesSkippedCount++
 			} catch (e: NotSupportedException) {
 				Logger.warning("Skipping GRIB record ${count} (${e.message})", e)
-				recordsSkippedCount++
+				messagesSkippedCount++
 			} catch (e: NoValidGribException) {
 				Logger.warning("Skipping GRIB record ${count} (${e.message})", e)
-				recordsSkippedCount++
+				messagesSkippedCount++
 			} finally {
 				GribRecordIS.seekNext(gribInputStream) // Skip to end of current record
 			}
 		}
 		gribInputStream.close()
-		if (recordsInternal.isEmpty()) throw NoValidGribException("No valid GRIB records found.")
-		else Logger.info("Reached end of file: ${recordsInternal.size} of ${count} records read successfully")
+		if (messages.isEmpty()) throw NoValidGribException("No valid GRIB message found")
+		else Logger.info("Reached end of file: ${messages.size} of ${count} messages read successfully")
 	}
 
 	fun getParameterLevelDescriptions(paramCode: String): List<String?> {
-		val descList = mutableListOf<String>()
-		for (record in recordsInternal) {
-			if (record.parameterCode == paramCode) {
-				if (descList.contains(record.levelIdentifier)) {
-					Logger.error("Record contains duplicate level IDs")
-				} else descList.add(record.levelDescription)
-			}
-		}
-		return descList
+		val params = messages
+				.asSequence()
+				.flatMap(GribMessage::records)
+				.filter { it.parameterCode == paramCode }
+				.map { it.levelIdentifier to it.levelDescription }
+				.groupBy(Pair<String, String>::first)
+				.mapValues { it.value.map(Pair<String, String>::second) }
+
+		if (params.values.any { it.size > 1 }) Logger.error("Record contains duplicate level IDs")
+		return params.values.map { it.first() }
 	}
 
-	fun getParameterLevelIdentifiers(paramCode: String): List<String?> = recordsInternal
+	fun getParameterLevelIdentifiers(paramCode: String): List<String?> = messages
 			.asSequence()
+			.flatMap { it.records }
 			.filter { it.parameterCode == paramCode }
 			.map { it.levelIdentifier }
 			.distinct()
@@ -190,38 +200,29 @@ class GribFile(gribInputStream: GribInputStream) {
 	 * specified parameter and level to find a record which matches these values.
 	 *
 	 * @param time Forecast time to search for
-	 * @param parameterAbbrev Parameter to search for
-	 * @param levelCode Level to search for
+	 * @param parameterCode Parameter to search for
+	 * @param level Level to search for
 	 * @return The found record, null if no record has been found
 	 */
-	fun getRecord(time: Calendar, parameterAbbrev: String, levelCode: String): GribRecord? {
+	fun getRecord(time: Calendar, parameterCode: String, level: String): GribRecord? {
 		// Find closest forecast time
-		var deltaMs: Long
-		var deltaminMs = Long.MAX_VALUE
-		var closestTime: Calendar? = null
-		for (record in recordsInternal) {
-			deltaMs = abs(time.timeInMillis - record.forecastTime.timeInMillis)
-			if (deltaMs < deltaminMs) {
-				deltaminMs = deltaMs
-				closestTime = record.forecastTime
-			}
-		}
+		val closestForecastTime: Calendar? = messages.asSequence()
+				.flatMap { it.records }
+				.map { it.forecastTime }
+				.minByOrNull { abs(time.timeInMillis - it.timeInMillis) }
 
 		// Match patterns such as "ISBL:200" and "SFC"
-		val pattern = Pattern.compile("(\\w+)(?::(\\d+))?")
-		var matcher: Matcher
-		for (record in recordsInternal) {
-			matcher = pattern.matcher(levelCode)
-			if (matcher.find()) {
-				val code = matcher.group(1)
-				if (record.forecastTime == closestTime
-						&& record.parameterCode == parameterAbbrev
-						&& record.levelCode == code
-						&& (matcher.group(2) == null
-								|| record.levelValues[0].toInt() == matcher.group(2).toInt())) {
-					return record
-				}
-			}
+		val matcher = Pattern.compile("(\\w+)(?::(\\d+))?").matcher(level)
+		if (matcher.find()) {
+			val levelCode = matcher.group(1)
+			val levelValue = matcher.group(2)?.toIntOrNull()
+			return messages.asSequence()
+					.flatMap { it.records }
+					.filter { it.forecastTime == closestForecastTime }
+					.filter { it.parameterCode == parameterCode }
+					.filter { it.levelCode == levelCode }
+					.filter { levelValue == null || it.levelValues[0].toInt() == levelValue }
+					.firstOrNull()
 		}
 		return null
 	}
@@ -230,9 +231,9 @@ class GribFile(gribInputStream: GribInputStream) {
 	 * Prints out a summary of the GRIB file.
 	 * @param out
 	 */
-	fun getSummary(out: PrintStream) {
-		val sdf = SimpleDateFormat("dd-MM-yyyy HH:mm:ss 'UTC'", Locale.ROOT)
-		sdf.timeZone = TimeZone.getTimeZone("UTC")
+	fun getSummary(out: PrintStream = System.out) {
+		val simpleDateFormat = SimpleDateFormat("dd-MM-yyyy HH:mm:ss 'UTC'", Locale.ROOT)
+				.apply { timeZone = TimeZone.getTimeZone("UTC") }
 		val centreIds = centreIDs
 		val processIds = processIDs
 		val refDates = referenceTimes
@@ -242,15 +243,14 @@ class GribFile(gribInputStream: GribInputStream) {
 		out.println("---------------------------------------")
 		out.println("Reading file: ${filename}")
 		out.println("GRIB Edition: ${edition}")
-		out.println("Records successfully read: " + recordCount + " of "
-				+ (recordCount + recordsSkippedCount))
+		out.println("Messages successfully read: ${messages.size} of ${messages.size + messagesSkippedCount}")
+		out.println("Records successfully read: ${recordCount}")
 		out.println("---------------------------------------")
 
 		// Print out originating centre info
 		out.print("Weather Centre(s): ")
 		for (i in centreIds.indices) {
-			out.print(centreIds[i]
-					.toString() + " [" + getCentreName(centreIds[i]) + "]")
+			out.print("${centreIds[i]} [${getCentreName(centreIds[i])}]")
 			if (i != centreIds.size - 1) out.print(",")
 		}
 		out.println()
@@ -258,24 +258,25 @@ class GribFile(gribInputStream: GribInputStream) {
 		// Print out generating process info
 		out.print("Generating Process(es): ")
 		for (i in processIds.indices) {
-			out.print(processIds[i]
-					.toString() + " [" + getProcessName(processIds[i]) + "]")
+			out.print("${processIds[i]} [${getProcessName(processIds[i])}]")
 			if (i != processIds.size - 1) out.print(",")
 		}
 		out.println()
 
 		// Get reference time
-		println("Reference Time: ")
+		out.println("Reference Time: ")
 		for (date in refDates) {
-			println("\t" + sdf.format(date.time))
+			out.println("\t${simpleDateFormat.format(date.time)}")
 		}
 
 		// Get forecast times
-		println("Forecast Time(s): ")
+		out.println("Forecast Time(s): ")
 		for (date in forecastDates) {
-			println("\t" + sdf.format(date.time))
+			out.println("\t${simpleDateFormat.format(date.time)}")
 		}
 	}
 
-	override fun toString(): String = "GRIB file (" + recordsInternal.size + " records)"
+	fun writeTo(gribOutputStream: GribOutputStream) = messages.forEach { it.writeTo(gribOutputStream) }
+
+	override fun toString(): String = "GRIB file (${recordCount} records)"
 }

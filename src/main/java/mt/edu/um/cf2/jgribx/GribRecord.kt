@@ -10,27 +10,18 @@
  */
 package mt.edu.um.cf2.jgribx
 
-import mt.edu.um.cf2.jgribx.grib1.Grib1Record
-import mt.edu.um.cf2.jgribx.grib2.Grib2Record
 import java.util.*
 
+/**
+ * A GRIB Record is a representation of part of a [GRIB message][mt.edu.um.cf2.jgribx.api.GribMessage] containing one
+ * dataset. Different GRIB editions support different number of such records per
+ * [GRIB message][mt.edu.um.cf2.jgribx.api.GribMessage]. Currently GRIB1 supports exactly one records per message while
+ * GRIB2 supports multiple records per message due to possible repetitions of sections 2 to 7, 3 to 7, or 4 to 7.
+ *
+ * @param indicatorSection [Section 0: Indicator Section](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_sect0.shtml)
+ * @author Jan Kubovy [jan@kubovy.eu]
+ */
 abstract class GribRecord(val indicatorSection: GribRecordIS) {
-	companion object {
-		internal fun readFromStream(gribInputStream: GribInputStream): GribRecord {
-			val indicatorSection = GribRecordIS.readFromStream(gribInputStream)
-			val record = when (indicatorSection.gribEdition) {
-				1 -> Grib1Record.readFromStream(gribInputStream, indicatorSection)
-				2 -> indicatorSection.discipline?.let { discipline ->
-					Grib2Record.readFromStream(gribInputStream, indicatorSection, discipline)
-				} ?: throw NoValidGribException("Missing discipline for GRIB2 edition")
-				else -> throw NoValidGribException("Unsupported GRIB edition ${indicatorSection.gribEdition}")
-			}
-			val es = GribRecordES.readFromStream(gribInputStream)
-			if (!es.isValid) throw NoValidGribException("Grib End Section is invalid")
-			return record
-		}
-	}
-
 	/** Returns the ID corresponding to the originating centre. */
 	abstract val centreId: Int
 	abstract val forecastTime: Calendar

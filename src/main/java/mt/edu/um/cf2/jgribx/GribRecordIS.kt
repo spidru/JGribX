@@ -42,7 +42,7 @@ import java.io.IOException
  *
  * @param gribEdition Edition of GRIB specification used.
  * @param discipline Discipline – GRIB Master Table Number (see [Code Table 0.0](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table0-0.shtml))
- * @param recordLength Length in bytes of GRIB record.
+ * @param messageLength Length in bytes of GRIB record.
  *
  * @author Benjamin Stark
  * @author Richard D. Gonzalez
@@ -51,7 +51,7 @@ import java.io.IOException
  */
 class GribRecordIS internal constructor(var gribEdition: Int,
 										var discipline: ProductDiscipline?,
-										val recordLength: Long) : GribSection {
+										internal var messageLength: Long) : GribSection {
 
 	override val number: Int = 0
 
@@ -113,7 +113,7 @@ class GribRecordIS internal constructor(var gribEdition: Int,
 					break
 				}
 				gribInputStream.reset()
-				gribInputStream.read(1) // skip 1 byte
+				gribInputStream.skip(1) // skip 1 byte
 				bytesSkipped++
 			}
 			if (bytesSkipped > 0) {
@@ -135,18 +135,18 @@ class GribRecordIS internal constructor(var gribEdition: Int,
 
 
 	override fun writeTo(outputStream: GribOutputStream) {
-		Logger.debug("Writing GRIB${gribEdition} Indicator Section (IS) - ${length} bytes (total: ${recordLength} bytes)")
+		Logger.debug("Writing GRIB${gribEdition} Indicator Section (IS) - ${length} bytes (total: ${messageLength} bytes)")
 		outputStream.write("GRIB".toByteArray())
 		when (gribEdition) {
 			1 -> {
-				outputStream.writeLong(recordLength, bytes = 3) // [5-7] Record length
+				outputStream.writeLong(messageLength, bytes = 3) // [5-7] Record length
 				outputStream.writeUInt(gribEdition, bytes = 1) // [8] GRIB Edition
 			}
 			2 -> {
 				outputStream.write(byteArrayOf(0, 0)) // [5-6] Reserved
 				outputStream.writeUInt(discipline?.value ?: ProductDiscipline.MISSING, bytes = 1) // [7] Discipline
 				outputStream.writeUInt(gribEdition, bytes = 1) // [8] GRIB Edition
-				outputStream.writeLong(recordLength, bytes = 8) // [9-16] Record length
+				outputStream.writeLong(messageLength, bytes = 8) // [9-16] Record length
 			}
 			else -> throw Exception("Unsupported GRIB edition ${gribEdition}")
 		}
@@ -158,14 +158,14 @@ class GribRecordIS internal constructor(var gribEdition: Int,
 			&& number == other.number
 			&& gribEdition == other.gribEdition
 			&& discipline == other.discipline
-			&& recordLength == other.recordLength
+			&& messageLength == other.messageLength
 
 	override fun hashCode(): Int {
 		var result = length
 		result = 31 * result + number
 		result = 31 * result + gribEdition
 		result = 31 * result + (discipline?.hashCode() ?: 0)
-		result = 31 * result + recordLength.hashCode()
+		result = 31 * result + messageLength.hashCode()
 		return result
 	}
 
@@ -174,6 +174,6 @@ class GribRecordIS internal constructor(var gribEdition: Int,
 			"\tGrib edition ${gribEdition}",
 			discipline?.let { "\tDiscipline: ${it}" },
 			"\tLength: ${length}",
-			"\tRecord length: ${recordLength} bytes")
+			"\tRecord length: ${messageLength} bytes")
 			.joinToString("\n")
 }

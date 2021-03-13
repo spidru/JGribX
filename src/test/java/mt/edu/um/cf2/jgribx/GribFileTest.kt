@@ -31,7 +31,7 @@ class GribFileTest {
 			} catch (e: NoValidGribException) {
 				break
 			}
-			var messageLength = indicatorSection.recordLength - indicatorSection.length
+			var messageLength = indicatorSection.messageLength - indicatorSection.length
 
 			val discipline: ProductDiscipline = indicatorSection.discipline!!
 			var referenceTime: Calendar? = null

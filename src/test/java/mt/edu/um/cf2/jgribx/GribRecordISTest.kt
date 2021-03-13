@@ -21,7 +21,7 @@ class GribRecordISTest {
 	@Test
 	fun testWritingGRIB1() {
 		// Given
-		val expected = GribRecordIS(gribEdition = 1, discipline = null, recordLength = Random.nextLong(1000, 1000000))
+		val expected = GribRecordIS(gribEdition = 1, discipline = null, messageLength = Random.nextLong(1000, 1000000))
 
 		// When
 		val bos = ByteArrayOutputStream()
@@ -39,7 +39,7 @@ class GribRecordISTest {
 	fun testWritingGRIB2() {
 		// Given
 		val discipline = ProductDiscipline.VALUES[0]
-		val expected = GribRecordIS(gribEdition = 2, discipline = discipline, recordLength = Random.nextLong(1000, 1000000))
+		val expected = GribRecordIS(gribEdition = 2, discipline = discipline, messageLength = Random.nextLong(1000, 1000000))
 
 		// When
 		val bos = ByteArrayOutputStream()
