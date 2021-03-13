@@ -100,8 +100,8 @@ class Grib2RecordDRS3 private constructor(nDataPoints: Int,
 	companion object {
 		internal fun readFromStream(gribInputStream: GribInputStream, nDataPoints: Int): Grib2RecordDRS3 {
 			val drs2 = Grib2RecordDRS2.readFromStream(gribInputStream, nDataPoints)
-			val spatialDiffOrder = gribInputStream.readUINT(1)
-			val spatialDescriptorOctets = gribInputStream.readUINT(1)
+			val spatialDiffOrder = gribInputStream.readUInt(1)
+			val spatialDescriptorOctets = gribInputStream.readUInt(1)
 
 			return Grib2RecordDRS3(drs2, spatialDiffOrder, spatialDescriptorOctets)
 		}

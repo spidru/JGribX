@@ -74,7 +74,7 @@ class Grib1RecordBDS(
 			val decimalScale = pds.decimalScale
 
 			// [4], 1st half (packing flag)
-			val dataFlag = gribInputStream.readUINT(1)
+			val dataFlag = gribInputStream.readUInt(1)
 			if (dataFlag and 240 != 0) {
 				throw NotSupportedException("GribRecordBDS: No other flag " +
 						"(octet 4, 1st half) than 0 (= simple packed floats as " +
@@ -85,13 +85,13 @@ class Grib1RecordBDS(
 			val unusedBits = dataFlag and 15
 
 			// [5-6] (binary scale factor)
-			val binaryScaleFactor = gribInputStream.readINT(2, Bytes2Number.INT_SM)
+			val binaryScaleFactor = gribInputStream.readSMInt(2)
 
 			// [7-10] (reference point = minimum value)
-			val referenceValue = gribInputStream.readFloat(4, Bytes2Number.FLOAT_IBM)
+			val referenceValue = gribInputStream.readFloatIBM()
 
 			// [11] (number of bits per value)
-			val bitsPerValue = gribInputStream.readUINT(1)
+			val bitsPerValue = gribInputStream.readUInt(1)
 			val isConstant = bitsPerValue == 0
 
 			// *** read values ************************************************************

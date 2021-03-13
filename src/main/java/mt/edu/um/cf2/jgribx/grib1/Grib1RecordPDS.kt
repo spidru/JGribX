@@ -166,7 +166,7 @@ class Grib1RecordPDS internal constructor(val tableVersion: Int,
 					offset = p2
 					offset2 = p1
 				}
-				10 -> offset = Bytes2Number.uint2(p1, p2)
+				10 -> offset = (p1 shl 8) or p2
 				else -> Logger.error("GribRecordPDS: Time Range Indicator ${timeRangeId} is not yet supported" +
 						" - continuing, but time of data is not valid")
 			}
@@ -224,72 +224,72 @@ class Grib1RecordPDS internal constructor(val tableVersion: Int,
 			val length = Grib1Section.readFromStream(gribInputStream)
 
 			/* [4] Table Version */
-			val tableVersion = gribInputStream.readUINT(1)
+			val tableVersion = gribInputStream.readUInt(1)
 
 			/* [5] Originating Centre ID */
-			val centre = gribInputStream.readUINT(1)
+			val centre = gribInputStream.readUInt(1)
 
 			/* [6] Generating Process */
-			val processId = gribInputStream.readUINT(1)
+			val processId = gribInputStream.readUInt(1)
 
 			/* [7] Grid Definition */
-			val gridId = gribInputStream.readUINT(1)
+			val gridId = gribInputStream.readUInt(1)
 
 			/* [8] Flag (Presence of PDS and GDS) */
-			val flag = gribInputStream.readUINT(1)
+			val flag = gribInputStream.readUInt(1)
 
 			/* [9] Parameter Indicator */
-			val parameterId = gribInputStream.readUINT(1)
+			val parameterId = gribInputStream.readUInt(1)
 
 			/* [10] Level Type */
-			val levelType = gribInputStream.readUINT(1)
+			val levelType = gribInputStream.readUInt(1)
 
 			/* [11-12] Level Data (height, pressure, etc.) */
-			val levelData = gribInputStream.readUINT(2)
+			val levelData = gribInputStream.readUInt(2)
 
 			/* [13] Year of Century */
-			val centuryYear = gribInputStream.readUINT(1)
+			val centuryYear = gribInputStream.readUInt(1)
 
 			/* [14] Month */
-			val month = gribInputStream.readUINT(1)
+			val month = gribInputStream.readUInt(1)
 
 			/* [15] Day */
-			val day = gribInputStream.readUINT(1)
+			val day = gribInputStream.readUInt(1)
 
 			/* [16] Hour */
-			val hour = gribInputStream.readUINT(1)
+			val hour = gribInputStream.readUInt(1)
 
 			/* [17] Minute */
-			val minute = gribInputStream.readUINT(1)
+			val minute = gribInputStream.readUInt(1)
 
 			/* [18] Time Unit */
-			val timeUnit = gribInputStream.readUINT(1)
+			val timeUnit = gribInputStream.readUInt(1)
 
 			/* [19] Time Period P1 (time units) */
-			val p1 = gribInputStream.readUINT(1)
+			val p1 = gribInputStream.readUInt(1)
 
 			/* [20] Time Period P2 (time units) */
-			val p2 = gribInputStream.readUINT(1)
+			val p2 = gribInputStream.readUInt(1)
 
 			/* [21] Time Range */
-			val timeRangeId = gribInputStream.readUINT(1)
+			val timeRangeId = gribInputStream.readUInt(1)
 
 			/* [22-23] Number included in average */
-			val number = gribInputStream.readUINT(2)
+			val number = gribInputStream.readUInt(2)
 
 			/* [24] Number missing from averages */
-			val numberMissing = gribInputStream.readUINT(1)
+			val numberMissing = gribInputStream.readUInt(1)
 
 			/* [25] Reference Time Century */
-			val century = gribInputStream.readUINT(1)
+			val century = gribInputStream.readUInt(1)
 			val referenceTime = GregorianCalendar(100 * (century - 1) + centuryYear, month - 1, day, hour, minute, 0)
 					.apply { timeZone = TimeZone.getTimeZone("UTC") }
 
 			/* [26] Originating Sub-centre ID */
-			val subcenterId = gribInputStream.readUINT(1)
+			val subcenterId = gribInputStream.readUInt(1)
 
 			/* [27-28] Decimal Scale Factor */
-			val decimalScale = gribInputStream.readINT(2, Bytes2Number.INT_SM)
+			val decimalScale = gribInputStream.readSMInt(2)
 
 			return Grib1RecordPDS(tableVersion, centre, processId, gridId, flag, parameterId, levelType, levelData,
 					referenceTime, timeUnit, p1, p2, timeRangeId, number, numberMissing, subcenterId,

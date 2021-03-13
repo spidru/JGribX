@@ -80,45 +80,45 @@ class Grib2RecordIDS internal constructor(val centreId: Int,
 			val length = Grib2Section.readFromStream(gribInputStream, 1)
 
 			/* [6-7] Originating Centre ID */
-			val centreId = gribInputStream.readUINT(2)
+			val centreId = gribInputStream.readUInt(2)
 
 			/* [8-9] Originating Sub-centre ID */
-			val origSubCentreId = gribInputStream.readUINT(2)
+			val origSubCentreId = gribInputStream.readUInt(2)
 
 			/* [10] Master Tables Version Number */
-			val masterTableVersion = gribInputStream.readUINT(1)
+			val masterTableVersion = gribInputStream.readUInt(1)
 
 			/* [11] Local Tables Version Number */
-			val localTableVersion = gribInputStream.readUINT(1)
+			val localTableVersion = gribInputStream.readUInt(1)
 
 			/* [12] Reference Time Significance */
-			val refTimeSig = gribInputStream.readUINT(1)
+			val refTimeSig = gribInputStream.readUInt(1)
 
 			/* [13-14] Reference Year */
-			val year = gribInputStream.readUINT(2)
+			val year = gribInputStream.readUInt(2)
 
 			/* [15] Reference Month */
-			val month = gribInputStream.readUINT(1)
+			val month = gribInputStream.readUInt(1)
 
 			/* [16] Reference Day */
-			val day = gribInputStream.readUINT(1)
+			val day = gribInputStream.readUInt(1)
 
 			/* [17] Hour */
-			val hour = gribInputStream.readUINT(1)
+			val hour = gribInputStream.readUInt(1)
 
 			/* [18] Minute */
-			val minute = gribInputStream.readUINT(1)
+			val minute = gribInputStream.readUInt(1)
 
 			/* [19] Second */
-			val second = gribInputStream.readUINT(1)
+			val second = gribInputStream.readUInt(1)
 			val referenceTime = GregorianCalendar(year, month - 1, day, hour, minute, second)
 					.apply { timeZone = TimeZone.getTimeZone("UTC") }
 
 			/* [20] Data Production Status */
-			val dataProdStatus = gribInputStream.readUINT(1)
+			val dataProdStatus = gribInputStream.readUInt(1)
 
 			/* [21] Data Type */
-			val dataType = gribInputStream.readUINT(1)
+			val dataType = gribInputStream.readUInt(1)
 
 			/* [22-N] Additional Data */
 			var reserved: ByteArray? = null

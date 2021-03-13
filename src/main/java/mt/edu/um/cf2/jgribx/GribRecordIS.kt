@@ -10,7 +10,6 @@
  */
 package mt.edu.um.cf2.jgribx
 
-import mt.edu.um.cf2.jgribx.Bytes2Number.bytesToLong
 import mt.edu.um.cf2.jgribx.api.GribSection
 import mt.edu.um.cf2.jgribx.grib2.ProductDiscipline
 import java.io.IOException
@@ -64,28 +63,29 @@ class GribRecordIS internal constructor(var gribEdition: Int,
 		 * @throws IOException           if stream can not be opened etc.
 		 */
 		fun readFromStream(gribInputStream: GribInputStream): GribRecordIS {
-			val octets = ByteArray(16)
-			gribInputStream.read(octets, 0, 8)
-			val startCode = String(octets.copyOfRange(0, 4))
+			val startCode = gribInputStream.readString(4) // [1-4]
 			if (startCode != "GRIB") {
 				Logger.info("Start code not recognised: ${startCode}")
 				throw NoValidGribException("Record does not have a valid GRIB header")
 			}
 
 			// check GRIB edition number
-			val gribEdition = octets[7].toInt()
+			val octets = gribInputStream.peek(4)
+			val gribEdition = octets[3].toInt()
 			val discipline: ProductDiscipline?
 			val recordLength: Long
 			when (gribEdition) {
 				1 -> {
 					discipline = null
-					recordLength = bytesToLong(octets.copyOfRange(4, 7))
+					recordLength = gribInputStream.readLong(3) // [5-7]
+					gribInputStream.skip(1) // [8]
 				}
 				2 -> {
-					discipline = ProductDiscipline.VALUES[octets[6].toInt()]
-							?: TODO("Discipline ${octets[6].toInt()} not implemented")
-					gribInputStream.read(octets, 8, 8)
-					recordLength = bytesToLong(octets.copyOfRange(8, 16))
+					gribInputStream.skip(2) // [5-6]
+					discipline = gribInputStream.readUInt(1) // [7]
+							.let { ProductDiscipline.VALUES[it] ?: TODO("Discipline ${it} not implemented") }
+					gribInputStream.skip(1) // [8]
+					recordLength = gribInputStream.readLong(8) // [9-16]
 				}
 				else -> throw NotSupportedException("GRIB edition ${gribEdition} is not yet supported")
 			}

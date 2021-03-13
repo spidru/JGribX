@@ -10,7 +10,10 @@
  */
 package mt.edu.um.cf2.jgribx.grib1
 
-import mt.edu.um.cf2.jgribx.*
+import mt.edu.um.cf2.jgribx.GribInputStream
+import mt.edu.um.cf2.jgribx.GribOutputStream
+import mt.edu.um.cf2.jgribx.Logger
+import mt.edu.um.cf2.jgribx.NoValidGribException
 
 /**
  * ### [Grid 10: Rotated latitude/longitude](https://apps.ecmwf.int/codes/grib/format/grib1/grids/10/)
@@ -128,9 +131,9 @@ class Grib1GDSRotatedLatLon(numberOfVerticalCoordinateValues: Int,
 									pvlLocation: Int): Grib1GDSRotatedLatLon {
 			val gdsLatLon = Grib1GDSLatLon.readFromStream(gribInputStream, numberOfVerticalCoordinateValues, pvlLocation)
 			Logger.warning("GRIB Record uses rotated LatLon grid. This is untested.")
-			val latitudeOfSouthernPole = gribInputStream.readINT(3, Bytes2Number.INT_SM) / 1000.0
-			val longitudeOfSouthernPole = gribInputStream.readINT(3, Bytes2Number.INT_SM) / 1000.0
-			val angleOfRotationInDegrees = gribInputStream.readFloat(4, Bytes2Number.FLOAT_IBM)
+			val latitudeOfSouthernPole = gribInputStream.readSMInt(3) / 1000.0
+			val longitudeOfSouthernPole = gribInputStream.readSMInt(3) / 1000.0
+			val angleOfRotationInDegrees = gribInputStream.readFloatIBM()
 
 			return Grib1GDSRotatedLatLon(gdsLatLon, latitudeOfSouthernPole, longitudeOfSouthernPole,
 					angleOfRotationInDegrees)

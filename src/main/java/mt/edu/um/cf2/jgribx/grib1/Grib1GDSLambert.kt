@@ -174,36 +174,36 @@ class Grib1GDSLambert(numberOfVerticalCoordinateValues: Int,
 									numberOfVerticalCoordinateValues: Int,
 									pvlLocation: Int): Grib1GDSLambert {
 			// [7-8] Nx number of points along x-axis
-			val gridNx = gribInputStream.readUINT(2)
+			val gridNx = gribInputStream.readUInt(2)
 
 			// [9-10] Ny number of points along y-axis
-			val gridNy = gribInputStream.readUINT(2)
+			val gridNy = gribInputStream.readUInt(2)
 
 			// [11-13] La1 latitude of first grid point
-			val latitudeOfFirstGridPoint = gribInputStream.readUINT(3) / 1000.0
+			val latitudeOfFirstGridPoint = gribInputStream.readUInt(3) / 1000.0
 
 			// [14-16] Lo1 longitude of first grid point
-			val longitudeOfFirstGridPoint = gribInputStream.readUINT(3) / 1000.0
+			val longitudeOfFirstGridPoint = gribInputStream.readUInt(3) / 1000.0
 
 			// [17] Resolution and component flags (see Code table 7)
-			val resolutionAndComponentFlags = gribInputStream.readUINT(1)
+			val resolutionAndComponentFlags = gribInputStream.readUInt(1)
 
 			// [18-20] LoV orientation of the grid; i.e. the longitude value of the meridian which is parallel to the
 			// y-axis (or columns of the grid) along which latitude increases as the Y-coordinate increases (the
 			// orientation longitude may or may not appear on a particular grid)
-			val loV = gribInputStream.readUINT(3) / 1000.0
+			val loV = gribInputStream.readUInt(3) / 1000.0
 
 			// [21-23] Dx X-direction grid length (see Note (2))
-			var dxInMetres = gribInputStream.readUINT(3).toDouble()
+			var dxInMetres = gribInputStream.readUInt(3).toDouble()
 
 			// [24-26] Dy Y-direction grid length (see Note (2))
-			var dyInMetres = gribInputStream.readUINT(3).toDouble()
+			var dyInMetres = gribInputStream.readUInt(3).toDouble()
 
 			// [27] Projection centre flag (see Note (5))
-			val projectionCenterFlag = gribInputStream.readUINT(1)
+			val projectionCenterFlag = gribInputStream.readUInt(1)
 
 			// [28] Scanning mode (flags see Flag/Code table 8)
-			val scanningMode = gribInputStream.readUINT(1)
+			val scanningMode = gribInputStream.readUInt(1)
 			if (scanningMode and 63 != 0) throw NoValidGribException("GribRecordGDS: This scanning mode" +
 					" (${scanningMode}) is not supported.")
 			if (scanningMode and 128 != 0) dxInMetres *= -1.0
@@ -211,16 +211,16 @@ class Grib1GDSLambert(numberOfVerticalCoordinateValues: Int,
 			if (scanningMode and 64 != 64) dyInMetres *= -1.0
 
 			// [29-31] Latin 1 first latitude from the pole at which the secant cone cuts the sphere
-			val latin1 = gribInputStream.readUINT(3) / 1000.0
+			val latin1 = gribInputStream.readUInt(3) / 1000.0
 
 			// [32-34] Latin 2 second latitude from the pole at which the secant cone cuts the sphere
-			val latin2 = gribInputStream.readUINT(3) / 1000.0
+			val latin2 = gribInputStream.readUInt(3) / 1000.0
 
 			// [35-37] Latitude of the southern pole in millidegrees (integer)
-			val latitudeOfSouthernPole = gribInputStream.readUINT(3) / 1000.0
+			val latitudeOfSouthernPole = gribInputStream.readUInt(3) / 1000.0
 
 			// [36-40] Longitude of the southern pole in millidegrees (integer)
-			val longitudeOfSouthernPole = gribInputStream.readUINT(3) / 1000.0
+			val longitudeOfSouthernPole = gribInputStream.readUInt(3) / 1000.0
 
 			// [41-42]
 			gribInputStream.skip(2)

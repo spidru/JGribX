@@ -1,6 +1,5 @@
 package mt.edu.um.cf2.jgribx.grib2
 
-import mt.edu.um.cf2.jgribx.Bytes2Number
 import mt.edu.um.cf2.jgribx.GribInputStream
 import mt.edu.um.cf2.jgribx.GribOutputStream
 import mt.edu.um.cf2.jgribx.Logger
@@ -58,11 +57,11 @@ class Grib2RecordDS3 private constructor(gds: Grib2RecordGDS,
 			val minsd: Int
 			if (drs.spatialDescriptorOctets > 0) {
 				// first order spatial differencing g1 and gMin
-				ival1 = gribInputStream.readINT(drs.spatialDescriptorOctets, Bytes2Number.INT_SM)
+				ival1 = gribInputStream.readSMInt(drs.spatialDescriptorOctets)
 				if (drs.spatialDiffOrder == 2) { // second order spatial differencing h1, h2, hMin
-					ival2 = gribInputStream.readINT(drs.spatialDescriptorOctets, Bytes2Number.INT_SM)
+					ival2 = gribInputStream.readSMInt(drs.spatialDescriptorOctets)
 				}
-				minsd = gribInputStream.readINT(drs.spatialDescriptorOctets, Bytes2Number.INT_SM)
+				minsd = gribInputStream.readSMInt(drs.spatialDescriptorOctets)
 			} else {
 				// TODO raise exception
 				val data = FloatArray(gds.numberOfDataPoints)

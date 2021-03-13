@@ -85,10 +85,10 @@ open class Grib2RecordDRS2 protected constructor(nDataPoints: Int,
 	companion object {
 		internal fun readFromStream(gribInputStream: GribInputStream, nDataPoints: Int): Grib2RecordDRS2 {
 			val drs0 = Grib2RecordDRS0.readFromStream(gribInputStream, nDataPoints)
-			val splitMethod = gribInputStream.readUINT(1) // [22]
-			val missingValueManagement = gribInputStream.readUINT(1) // [23]
-			val missing1 = gribInputStream.readUINT(4) // [24-27]
-			val missing2 = gribInputStream.readUINT(4) // [28-31]
+			val splitMethod = gribInputStream.readUInt(1) // [22]
+			val missingValueManagement = gribInputStream.readUInt(1) // [23]
+			val missing1 = gribInputStream.readUInt(4) // [24-27]
+			val missing2 = gribInputStream.readUInt(4) // [28-31]
 			//val missingValue = when (missingValueManagement) {
 			//	0 -> floatArrayOf(Float.NaN, Float.NaN)
 			//	1 -> floatArrayOf(missing1.toFloat(), Float.NaN)
@@ -96,13 +96,13 @@ open class Grib2RecordDRS2 protected constructor(nDataPoints: Int,
 			//	else -> floatArrayOf(Float.NaN, Float.NaN)
 			//}
 			val missingValue = intArrayOf(missing1, missing2)
-			val nGroups = gribInputStream.readUINT(4) // [32-35]
-			val refGroupWidths = gribInputStream.readUINT(1) // [36]
-			val groupWidthBits = gribInputStream.readUINT(1) // [37]
-			val refGroupLengths = gribInputStream.readUINT(4) // [38-41]
-			val groupLengthIncrement = gribInputStream.readUINT(1) // [42]
-			val lastGroupLength = gribInputStream.readUINT(4) // [43-46]
-			val nBitsScaledGroupLengths = gribInputStream.readUINT(1) // [47]
+			val nGroups = gribInputStream.readUInt(4) // [32-35]
+			val refGroupWidths = gribInputStream.readUInt(1) // [36]
+			val groupWidthBits = gribInputStream.readUInt(1) // [37]
+			val refGroupLengths = gribInputStream.readUInt(4) // [38-41]
+			val groupLengthIncrement = gribInputStream.readUInt(1) // [42]
+			val lastGroupLength = gribInputStream.readUInt(4) // [43-46]
+			val nBitsScaledGroupLengths = gribInputStream.readUInt(1) // [47]
 
 			return Grib2RecordDRS2(drs0, splitMethod, missingValueManagement, missingValue, nGroups, refGroupWidths,
 					groupWidthBits, refGroupLengths, groupLengthIncrement, lastGroupLength, nBitsScaledGroupLengths)

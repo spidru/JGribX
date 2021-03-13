@@ -44,8 +44,8 @@ class GribFileTest {
 				if (messageLength == 4L) break
 
 				inputStream.mark(5)
-				val sectionLength = inputStream.readUINT(4)
-				val sectionNumber = inputStream.readUINT(1)
+				val sectionLength = inputStream.readUInt(4)
+				val sectionNumber = inputStream.readUInt(1)
 				inputStream.resetBitCounter()
 				inputStream.reset()
 				val expected = ByteArray(sectionLength)

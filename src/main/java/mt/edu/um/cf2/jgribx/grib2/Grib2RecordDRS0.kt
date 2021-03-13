@@ -1,6 +1,5 @@
 package mt.edu.um.cf2.jgribx.grib2
 
-import mt.edu.um.cf2.jgribx.Bytes2Number
 import mt.edu.um.cf2.jgribx.GribInputStream
 import mt.edu.um.cf2.jgribx.GribOutputStream
 
@@ -49,19 +48,19 @@ open class Grib2RecordDRS0 internal constructor(nDataPoints: Int,
 		internal fun readFromStream(gribInputStream: GribInputStream, nDataPoints: Int): Grib2RecordDRS0 {
 
 			/* [12-15] Reference value (R) (IEEE 32-bit floating-point value) */
-			val refValue = gribInputStream.readFloat(4, Bytes2Number.FLOAT_IEEE754)
+			val refValue = gribInputStream.readFloatIEEE754(4)
 
 			/* [16-17] Binary Scale Factor (E) */
-			val binaryScaleFactor = gribInputStream.readINT(2, Bytes2Number.INT_SM)
+			val binaryScaleFactor = gribInputStream.readSMInt(2)
 
 			/* [18-19] Decimal Scale Factor (D) */
-			val decimalScaleFactor = gribInputStream.readINT(2, Bytes2Number.INT_SM)
+			val decimalScaleFactor = gribInputStream.readSMInt(2)
 
 			/* [20] Number of bits used for each packed value for simple packing */
-			val nBits = gribInputStream.readUINT(1)
+			val nBits = gribInputStream.readUInt(1)
 
 			/* [21] Type of original field values */
-			val type = gribInputStream.readUINT(1)
+			val type = gribInputStream.readUInt(1)
 
 			return Grib2RecordDRS0(nDataPoints, refValue, binaryScaleFactor, decimalScaleFactor, nBits, type)
 		}
