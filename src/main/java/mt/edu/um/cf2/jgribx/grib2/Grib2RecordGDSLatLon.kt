@@ -12,6 +12,9 @@ package mt.edu.um.cf2.jgribx.grib2
 
 import mt.edu.um.cf2.jgribx.*
 import kotlin.math.abs
+import kotlin.math.ceil
+import kotlin.math.min
+import kotlin.math.roundToInt
 
 /**
  * ### [Grid Definition Template 3.0: Latitude/Longitude (or equidistant cylindrical, or Plate Carree)](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_temp3-0.shtml)
@@ -92,15 +95,15 @@ class Grib2RecordGDSLatLon internal constructor(gridDefinitionSource: Int,
 												private val majorScaledValue: Int,
 												private val minorScaleFactor: Int,
 												private val minorScaledValue: Int,
-												internal val gridNi: Int,
-												internal val gridNj: Int,
+												gridNi: Int,
+												gridNj: Int,
 												private val basicAngle: Int,
 												private val basicAngleSubdiv: Int,
-												private val lat1: Double,
-												private val lon1: Double,
+												private var lat1: Double,
+												private var lon1: Double,
 												private val flags: Int,
-												private val lat2: Double,
-												private val lon2: Double,
+												private var lat2: Double,
+												private var lon2: Double,
 												private val gridDi: Double,
 												private val gridDj: Double,
 												internal val scanMode: ScanMode,
@@ -161,19 +164,19 @@ class Grib2RecordGDSLatLon internal constructor(gridDefinitionSource: Int,
 			} else TODO("Not implemented")
 
 			/* [64-67] i-Direction Increment Di */
-			var gridDi = 0.0
+			var gridDi: Double
 			if (iDirectionIncrementsGiven) {
 				if (basicAngle == 0) {
 					gridDi = gribInputStream.readUINT(4) / 1.0e6
 				} else TODO("Not implemented")
-			}
+			} else TODO("Not implemented")
 			/* [68-71] j-Direction Increment Dj */
-			var gridDj = 0.0
+			var gridDj: Double
 			if (jDirectionIncrementsGiven) {
 				if (basicAngle == 0) {
 					gridDj = gribInputStream.readUINT(4) / 1.0e6
 				} else TODO("Not implemented")
-			}
+			} else TODO("Not implemented")
 			/* [72] Scanning Mode */
 			val scanMode = ScanMode(gribInputStream.readUINT(1).toByte()).also { scanMode ->
 				// boolean iPositiveDirection = (scanMode & 0x80) != 0x80;
@@ -205,14 +208,20 @@ class Grib2RecordGDSLatLon internal constructor(gridDefinitionSource: Int,
 
 	override val gridType: Int = 0
 
-	override val gridCoords: Array<DoubleArray>
+	internal var gridNi: Int = gridNi
+		private set
+
+	internal var gridNj: Int = gridNj
+		private set
+
+	override val coords: Array<DoubleArray>
 		get() {
 			val coords = Array(gridNi * gridNj) { DoubleArray(2) }
 			var k = 0
 			for (j in 0 until gridNj) {
 				for (i in 0 until gridNi) {
-					var lon = lon1 + i * gridDi
-					val lat = lat1 + j * gridDj
+					var lon = lngStart + i * deltaX % 360.0
+					val lat = latStart + j * deltaY
 
 					// move x-coordinates to the range -180..180
 					if (lon >= 180.0) lon -= 360.0
@@ -228,52 +237,130 @@ class Grib2RecordGDSLatLon internal constructor(gridDefinitionSource: Int,
 			return coords
 		}
 
-	override val gridXCoords: DoubleArray
+	override val xCoords: DoubleArray
 		get() {
 			val coords = DoubleArray(gridNi)
-			val convertTo180 = true
 			for (x in 0 until gridNi) {
-				var lon = lon1 + x * gridDi
-				if (convertTo180) {
-					// move x-coordinates to the range -180..180
-					if (lon >= 180.0) lon -= 360.0
-					if (lon < -180.0) lon += 360.0
-				} else { // handle wrapping at 360
-					if (lon >= 360.0) lon -= 360.0
-				}
+				var lon = (lngStart + x * deltaX) % 360.0
+				// move x-coordinates to the range -180..180
+				if (lon >= 180.0) lon -= 360.0
+				if (lon < -180.0) lon += 360.0
 				coords[x] = lon
 			}
 			return coords
 		}
 
-	override val gridYCoords: DoubleArray
+	override val yCoords: DoubleArray
 		get() {
 			val coords = DoubleArray(gridNj)
 			for (y in 0 until gridNj) {
-				val lat = lat1 + y * gridDj
-				if (lat > 90.0 || lat < -90.0) System.err.println("GribGDSLatLon.getYCoords: latitude out of range (-90 to 90).")
+				val lat = latStart + y * deltaY
+				if (lat > 90.0 || lat < -90.0) {
+					Logger.error("GribGDSLatLon.getYCoords: latitude out of range (-90 to 90).")
+				}
 				coords[y] = lat
 			}
 			return coords
 		}
 
-	override val gridDeltaX: Double
-		get() = gridDi
-
-	override val gridDeltaY: Double
-		get() = gridDj
-
-	override val gridLatStart: Double
-		get() = lat1
-
-	override val gridLonStart: Double
-		get() = lon1
-
-	override val gridSizeX: Int
+	override val cols: Int
 		get() = gridNi
 
-	override val gridSizeY: Int
+	override val rows: Int
 		get() = gridNj
+
+	override val deltaX: Double
+		get() = abs(gridDi)
+
+	override val deltaY: Double
+		get() = abs(gridDj)
+
+	override val latStart: Double
+		get() = min(lat1, lat2)
+
+	override val lngStart: Double
+		get() = min(lon1, lon2)
+
+	override val dataIndices: Sequence<Int>
+		get() = generateSequence(0 to 0) { (i, _) -> (i + 1) to getDataIndex(i + 1) }
+				.take(gridNi * gridNj)
+				.map { (_, index) -> index }
+
+	internal fun closestLatSmallerThan(latitude: Double): Double = yCoords
+			.filter { latitude >= it }
+			.minByOrNull { abs(latitude - it) }
+			?: throw TransformationException("Could not find closest first latitude")
+
+	internal fun closestLatLargerThan(latitude: Double): Double = yCoords
+			.filter { latitude <= it }
+			.minByOrNull { abs(latitude - it) }
+			?: throw TransformationException("Could not find closest first latitude")
+
+	internal fun closestLngSmallerThan(longitude: Double): Double = xCoords
+			.filter { longitude >= it }
+			.minByOrNull { abs(longitude - it) }
+			?: throw TransformationException("Could not find closest first longitude")
+
+	internal fun closestLngLargerThan(longitude: Double): Double = xCoords
+			.filter { longitude <= it }
+			.minByOrNull { abs(longitude - it) }
+			?: throw TransformationException("Could not find closest first longitude")
+
+	internal fun iPointsCount(lng1: Double, lng2: Double): Int = ceil(abs(lng2 - lng1) / deltaX).toInt() + 1
+
+	internal fun jPointsCount(lat1: Double, lat2: Double): Int = ceil(abs(lat2 - lat1) / deltaY).toInt() + 1
+
+	override fun getDataIndex(sequence: Int): Int = getDataIndex(sequence % gridNi, sequence / gridNi)
+
+	override fun getDataIndex(latitude: Double, longitude: Double): Int {
+		// double[] xcoords = gds.getGridXCoords();
+		// double[] ycoords = gds.getGridYCoords();
+		val j = ((latitude - latStart) / deltaY).roundToInt() // j = index_closest_latitude
+		val i = ((longitude - lngStart) / deltaX).roundToInt() // i = index_closest_longitude
+
+		// double closest_latitude = ycoords[index_closest_latitude];
+		// double closest_longitude = xcoords[index_closest_longitude];
+		return getDataIndex(i, j)
+	}
+
+	private fun getDataIndex(i: Int, j: Int): Int {
+		if (scanMode.iDirectionEvenRowsOffset
+				|| scanMode.iDirectionOddRowsOffset
+				|| scanMode.jDirectionOffset
+				|| !scanMode.rowsNiNjPoints
+				|| scanMode.rowsZigzag) {
+			Logger.error("Unsupported scan mode ${scanMode} found")
+		}
+		return if (scanMode.iDirectionConsecutive) gridNi * j + i else gridNj * i + j
+	}
+
+	override fun cutOut(north: Double, east: Double, south: Double, west: Double) {
+		val inputLat1 = if (gridDj >= 0) south else north
+		val inputLng1 = if (gridDi >= 0) west else east
+		val inputLat2 = if (gridDj >= 0) north else south
+		val inputLng2 = if (gridDi >= 0) east else west
+
+		val closestLat1 = if (gridDj >= 0) closestLatSmallerThan(inputLat1) else closestLatLargerThan(inputLat1)
+		val closestLng1 = if (gridDi >= 0) closestLngSmallerThan(inputLng1) else closestLngLargerThan(inputLng1)
+		val closestLat2 = if (gridDj >= 0) closestLatLargerThan(inputLat2) else closestLatSmallerThan(inputLat2)
+		val closestLng2 = if (gridDi >= 0) closestLngLargerThan(inputLng2) else closestLngSmallerThan(inputLng2)
+
+		val newNj = jPointsCount(closestLat1, closestLat2)
+		val newNi = iPointsCount(closestLng1, closestLng2)
+
+		//if (closestLat2 > south) throw TransformationException("South exceeded")
+		//if (lon1 <= lon2 && closestLat1 > closestLat2
+		//		|| lon1 > lon2 && closestLat1 <= closestLat2) throw TransformationException("West exceeded")
+
+		// Update
+		lat1 = closestLat1
+		lon1 = closestLng1
+		gridNj = newNj
+		gridNi = newNi
+		lat2 = closestLat2
+		lon2 = closestLng2
+		numberOfDataPoints = newNi * newNj
+	}
 
 	override fun writeTo(outputStream: GribOutputStream) {
 		super.writeTo(outputStream) // [1-5] length, section number + [6-14] GDS

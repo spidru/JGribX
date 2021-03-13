@@ -11,6 +11,7 @@
 package mt.edu.um.cf2.jgribx.grib2
 
 import mt.edu.um.cf2.jgribx.*
+import mt.edu.um.cf2.jgribx.api.GribGridDefinitionSectionInternal
 
 /**
  * ### [Section 3: Grid Definition Section](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_sect3.shtml)
@@ -42,7 +43,7 @@ import mt.edu.um.cf2.jgribx.*
 abstract class Grib2RecordGDS protected constructor(protected var gridDefinitionSource: Int,
 													var numberOfDataPoints: Int,
 													protected var nBytes: Int,
-													protected var interpretation: Int) : Grib2Section {
+													protected var interpretation: Int) : Grib2Section, GribGridDefinitionSectionInternal {
 
 	class ScanMode internal constructor(flags: Byte) {
 		internal var iDirectionPositive: Boolean = flags.toInt() and 0x80 != 0x80
@@ -111,15 +112,11 @@ abstract class Grib2RecordGDS protected constructor(protected var gridDefinition
 	 *  (see [Table 3.1](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table3-1.shtml) */
 	protected abstract val gridType: Int
 
-	abstract val gridCoords: Array<DoubleArray>
-	protected abstract val gridXCoords: DoubleArray
-	protected abstract val gridYCoords: DoubleArray
-	abstract val gridDeltaX: Double
-	abstract val gridDeltaY: Double
-	abstract val gridLatStart: Double
-	abstract val gridLonStart: Double
-	protected abstract val gridSizeX: Int
-	protected abstract val gridSizeY: Int
+	abstract val latStart: Double
+	abstract val lngStart: Double
+
+	/** @see mt.edu.um.cf2.jgribx.api.GribRecord.cutOut */
+	internal abstract fun cutOut(north: Double, east: Double, south: Double, west: Double)
 
 	override fun writeTo(outputStream: GribOutputStream) {
 		Logger.debug("Writing GRIB2 Grid Definition Section (GDS) - ${length} bytes")

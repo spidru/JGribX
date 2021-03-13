@@ -14,6 +14,8 @@ import mt.edu.um.cf2.jgribx.GribInputStream
 import mt.edu.um.cf2.jgribx.GribOutputStream
 import mt.edu.um.cf2.jgribx.Logger
 import mt.edu.um.cf2.jgribx.NoValidGribException
+import mt.edu.um.cf2.jgribx.api.GribRecord
+import kotlin.math.roundToInt
 
 /**
  * ### [Section 7: Data Section](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_sect7.shtml)
@@ -37,7 +39,7 @@ import mt.edu.um.cf2.jgribx.NoValidGribException
 abstract class Grib2RecordDS<DRS : Grib2RecordDRS> internal constructor(internal val gds: Grib2RecordGDS,
 																		internal val drs: DRS,
 																		internal val bms: Grib2RecordBMS,
-																		val data: FloatArray) : Grib2Section {
+																		data: FloatArray) : Grib2Section {
 	companion object {
 		internal fun <DRS : Grib2RecordDRS> readFromStream(gribInputStream: GribInputStream,
 														   gds: Grib2RecordGDS,
@@ -53,12 +55,50 @@ abstract class Grib2RecordDS<DRS : Grib2RecordDRS> internal constructor(internal
 				is Grib2RecordDRS2 -> Grib2RecordDS2.readFromStream(gribInputStream, gds, drs, bms)
 						.also { it.length = length } // TODO Calculate length
 				is Grib2RecordDRS0 -> Grib2RecordDS0.readFromStream(gribInputStream, gds, drs, bms)
-				else -> throw TODO("Grib2RecordDS${drs::class.simpleName?.get(0)} not implemented!")
+				else -> TODO("Grib2RecordDS${drs::class.simpleName?.get(0)} not implemented!")
 			}.takeIf { it.length == length } ?: throw NoValidGribException("DS length mismatch")
 		}
 	}
 
 	override val number: Int = 7
+
+	internal var data: FloatArray = data
+		private set
+
+	/**
+	 * Data values ordered with the defined [grid][Grib2RecordDS.gds].
+	 *
+	 * Since this iterates over data and instantiates an new array on every call it should only be use when one
+	 * needs the while data for sequential access. For random access use one of the [Grib2RecordDS.getValue] methods.
+	 */
+	internal val values: FloatArray
+		get() = gds.dataIndices.map { data[it] }.toList().toFloatArray()
+
+	internal fun getValue(sequence: Int) = gds.getDataIndex(sequence).let { data[it] }
+
+	internal fun getValue(latitude: Double, longitude: Double): Float = gds.getDataIndex(latitude, longitude).let { data[it] }
+
+	/** @see GribRecord.cutOut */
+	internal fun cutOut(north: Double, east: Double, south: Double, west: Double) {
+		val gds = gds
+		if (gds !is Grib2RecordGDSLatLon) throw TODO("${gds::class.simpleName} not implemented")
+
+		val closestSouth = gds.closestLatSmallerThan(south)
+		val closestWest = gds.closestLngSmallerThan(west)
+		val closestNorth = gds.closestLatLargerThan(north)
+		val closestEast = gds.closestLngLargerThan(east)
+
+		val jMin = ((closestSouth - gds.latStart) / gds.deltaY).roundToInt() // j = index_closest_latitude
+		val iMin = ((closestWest - gds.lngStart) / gds.deltaX).roundToInt() // i = index_closest_longitude
+		val jMax = jMin + gds.jPointsCount(closestSouth, closestNorth)
+		val iMax = iMin + gds.iPointsCount(closestWest, closestEast)
+
+		this.data = (jMin until jMax).flatMap { j -> (iMin until iMax).map { j to it } }
+				.map { (j, i) -> if (gds.scanMode.iDirectionConsecutive) gds.gridNi * j + i else gds.gridNj * i + j }
+				.map { data[it] }
+				.toFloatArray()
+		gds.cutOut(north, east, south, west)
+	}
 
 	override fun writeTo(outputStream: GribOutputStream) {
 		Logger.debug("Writing GRIB2 Data Section (DS), template: ${drs.templateNumber} - ${length} bytes")

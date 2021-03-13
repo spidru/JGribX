@@ -188,16 +188,16 @@ class Grib1GDSPolarStereo(numberOfVerticalCoordinateValues: Int,
 
 	override val dataRepresentationType: Int = 5
 
-	override val gridCols: Int
+	override val cols: Int
 		get() = gridNx
 
-	override val gridRows: Int
+	override val rows: Int
 		get() = gridNy
 
-	override val gridDeltaX: Double
+	override val deltaX: Double
 		get() = dxInMetres
 
-	override val gridDeltaY: Double
+	override val deltaY: Double
 		get() = dyInMetres
 
 	/** Latitude of Center - assumed 60 N or 60 S based on note 2 of table D */
@@ -235,7 +235,7 @@ class Grib1GDSPolarStereo(numberOfVerticalCoordinateValues: Int,
 			return yCoords
 		}
 
-	override val gridCoords: DoubleArray
+	override val coords: Array<DoubleArray>
 		get() {
 			var count = 0
 			var rho: Double
@@ -246,7 +246,7 @@ class Grib1GDSPolarStereo(numberOfVerticalCoordinateValues: Int,
 			var lat: Double
 			var x: Double
 			var y: Double
-			val coords = DoubleArray(gridNx * gridNy * 2)
+			val coords = Array(gridNx * gridNy) { DoubleArray(2) }
 			val cos60 = cos(Math.toRadians(latitudeTrueScale))
 			val sin60 = sin(Math.toRadians(latitudeTrueScale))
 			for (j in 0 until gridNy) {
@@ -266,12 +266,20 @@ class Grib1GDSPolarStereo(numberOfVerticalCoordinateValues: Int,
 					if (lat > 90.0 || lat < -90.0) {
 						Logger.error("GribGDSPolarStereo: latitude out of range (-90 to 90).")
 					}
-					coords[count++] = lon
-					coords[count++] = lat
+					coords[count][0] = lon
+					coords[count][1] = lat
+					count++
 				}
 			}
 			return coords
 		}
+
+	override val dataIndices: Sequence<Int>
+		get() = TODO("Not yet implemented")
+
+	override fun getDataIndex(sequence: Int): Int = TODO("Not yet implemented")
+
+	override fun getDataIndex(latitude: Double, longitude: Double): Int = TODO("Not yet implemented")
 
 	override fun writeTo(outputStream: GribOutputStream) = TODO()
 

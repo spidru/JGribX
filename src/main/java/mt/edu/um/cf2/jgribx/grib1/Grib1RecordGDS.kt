@@ -11,6 +11,7 @@
 package mt.edu.um.cf2.jgribx.grib1
 
 import mt.edu.um.cf2.jgribx.*
+import mt.edu.um.cf2.jgribx.api.GribGridDefinitionSectionInternal
 
 /**
  * ### [SSection 2: Grid description section](https://apps.ecmwf.int/codes/grib/format/grib1/sections/2/)
@@ -89,7 +90,7 @@ import mt.edu.um.cf2.jgribx.*
  */
 abstract class Grib1RecordGDS(
 		internal val numberOfVerticalCoordinateValues: Int,
-		internal val pvlLocation: Int) : Grib1Section {
+		internal val pvlLocation: Int) : Grib1Section, GribGridDefinitionSectionInternal {
 
 	companion object {
 		/** Radius of earth used in calculating projections per table 7 - assumes spheroid */
@@ -123,23 +124,11 @@ abstract class Grib1RecordGDS(
 	/** (`6`) Type of grid (See table 6) */
 	abstract val dataRepresentationType: Int
 
-	/** Number of grid columns. (Also Ni) */
-	abstract val gridCols: Int
-
-	/** Number of grid rows. (Also Nj) */
-	abstract val gridRows: Int
-
 	/** Latitude of grid start point. */
 	abstract val latitudeOfFirstGridPoint: Double
 
 	/** Longitude of grid start point. */
 	abstract val longitudeOfFirstGridPoint: Double
-
-	/** x-distance between two grid points can be delta-Lon or delta x. */
-	abstract val gridDeltaX: Double
-
-	/** y-distance of two grid points can be delta-Lat or delta y. */
-	abstract val gridDeltaY: Double
 
 	/** Scanning mode (See table 8). Get scan mode (sign of increments). *Only 64, 128 and 192 supported so far. */
 	abstract val scanningMode: Int
@@ -147,15 +136,6 @@ abstract class Grib1RecordGDS(
 	// rdg - the remaining coordinates are not common to all types, and as such
 	//    should be removed.  They are left here (temporarily) for continuity.
 	//    These should be implemented in a GribGDSxxxx child class.
-
-	/** Get all longitide coordinates */
-	abstract val xCoords: DoubleArray
-
-	/** Get all latitude coordinates */
-	abstract val yCoords: DoubleArray
-
-	/** Get grid coordinates in longitude/latitude */
-	abstract val gridCoords: DoubleArray
 
 	/**
 	 * Table J.Resolution and Component Flags,
