@@ -2,8 +2,9 @@ package mt.edu.um.cf2.jgribx.grib2
 
 import mt.edu.um.cf2.jgribx.grib2.ParameterCategory.Companion.getCategories
 
-class ProductDiscipline private constructor(private val value: Int, private val name: String = "") {
+class ProductDiscipline private constructor(internal val value: Int, private val name: String = "") {
 	companion object {
+		val MISSING = 255
 		val VALUES = mapOf(
 				0 to "METEOROLOGICAL",
 				1 to "HYDROLOGICAL",
@@ -16,14 +17,11 @@ class ProductDiscipline private constructor(private val value: Int, private val 
 
 	val parameterCategories = getCategories(value)
 
-	override fun equals(other: Any?): Boolean = other != null && other is ProductDiscipline && value == other.value
+	override fun equals(other: Any?): Boolean = this === other
+			|| other is ProductDiscipline
+			&& value == other.value
 
-	override fun hashCode(): Int {
-		var result = value
-		result = 31 * result + name.hashCode()
-		result = 31 * result + (parameterCategories?.hashCode() ?: 0)
-		return result
-	}
+	override fun hashCode(): Int = value
 
 	override fun toString(): String = name
 }

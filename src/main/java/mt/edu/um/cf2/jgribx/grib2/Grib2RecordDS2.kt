@@ -1,6 +1,7 @@
 package mt.edu.um.cf2.jgribx.grib2
 
 import mt.edu.um.cf2.jgribx.GribInputStream
+import mt.edu.um.cf2.jgribx.GribOutputStream
 import mt.edu.um.cf2.jgribx.Logger
 import kotlin.math.pow
 
@@ -25,9 +26,19 @@ import kotlin.math.pow
  *
  *     Y = ( R + (X1 + X2) * 2^E ) / 10^D
  *
+ * @param gds Reference to [Section 3: Grid Definition Section](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_sect3.shtml)
+ * @param drs Reference to [Section 5: Data Representation Section](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_sect5.shtml)
+ * @param bms Reference to [Section 6: Bit Map Section](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_sect6.shtml)
+ * @param data Decoded data
+ *
  * @author Jan Kubovy [jan@kubovy.eu]
  */
-open class Grib2RecordDS2 private constructor(length: Int, data: FloatArray) : Grib2RecordDS(length, data) {
+open class Grib2RecordDS2 private constructor(gds: Grib2RecordGDS,
+											  drs: Grib2RecordDRS2,
+											  bms: Grib2RecordBMS,
+											  data: FloatArray) :
+		Grib2RecordDS<Grib2RecordDRS2>(gds, drs, bms, data) {
+
 	companion object {
 		/**
 		 * (`6-xx`) NG group reference values (`X1` in the decoding formula), each of which is encoded using the number
@@ -213,16 +224,7 @@ open class Grib2RecordDS2 private constructor(length: Int, data: FloatArray) : G
 		internal fun readFromStream(gribInputStream: GribInputStream,
 									gds: Grib2RecordGDS,
 									drs: Grib2RecordDRS2,
-									bms: Grib2RecordBMS): Grib2RecordDS2? {
-			val length = gribInputStream.readUINT(4)
-			val section = gribInputStream.readUINT(1)
-			if (section != 7) {
-				Logger.error("DS contains an incorrect section number ${section}!")
-				return null
-			}
-
-			gribInputStream.seekNextByte()
-
+									bms: Grib2RecordBMS): Grib2RecordDS2 {
 			// [ 6 - xx] NG group reference values (X1 in the decoding formula), each of which is encoded using the
 			//           number of bits specified in octet 20 of data representation template 5.0.
 			val valueX1 = readGroupReferenceValuesX1(gribInputStream, drs)
@@ -243,7 +245,7 @@ open class Grib2RecordDS2 private constructor(length: Int, data: FloatArray) : G
 				repeat(drs.nDataPoints) { i ->
 					data[i] = drs.missingValue[0].toFloat() // FIXME
 				}
-				return Grib2RecordDS2(length, data)
+				return Grib2RecordDS2(gds, drs, bms, data)
 			}
 
 			// [[zz+1] - nn] Packed values (X2 in the decoding formula), where each value is a deviation from its
@@ -262,7 +264,14 @@ open class Grib2RecordDS2 private constructor(length: Int, data: FloatArray) : G
 				//}
 			}
 
-			return Grib2RecordDS2(length, data)
+			return Grib2RecordDS2(gds, drs, bms, data)
 		}
+	}
+
+	override var length: Int = 0 // TODO Calculate length
+
+	override fun writeTo(outputStream: GribOutputStream) {
+		super.writeTo(outputStream) // [1-5] length, section number
+		TODO("Writing Grid point data - Complex Packing is not supported yet")
 	}
 }

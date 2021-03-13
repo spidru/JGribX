@@ -25,12 +25,12 @@ import java.util.regex.Pattern
  * @param description Parameter description
  * @param units Parameter units
  */
-class Grib2Parameter(private val discipline: ProductDiscipline,
-					 private val category: ParameterCategory,
-					 private val index: Int,
-					 val code: String,
-					 val description: String,
-					 val units: String) {
+class Grib2Parameter private constructor(private val discipline: ProductDiscipline,
+										 internal val category: ParameterCategory,
+										 internal val index: Int,
+										 val code: String,
+										 val description: String,
+										 val units: String) {
 
 	companion object {
 		private val paramList = mutableListOf<Grib2Parameter>()
@@ -94,6 +94,19 @@ class Grib2Parameter(private val discipline: ProductDiscipline,
 			}
 			return null
 		}
+	}
+
+	override fun equals(other: Any?) = this === other
+			|| other is Grib2Parameter
+			&& discipline == other.discipline
+			&& category == other.category
+			&& index == other.index
+
+	override fun hashCode(): Int {
+		var result = discipline.hashCode()
+		result = 31 * result + category.hashCode()
+		result = 31 * result + index
+		return result
 	}
 
 	override fun toString() = "Grib2Parameter(discipline=${discipline}, category=${category}, index=${index}," +

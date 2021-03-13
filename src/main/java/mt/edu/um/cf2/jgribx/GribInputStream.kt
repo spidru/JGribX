@@ -25,12 +25,12 @@ import kotlin.math.ceil
  * @author  Benjamin Stark
  * @version 1.0
  */
-class GribInputStream(inputStream: InputStream?, private val onRead: (Long) -> Unit) : FilterInputStream(inputStream) {
+class GribInputStream(inputStream: InputStream?, private val onRead: (Long) -> Unit = {}) : FilterInputStream(inputStream) {
 	/** Buffer for one byte which will be processed bit by bit. */
-	protected var bitBuf = 0
+	private var bitBuf = 0
 
 	/** Current bit position in <tt>bitBuf</tt>. */
-	protected var bitPos = 0
+	private var bitPos = 0
 
 	private var markedCountBits: Long = 0
 
@@ -184,18 +184,14 @@ class GribInputStream(inputStream: InputStream?, private val onRead: (Long) -> U
 		}
 		while (true) {
 			val shift = bitsLeft - bitPos
-			if (shift > 0) {
-
-				// Consume the entire buffer
+			if (shift > 0) { // Consume the entire buffer
 				result = result or (bitBuf shl shift).toLong()
 				bitsLeft -= bitPos
 
 				// Get the next byte from the input stream
 				bitBuf = `in`.read()
 				bitPos = 8
-			} else {
-
-				// Consume a portion of the buffer
+			} else { // Consume a portion of the buffer
 				result = result or (bitBuf shr -shift).toLong()
 				bitPos -= bitsLeft
 				bitBuf = bitBuf and (0xff shr 8 - bitPos) // mask off consumed bits

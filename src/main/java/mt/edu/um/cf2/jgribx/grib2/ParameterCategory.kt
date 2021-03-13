@@ -5,7 +5,7 @@ import mt.edu.um.cf2.jgribx.Logger
 /**
  * [Parameter category by product discipline](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table4-1.shtml)
  */
-abstract class ParameterCategory(internal val value: Int, private val name: String) {
+abstract class ParameterCategory private constructor(internal val value: Int, private val name: String) {
 	class Meteorological private constructor(categoryId: Int, name: String) : ParameterCategory(categoryId, name) {
 		companion object {
 			val CATEGORIES: List<ParameterCategory> = mapOf(
@@ -79,7 +79,10 @@ abstract class ParameterCategory(internal val value: Int, private val name: Stri
 		}
 	}
 
-	override fun equals(other: Any?): Boolean = other != null && other is ParameterCategory && other.value == value
+	override fun equals(other: Any?): Boolean = this === other
+			|| other is ParameterCategory
+			&& value == other.value
+			&& name == other.name
 
 	override fun hashCode(): Int = 31 * value + name.hashCode()
 

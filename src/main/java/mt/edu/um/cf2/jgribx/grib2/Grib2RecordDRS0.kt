@@ -2,6 +2,7 @@ package mt.edu.um.cf2.jgribx.grib2
 
 import mt.edu.um.cf2.jgribx.Bytes2Number
 import mt.edu.um.cf2.jgribx.GribInputStream
+import mt.edu.um.cf2.jgribx.GribOutputStream
 
 /**
  * ### [5.0 Grid point data - simple packing](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_temp5-0.shtml)
@@ -23,14 +24,12 @@ import mt.edu.um.cf2.jgribx.GribInputStream
  *     Y = ( R + (X1 + X2) * 2^E ) / 10^D
  *   where `X1 = 0`, `X2 = X` (the value)
  *
- * @param length             (`1-4`)  Length of the section in octets (nn)
- * @param nDataPoints        (`6-9`)  Number of data points where one or more values are specified in Section 7 when a bit
- *                                    map is present, total number of data points when a bit map is absent.
- * @param templateNumber     (`10-11`) Data representation template number
- *                                     [Table 5.0](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table5-0.shtml)
- * @param refValue           (`12-15`) Reference value (R) (IEEE 32-bit floating-point value)
- * @param binaryScaleFactor  (`16-17`) Binary scale factor (E)
- * @param decimalScaleFactor (`18-19`) Decimal scale factor (D)
+ * @param nDataPoints        (`6-9`)   Number of data points where one or more values are specified in
+ *                                     [Section 7](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_sect7.shtml)
+ *                                     when a bit map is present, total number of data points when a bit map is absent.
+ * @param refValue           (`12-15`) Reference value (`R`) (IEEE 32-bit floating-point value)
+ * @param binaryScaleFactor  (`16-17`) Binary scale factor (`E`)
+ * @param decimalScaleFactor (`18-19`) Decimal scale factor (`D`)
  * @param nBits              (`20`)    Number of bits used for each packed value for simple packing, or for each group
  *                                     reference value for complex packing or spatial differencing
  * @param type               (`21`)    Type of original field values
@@ -38,21 +37,16 @@ import mt.edu.um.cf2.jgribx.GribInputStream
  *
  * @author Jan Kubovy [jan@kubovy.eu]
  */
-open class Grib2RecordDRS0 protected constructor(length: Int,
-												 nDataPoints: Int,
-												 templateNumber: Int,
-												 internal val refValue: Float,
-												 internal val binaryScaleFactor: Int,
-												 internal val decimalScaleFactor: Int,
-												 internal val nBits: Int,
-												 internal val type: Int) :
-		Grib2RecordDRS(length, nDataPoints, templateNumber) {
+open class Grib2RecordDRS0 internal constructor(nDataPoints: Int,
+												internal val refValue: Float,
+												internal val binaryScaleFactor: Int,
+												internal val decimalScaleFactor: Int,
+												internal val nBits: Int,
+												internal val type: Int) :
+		Grib2RecordDRS(nDataPoints) {
 
 	companion object {
-		internal fun readFromStream(gribInputStream: GribInputStream,
-									length: Int,
-									nDataPoints: Int,
-									templateNumber: Int): Grib2RecordDRS0 {
+		internal fun readFromStream(gribInputStream: GribInputStream, nDataPoints: Int): Grib2RecordDRS0 {
 
 			/* [12-15] Reference value (R) (IEEE 32-bit floating-point value) */
 			val refValue = gribInputStream.readFloat(4, Bytes2Number.FLOAT_IEEE754)
@@ -69,8 +63,39 @@ open class Grib2RecordDRS0 protected constructor(length: Int,
 			/* [21] Type of original field values */
 			val type = gribInputStream.readUINT(1)
 
-			return Grib2RecordDRS0(length, nDataPoints, templateNumber, refValue, binaryScaleFactor,
-					decimalScaleFactor, nBits, type)
+			return Grib2RecordDRS0(nDataPoints, refValue, binaryScaleFactor, decimalScaleFactor, nBits, type)
 		}
+	}
+
+	override val length: Int = 21
+
+	override val templateNumber: Int = 0
+
+	override fun writeTo(outputStream: GribOutputStream) {
+		super.writeTo(outputStream) // [1-5] length, section number, [6-11] DRS common stuff
+		outputStream.writeFloatIEEE754(refValue, bytes = 4) // [12-15]
+		outputStream.writeSMInt(binaryScaleFactor, bytes = 2) // [16-17]
+		outputStream.writeSMInt(decimalScaleFactor, bytes = 2) // [18-19]
+		outputStream.writeUInt(nBits, bytes = 1) // [20]
+		outputStream.writeUInt(type, bytes = 1) // [21]
+	}
+
+	override fun equals(other: Any?) = this === other
+			|| super.equals(other)
+			&& other is Grib2RecordDRS0
+			&& refValue == other.refValue
+			&& binaryScaleFactor == other.binaryScaleFactor
+			&& decimalScaleFactor == other.decimalScaleFactor
+			&& nBits == other.nBits
+			&& type == other.type
+
+	override fun hashCode(): Int {
+		var result = super.hashCode()
+		result = 31 * result + refValue.hashCode()
+		result = 31 * result + binaryScaleFactor
+		result = 31 * result + decimalScaleFactor
+		result = 31 * result + nBits
+		result = 31 * result + type
+		return result
 	}
 }
