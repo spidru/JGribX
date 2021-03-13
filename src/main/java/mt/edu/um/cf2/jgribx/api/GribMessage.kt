@@ -11,7 +11,9 @@ import mt.edu.um.cf2.jgribx.grib2.Grib2Message
  */
 interface GribMessage {
 	companion object {
-		internal fun readFromStream(gribInputStream: GribInputStream): GribMessage {
+		internal fun readFromStream(gribInputStream: GribInputStream,
+									messageIndex: Int,
+									parameterFilter: (String) -> Boolean): GribMessage {
 			val indicatorSection = GribRecordIS.readFromStream(gribInputStream)
 
 			// In case of an error skip the whole message to speed up reading (GribRecordIS is slow)
@@ -19,9 +21,9 @@ interface GribMessage {
 					initial = indicatorSection.length.toLong(),
 					length = indicatorSection.messageLength).use {
 				val message = when (indicatorSection.gribEdition) {
-					1 -> Grib1Message.readFromStream(gribInputStream, indicatorSection)
+					1 -> Grib1Message.readFromStream(gribInputStream, indicatorSection, messageIndex, parameterFilter)
 					2 -> indicatorSection.discipline?.let { discipline ->
-						Grib2Message.readFromStream(gribInputStream, indicatorSection, discipline)
+						Grib2Message.readFromStream(gribInputStream, indicatorSection, discipline, messageIndex, parameterFilter)
 					} ?: throw NoValidGribException("Missing discipline for GRIB2 edition")
 					else -> throw NoValidGribException("Unsupported GRIB edition ${indicatorSection.gribEdition}")
 				}

@@ -567,7 +567,7 @@ class Grib1PDSParamTable(protected var filename: String? = null,
 	 * @param id
 	 * @return tag/name of the parameter
 	 */
-	fun getParameterTag(id: Int): String = getParameter(id).abbreviation
+	fun getParameterTag(id: Int): String = getParameter(id).code
 
 	/**
 	 * Get a description for the parameter with id <tt>id</tt>.

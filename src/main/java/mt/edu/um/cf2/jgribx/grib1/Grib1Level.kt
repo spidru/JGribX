@@ -15,6 +15,8 @@
  */
 package mt.edu.um.cf2.jgribx.grib1
 
+import mt.edu.um.cf2.jgribx.api.GribLevel
+
 /**
  * A class containing static methods which deliver descriptions and names of
  * parameters, levels and units for byte codes from GRIB records.
@@ -28,7 +30,7 @@ package mt.edu.um.cf2.jgribx.grib1
  *
  * @see <a href="http://www.nco.ncep.noaa.gov/pmb/docs/on388/table3.html">Table 3</a>
  *
- * @property type Index number from table 3 - can be used for comparison even if the description of the level changes
+ * @property id Index number from table 3 - can be used for comparison even if the description of the level changes
  * @property code Stores a short name of the level - same as the string "level" in the original GribRecordPDS
  *                implementation
  * @property name Name of the vertical coordinate/level
@@ -44,16 +46,16 @@ package mt.edu.um.cf2.jgribx.grib1
  * @property isIncreasingUp Indicates whether the vertical coordinate increases with height. e.g. false for pressure
  *                          and sigma, true for height above ground or if unknown
  */
-class Grib1Level(val type: Int,
-				 val code: String,
-				 val name: String,
-				 val description: String? = null,
-				 val units: String = "",
-				 val value1: Float = Float.NaN,
-				 val value2: Float = Float.NaN,
-				 val isNumeric: Boolean = false,
-				 val isSingleLayer: Boolean = true,
-				 val isIncreasingUp: Boolean = true) {
+class Grib1Level(override val id: Int,
+				 override val code: String,
+				 override val name: String,
+				 description: String? = null,
+				 private val units: String = "",
+				 private val value1: Float = Float.NaN,
+				 private val value2: Float = Float.NaN,
+				 private val isNumeric: Boolean = false,
+				 private val isSingleLayer: Boolean = true,
+				 private val isIncreasingUp: Boolean = true) : GribLevel {
 
 	companion object {
 		fun getLevel(levelType: Int, levelData: Int): Grib1Level? {
@@ -204,19 +206,12 @@ class Grib1Level(val type: Int,
 
 	/** true if negative z-value */
 	val isDepth: Boolean
-		get() = type == 111 || type == 160
+		get() = id == 111 || id == 160
 
-	/** Returns a unique ID for the given combination code-value combination. */
-	val identifier: String
-		get() {
-			var id = code
-			if (java.lang.Float.isNaN(value1)) return id
-			id += ":"
-			id += if (value1 % 1 == 0f) value1.toInt() else value1
-			return id
-		}
-	val values: FloatArray
-		get() = floatArrayOf(value1, value2)
+	override val description: String = description ?: name
+
+	override val value: Float
+		get() = value1
 
 	/**
 	 * rdg - added this method to be used in a comparator for sorting while
@@ -232,45 +227,27 @@ class Grib1Level(val type: Int,
 		if (level == null) return -1
 
 		// check if level is less than this
-		if (type > level.type) return -1
+		if (id > level.id) return -1
 		if (value1 > level.value1) return -1
 		return if (value2 > level.value2) -1 else 1
 	}
 
-	/**
-	 * rdg - added equals method didn't check everything as most are set in the
-	 * constructor
-	 *
-	 * @param other - Object to check
-	 * @return true/false depends upon succes
-	 * @see java.lang.Object.equals
-	 */
-	override fun equals(other: Any?): Boolean {
-		if (other !is Grib1Level) return false
-		// quick check to see if same object
-		if (this === other) return true
-		if (type != other.type) return false
-		if (value1 != other.value1) return false
-		return value2 == other.value2
-	}
+	override fun equals(other: Any?) = this === other
+			|| other is Grib1Level
+			&& id == other.id
+			&& value1 == other.value1
+			&& value2 == other.value2
 
 	override fun hashCode(): Int {
-		var result = type
-		result = 31 * result + code.hashCode()
-		result = 31 * result + name.hashCode()
-		result = 31 * result + (description?.hashCode() ?: 0)
-		result = 31 * result + units.hashCode()
+		var result = id
 		result = 31 * result + value1.hashCode()
 		result = 31 * result + value2.hashCode()
-		result = 31 * result + isNumeric.hashCode()
-		result = 31 * result + isSingleLayer.hashCode()
-		result = 31 * result + isIncreasingUp.hashCode()
 		return result
 	}
 
 	override fun toString(): String = listOfNotNull(
 			"GRIB1 Level description:",
-			"\tIndex: ${type}",
+			"\tIndex: ${id}",
 			"\tCode: ${code}",
 			"\tName: ${name}",
 			"\tDescription: ${description}",

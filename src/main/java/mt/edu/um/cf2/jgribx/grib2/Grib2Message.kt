@@ -35,7 +35,7 @@ import mt.edu.um.cf2.jgribx.api.GribMessage
  *
  * This results into possibly multiple [GRIB2 records][Grib2Record] per one [GRIB2 message][Grib2Message] and therefore
  * the implementations are split (in contrast to GRIB1 where one [GRIB1 message][mt.edu.um.cf2.jgribx.grib1.Grib1Message]
- * contains exactly one [GRIB record][GribRecord] only)
+ * contains exactly one [GRIB record][mt.edu.um.cf2.jgribx.api.GribRecord] only)
  *
  * @author AVLAB-USER3
  * @author Jan Kubovy [jan@kubovy.eu]
@@ -48,6 +48,8 @@ class Grib2Message(private val indicatorSection: GribRecordIS,
 		fun readFromStream(gribInputStream: GribInputStream,
 						   indicatorSection: GribRecordIS,
 						   discipline: ProductDiscipline,
+						   messageIndex: Int,
+						   parameterFilter: (String) -> Boolean,
 						   readEntire: Boolean = false): Grib2Message {
 			var messageLength = indicatorSection.messageLength - indicatorSection.length
 			var identificationSection: Grib2RecordIDS? = null
@@ -59,56 +61,80 @@ class Grib2Message(private val indicatorSection: GribRecordIS,
 
 			val gridDefinitionSectionList = mutableListOf<Grib2RecordGDS>()
 			val records = mutableListOf<Grib2Record>()
+			var recordCount = 0
 
 			while (messageLength > 4) {
 				if (messageLength == 4L) break
-				gribInputStream.mark(5)
-				val sectionLength = gribInputStream.readUINT(4)
+
+				val (sectionLength, sectionNumber) = Grib2Section.peekFromStream(gribInputStream)
+				if (sectionNumber == 1) recordCount++
 				if (sectionLength > messageLength) {
 					Logger.error("Section appears to be larger than the remaining length in the GRIB message")
 				}
-				val sectionNumber = gribInputStream.readUINT(1)
-				gribInputStream.reset()
-				gribInputStream.resetBitCounter()
-				when (sectionNumber) {
-					1 -> identificationSection = Grib2RecordIDS.readFromStream(gribInputStream, readEntire)
-					2 -> localUseSection = Grib2RecordLUS.readFromStream(gribInputStream, readEntire)
-					3 -> gridDefinitionSection = Grib2RecordGDS.readFromStream(gribInputStream)
-							.also { it.localUseSection = localUseSection }
-							.also { gridDefinitionSectionList.add(it) }
-					4 -> {
-						if (identificationSection == null) throw NoValidGribException("Missing required IDS section")
-						if (gridDefinitionSection == null) throw NoValidGribException("Missing required GDS section")
-						productDefinitionSection = Grib2RecordPDS.readFromStream(
-								gribInputStream,
-								discipline,
-								identificationSection.referenceTime)
-								.also { gridDefinitionSection.productDefinitionSections.add(it) }
+
+				val byteCounter = gribInputStream.createByteCounter(length = sectionLength.toLong())
+				try {
+					when (sectionNumber) {
+						1 -> identificationSection = Grib2RecordIDS.readFromStream(gribInputStream, readEntire)
+						2 -> localUseSection = Grib2RecordLUS.readFromStream(gribInputStream, readEntire)
+						3 -> gridDefinitionSection = Grib2RecordGDS.readFromStream(gribInputStream)
+								.also { it.localUseSection = localUseSection }
+								.also { gridDefinitionSectionList.add(it) }
+						4 -> {
+							if (identificationSection == null) throw NoValidGribException("Missing required IDS section")
+							if (gridDefinitionSection == null) throw NoValidGribException("Missing required GDS section")
+							productDefinitionSection = Grib2RecordPDS.readFromStream(
+									gribInputStream,
+									discipline,
+									identificationSection.referenceTime)
+									.also { gridDefinitionSection.productDefinitionSections.add(it) }
+							productDefinitionSection.log(messageIndex, records.size, identificationSection.referenceTime)
+							if (!parameterFilter(productDefinitionSection.parameter.code)) {
+								throw SkipException("Parameter filter applied")
+							}
+						}
+						5 -> dataRepresentationSection = Grib2RecordDRS.readFromStream(gribInputStream)
+						6 -> bitmapSection = Grib2RecordBMS.readFromStream(gribInputStream)
+						7 -> {
+							if (identificationSection == null) throw NoValidGribException("Missing required IDS section")
+							if (productDefinitionSection == null) throw NoValidGribException("Missing required PDS section")
+							if (gridDefinitionSection == null) throw NoValidGribException("Missing required GDS section")
+							if (dataRepresentationSection == null) throw NoValidGribException("Missing required DRS section")
+							if (bitmapSection == null) throw NoValidGribException("Missing required BMS section")
+							val dataSection = Grib2RecordDS.readFromStream(
+									gribInputStream,
+									gridDefinitionSection,
+									dataRepresentationSection,
+									bitmapSection)
+									.also { productDefinitionSection.dataSections.add(it) }
+							Grib2Record(indicatorSection, identificationSection, productDefinitionSection, dataSection)
+									.also { records.add(it) }
+						}
 					}
-					5 -> dataRepresentationSection = Grib2RecordDRS.readFromStream(gribInputStream)
-					6 -> bitmapSection = Grib2RecordBMS.readFromStream(gribInputStream)
-					7 -> {
-						if (identificationSection == null) throw NoValidGribException("Missing required IDS section")
-						if (productDefinitionSection == null) throw NoValidGribException("Missing required PDS section")
-						if (gridDefinitionSection == null) throw NoValidGribException("Missing required GDS section")
-						if (dataRepresentationSection == null) throw NoValidGribException("Missing required DRS section")
-						if (bitmapSection == null) throw NoValidGribException("Missing required BMS section")
-						val dataSection = Grib2RecordDS.readFromStream(
-								gribInputStream,
-								gridDefinitionSection,
-								dataRepresentationSection,
-								bitmapSection)
-								.also { productDefinitionSection.dataSections.add(it) }
-						Grib2Record(indicatorSection, identificationSection, productDefinitionSection, dataSection)
-								.also { records.add(it) }
+					if (gribInputStream.byteCounter != sectionLength) Logger.error(
+							"Length of Section ${sectionNumber} (${sectionLength}B)" +
+									" does not match actual amount of bytes read (${gribInputStream.byteCounter}B)")
+					messageLength -= sectionLength.toLong()
+				} catch (e: Throwable) {
+					Logger.warning("Skipping GRIB message ${messageIndex} record ${recordCount} (${e.message})", e)
+					messageLength -= sectionLength
+					gribInputStream.skip(sectionLength - byteCounter.read)
+					gribInputStream.destroyByteCounter(byteCounter)
+					for (i in ((sectionNumber + 1)..7)) {
+						val (length, number) = Grib2Section.peekFromStream(gribInputStream)
+						if (length > messageLength) {
+							Logger.error("Section appears to be larger than the remaining length in the GRIB message")
+							break
+						}
+						Logger.debug("Skipping section ${number} of ${length} B")
+						gribInputStream.skip(length.toLong())
+						messageLength -= length.toLong()
+						if (messageLength == 4L) break
 					}
 				}
-				if (gribInputStream.byteCounter != sectionLength) Logger.error(
-						"Length of Section ${sectionNumber} (${sectionLength}B)" +
-								" does not match actual amount of bytes read (${gribInputStream.byteCounter}B)")
-				messageLength -= sectionLength.toLong()
 			}
 			if (identificationSection == null) throw NoValidGribException("Missing IDS section")
+			if (records.isEmpty()) throw NoValidGribException("No valid records out of ${recordCount} in GRIB2 message")
 			if (gridDefinitionSectionList.isEmpty()) throw NoValidGribException("Missing GDS section")
 			if (gridDefinitionSectionList.first().productDefinitionSections.isEmpty()) throw NoValidGribException("Missing PDS section")
 			return Grib2Message(indicatorSection, identificationSection, gridDefinitionSectionList, records)

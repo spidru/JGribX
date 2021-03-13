@@ -27,19 +27,19 @@ import java.util.*
  *
  * For GRIB1 a grib message contains exactly one GRIB records and therefore this class implements both
  *
- * @property productDefinitionSection The product definition section (PDS).
- * @property gridDefinitionSection The grid definition section (GDS).
- * @property bitmapSection The bitmap section (BMS).
- * @property binaryDataSection The binary data section (BDS).
+ * @property productDefinition The product definition section (PDS).
+ * @property gridDefinition The grid definition section (GDS).
+ * @property bitmap The bitmap section (BMS).
+ * @property binaryData The binary data section (BDS).
  *
  * @author Benjamin Stark
  * @author Jan Kubovy [jan@kubovy.eu]
  */
-class Grib1Message private constructor(override val indicatorSection: GribRecordIS,
-									   private val productDefinitionSection: Grib1RecordPDS,
-									   override var gridDefinitionSection: Grib1RecordGDS,
-									   private var bitmapSection: Grib1RecordBMS?,
-									   private var binaryDataSection: Grib1RecordBDS) :
+class Grib1Message private constructor(override val indicator: GribRecordIS,
+									   override val productDefinition: Grib1RecordPDS,
+									   override var gridDefinition: Grib1RecordGDS,
+									   private var bitmap: Grib1RecordBMS?,
+									   private var binaryData: Grib1RecordBDS) :
 		GribRecord, GribMessage {
 
 	companion object {
@@ -55,11 +55,18 @@ class Grib1Message private constructor(override val indicatorSection: GribRecord
 		 * @throws NoValidGribException  if stream contains no valid GRIB file
 		 */
 		internal fun readFromStream(gribInputStream: GribInputStream,
-									indicatorSection: GribRecordIS): Grib1Message {
+									indicatorSection: GribRecordIS,
+									messageIndex: Int,
+									parameterFilter: (String) -> Boolean): Grib1Message {
 			gribInputStream.resetBitCounter()
 			val productDefinitionSection = Grib1RecordPDS.readFromStream(gribInputStream)
 			if (gribInputStream.byteCounter != productDefinitionSection.length)
 				throw NoValidGribException("Incorrect PDS length")
+			productDefinitionSection.log(messageIndex, 0, productDefinitionSection.referenceTime)
+
+			if (!parameterFilter(productDefinitionSection.parameter.code)) {
+				throw SkipException("Parameter: ${productDefinitionSection.parameter.code} filtered out")
+			}
 
 			val gridDefinitionSection = if (productDefinitionSection.gdsExists) {
 				gribInputStream.resetBitCounter()
@@ -97,81 +104,56 @@ class Grib1Message private constructor(override val indicatorSection: GribRecord
 		get() = listOf(this)
 
 	override val centreId: Int
-		get() = productDefinitionSection.centre
+		get() = productDefinition.centre
 
 	override val forecastTime: Calendar
-		get() = productDefinitionSection.localForecastTime
+		get() = productDefinition.forecastTime
 
 	/** Get the byte recordLength of this GRIB record. */
 	val length: Long
-		get() = indicatorSection.messageLength
+		get() = indicator.messageLength
 
-	override val parameterCode: String
-		get() = productDefinitionSection.parameterAbbreviation
-
-	override val parameterDescription: String
-		get() = productDefinitionSection.parameterDescription
 
 	override val processId: Int
-		get() = productDefinitionSection.processId
+		get() = productDefinition.processId
 
 	/** Get grid coordinates in longitude/latitude */
 	val gridCoords: Array<DoubleArray>
-		get() = gridDefinitionSection.coords
+		get() = gridDefinition.coords
 
 	/** Get data/parameter values as an array of float. */
 	override val values: FloatArray
 		get() {
-			if (!binaryDataSection.isConstant) return binaryDataSection.values
-			val gridSize: Int = gridDefinitionSection.cols * gridDefinitionSection.rows
+			if (!binaryData.isConstant) return binaryData.values
+			val gridSize: Int = gridDefinition.cols * gridDefinition.rows
 			val values = FloatArray(gridSize)
-			val ref: Float = binaryDataSection.referenceValue
+			val ref: Float = binaryData.referenceValue
 			for (i in 0 until gridSize) values[i] = ref
 			return values
 		}
 
-	/**
-	 * Get the unit for the parameter.
-	 *
-	 * @return name of unit
-	 */
-	val unit: String
-		get() = productDefinitionSection.parameterUnits
-
-	override val levelCode: String
-		get() = productDefinitionSection.level?.code ?: ""
-
-	override val levelDescription: String
-		get() = productDefinitionSection.level?.description ?: ""
-
-	override val levelIdentifier: String
-		get() = productDefinitionSection.level?.identifier ?: ""
-
-	override val levelValues: FloatArray
-		get() = productDefinitionSection.level?.values ?: floatArrayOf(Float.NaN, Float.NaN)
-
 	override val referenceTime: Calendar
-		get() = productDefinitionSection.referenceTime
+		get() = productDefinition.referenceTime
 
-	override fun getValue(sequence: Int): Float = binaryDataSection.getValue(sequence)
+	override fun getValue(sequence: Int): Float = binaryData.getValue(sequence)
 
-	override fun getValue(latitude: Double, longitude: Double): Float = binaryDataSection.getValue(latitude, longitude)
+	override fun getValue(latitude: Double, longitude: Double): Float = binaryData.getValue(latitude, longitude)
 
 	override fun toString(): String = listOfNotNull(
 			"GRIB1 record:",
-			indicatorSection.toString().prependIndent("\t"),
-			productDefinitionSection.toString().prependIndent("\t"),
-			gridDefinitionSection.toString().prependIndent("\t"),
-			bitmapSection?.toString()?.prependIndent("\t"),
-			binaryDataSection.toString().prependIndent("\t"))
+			indicator.toString().prependIndent("\t"),
+			productDefinition.toString().prependIndent("\t"),
+			gridDefinition.toString().prependIndent("\t"),
+			bitmap?.toString()?.prependIndent("\t"),
+			binaryData.toString().prependIndent("\t"))
 			.joinToString("\n")
 
 	override fun writeTo(gribOutputStream: GribOutputStream) {
-		indicatorSection.writeTo(gribOutputStream)
-		productDefinitionSection.writeTo(gribOutputStream)
-		gridDefinitionSection.writeTo(gribOutputStream)
-		bitmapSection?.writeTo(gribOutputStream)
-		binaryDataSection.writeTo(gribOutputStream)
+		indicator.writeTo(gribOutputStream)
+		productDefinition.writeTo(gribOutputStream)
+		gridDefinition.writeTo(gribOutputStream)
+		bitmap?.writeTo(gribOutputStream)
+		binaryData.writeTo(gribOutputStream)
 		GribRecordES(true).writeTo(gribOutputStream)
 	}
 

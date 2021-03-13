@@ -184,7 +184,7 @@ class Grib2RecordPDS0 internal constructor(numberOfCoordinates: Int,
 	override fun writeTo(outputStream: GribOutputStream) {
 		super.writeTo(outputStream) // [1-5] length, section number, [6-9] PDS global stuff
 		outputStream.writeUInt(parameter.category.value, bytes = 1) // [10]
-		outputStream.writeUInt(parameter.index, bytes = 1) // [11]
+		outputStream.writeUInt(parameter.id, bytes = 1) // [11]
 		outputStream.writeUInt(genProcessType, bytes = 1) // [12]
 		outputStream.writeUInt(backgroundGeneratingProcessId, bytes = 1) // [13]
 		outputStream.writeUInt(processId, bytes = 1) // [14]
@@ -237,9 +237,9 @@ class Grib2RecordPDS0 internal constructor(numberOfCoordinates: Int,
 
 	override fun toString(): String = listOfNotNull(
 			"GRIB2 PDS section:",
-			"\tAbbrev: ${parameterAbbrev}",
-			"\tDescription: ${parameterDescription}",
-			"\tUnits: ${parameterUnits}",
+			"\tAbbrev: ${parameter.code}",
+			"\tDescription: ${parameter.description}",
+			"\tUnits: ${parameter.units}",
 			"\tType: ${generatingProcessType}")
 			.joinToString("\n")
 }
