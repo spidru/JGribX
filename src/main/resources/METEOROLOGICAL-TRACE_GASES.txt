@@ -1,0 +1,18 @@
+0		:	Total Ozone								:	DU			:	TOZNE
+1		:	Ozone Mixing Ratio						:	kg kg-1		:	O3MR
+2		:	Total Column Integrated Ozone			:	DU			:	TCIOZ
+3-191	:	Reserved								:				:	RESERVED
+192		:	Ozone Mixing Ratio						:	kg kg-1		:	O3MR
+193		:	Ozone Concentration						:	ppb			:	OZCON
+194		:	Categorical Ozone Concentration			:	Non-Dim		:	OZCAT
+195		:	Ozone Vertical Diffusion				:	kg kg-1 s-1	:	VDFOZ
+196		:	Ozone Production						:	kg kg-1 s-1	:	POZ
+197		:	Ozone Tendency							:	kg kg-1 s-1	:	TOZ
+198		:	Ozone Production from Temperature Term	:	kg kg-1 s-1	:	POZT
+199		:	Ozone Production from Column Ozone Term	:	kg kg-1 s-1	:	POZO
+200		:	Ozone Daily Max from 1-hour Average		: 	ppbV		:	OZMAX1
+201		:	Ozone Daily Max from 8-hour Average		:	ppbV		:	OZMAX8
+202		:	PM 2.5 Daily Max from 1-hour Average	:	μg m-3		:	PDMAX1
+203		:	PM 2.5 Daily Max from 24-hour Average	:	μg m-3		:	PDMAX24
+204		:	Acetaldehyde & Higher Aldehydes			:	ppbV		:	ALD2
+255		:	Missing									:				:	MISSING

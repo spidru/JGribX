@@ -1,0 +1,70 @@
+0		:	Wave Spectra (1)									:	-			:	WVSP1
+1		:	Wave Spectra (2)									:	-			:	WVSP2
+2		:	Wave Spectra (3)									:	-			:	WVSP3
+3		:	Significant Height of Combined Wind Waves and Swell	:	m			:	HTSGW
+4		:	Direction of Wind Waves								:	° true		:	WVDIR
+5		:	Significant Height of Wind Waves					:	m			:	WVHGT
+6		:	Mean Period of Wind Waves							:	s			:	WVPER
+7		:	Direction of Swell Waves							:	° true		:	SWDIR
+8		:	Significant Height of Swell Waves					:	m			:	SWELL
+9		:	Mean Period of Swell Waves							:	s			:	SWPER
+10		:	Primary Wave Direction								:	° true		:	DIRPW
+11		:	Primary Wave Mean Period							:	s			:	PERPW
+12		:	Secondary Wave Direction							:	° true		:	DIRSW
+13		:	Secondary Wave Mean Period							:	s			:	PERSW
+14		:	Direction of Combined Wind Waves and Swell			:	° true		:	WWSDIR
+15		:	Mean Period of Combined Wind Waves and Swell		:	s			:	MWSPER
+16		:	Coefficient of Drag With Waves						:	-			:	CDWW
+17		:	Friction Velocity									:	m s-1		:	FRICV
+18		:	Wave Stress											:	N m-2		:	WSTR
+19		:	Normalised Waves Stress								:	-			:	NWSTR
+20		:	Mean Square Slope of Waves							:	-			:	MSSW
+21		:	U-component Surface Stokes Drift					:	m s-1		:	USSD
+22		:	V-component Surface Stokes Drift					:	m s-1		:	VSSD
+23		:	Period of Maximum Individual Wave Height			:	s			:	PMAXWH
+24		:	Maximum Individual Wave Height						:	m			:	MAXWH
+25		:	Inverse Mean Wave Frequency							:	s			:	IMWF
+26		:	Inverse Mean Frequency of The Wind Waves			:	s			:	IMFWW
+27		:	Inverse Mean Frequency of The Total Swell			:	s			:	IMFTSW
+28		:	Mean Zero-Crossing Wave Period						:	s			:	MZWPER
+29		:	Mean Zero-Crossing Period of The Wind Waves			:	s			:	MZPWW
+30		:	Mean Zero-Crossing Period of The Total Swell		:	s			:	MZPTSW
+31		:	Wave Directional Width								:	-			:	WDIRW
+32		:	Directional Width of The Wind Waves					:	-			:	DIRWWW
+33		:	Directional Width of The Total Swell				:	-			:	DIRWTS
+34		:	Peak Wave Period									:	s			:	PWPER
+35		:	Peak Period of The Wind Waves						:	s			:	PPERWW
+36		:	Peak Period of The Total Swell						:	s			:	PPERTS
+37		:	Altimeter Wave Height								:	m			:	ALTWH
+38		:	Altimeter Corrected Wave Height						:	m			:	ALCWH
+39		:	Altimeter Range Relative Correction					:	-			:	ALRRC
+40		:	10 Metre Neutral Wind Speed Over Waves				:	m s-1		:	MNWSOW
+41		:	10 Metre Wind Direction Over Waves					:	° true		:	MWDIRW
+42		:	Wave Engery Spectrum								:	m-2 s rad-1	:	WESP
+43		:	Kurtosis of The Sea Surface Elevation Due to Waves	:	-			:	KSSEW
+44		:	Benjamin-Feir Index									:	-			:	BENINX
+45		:	Spectral Peakedness Factor							:	s-1			:	SPFTR
+46		:	Peak wave direction									:	°			:	PWAVEDIR
+47		:	Significant wave height of first swell partition	:	m			:	SWHFSWEL
+48		:	Significant wave height of second swell partition	:	m			:	SWHSSWEL
+49		:	Significant wave height of third swell partition	:	m			:	SWHTSWEL
+50		:	Mean wave period of first swell partition			:	s			:	MWPFSWEL
+51		:	Mean wave period of second swell partition			:	s			:	MWPSSWEL
+52		:	Mean wave period of third swell partition			:	s			:	MWPTSWEL
+53		:	Mean wave direction of first swell partition		:	°			:	MWDFSWEL
+54		:	Mean wave direction of second swell partition		:	°			:	MWDSSWEL
+55		:	Mean wave direction of third swell partition		:	°			:	MWDTSWEL
+56		:	Wave directional width of first swell partition		:	-			:	WDWFSWEL
+57		:	Wave directional width of second swell partition	:	-			:	WDWSSWEL
+58		:	Wave directional width of third swell partition		:	-			:	WDWTSWEL
+59		:	Wave frequency width of first swell partition		:	-			:	WFWFSWEL
+60		:	Wave frequency width of second swell partition		:	-			:	WFWSSWEL
+61		:	Wave frequency width of third swell partition		:	-			:	WFWTSWEL
+62		:	Wave frequency width								:	-			:	WAVEFREW
+63		:	Frequency width of wind waves						:	-			:	FREWWW
+64		:	Frequency width of total swell						:	-			:	FREWTSW
+65-191	:	Reserved											:				:	RESERVED
+192-254	:	Reserved for Local Use								:				:	RESERVED
+192		:	Wave Steepness										:	proportion	:	WSTP
+193		:	Wave Length											:				:	WLENG
+255		:	Missing												:				:	MISSING

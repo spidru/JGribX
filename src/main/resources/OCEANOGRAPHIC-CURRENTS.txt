@@ -1,0 +1,13 @@
+0		:	Parcel Lifted Index (to 500 hPa)	:	K		:	PLI
+0		:	Current Direction					:	° true	:	DIRC
+1		:	Current Speed						:	m s-1	:	SPC
+2		:	U-Component of Current				:	m s-1	: 	UOGRD
+3		:	V-Component of Current				:	m s-1	:	VOGRD
+4		:	Rip Current Occurrence Probability	:	%		:	RIPCOP
+5-191	:	Reserved 							:			:	RESERVED
+192-254	:	Reserved for Local Use				:			:	RESERVED
+192		:	Ocean Mixed Layer U Velocity		:	m s-1	:	OMLU
+193		:	Ocean Mixed Layer V Velocity		:	m s-1	:	OMLV
+194		:	Barotropic U velocity				:	m s-1	:	UBARO
+195		:	Barotropic V velocity				:	m s-1	:	VBARO
+255		:	Missing								:			:	MISSING

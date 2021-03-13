@@ -17,6 +17,14 @@ import java.io.InputStreamReader
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
+/**
+ * @param discipline [Product discipline](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table0-0.shtml)
+ * @param category [Product category](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table4-1.shtml)
+ * @param index Parameter index/number
+ * @param code Parameter code/abbreviation
+ * @param description Parameter description
+ * @param units Parameter units
+ */
 class Grib2Parameter(private val discipline: ProductDiscipline,
 					 private val category: ParameterCategory,
 					 private val index: Int,
@@ -32,35 +40,38 @@ class Grib2Parameter(private val discipline: ProductDiscipline,
 		fun loadDefaultParameters() {
 			var filename: String
 			Logger.debug("Number of product disciplines: " + ProductDiscipline.VALUES.size)
-			for (discipline in ProductDiscipline.VALUES) {
+			for (discipline in ProductDiscipline.VALUES.values) {
 				val categories = discipline.parameterCategories
 				Logger.debug("Number of ${discipline} parameter categories: ${categories?.size}")
 				if (categories != null) for (category in categories) {
-					filename = "/$discipline-$category.txt"
+					filename = "/${discipline}-${category}.txt"
 					Logger.info("Resource path: ${filename}")
 					val inputStream = Grib2Parameter::class.java.getResourceAsStream(filename)
 					if (inputStream == null) {
-						Logger.error("Cannot find ${filename}")
+						Logger.warning("Cannot find ${filename}")
 						continue
 					}
 					try {
 						BufferedReader(InputStreamReader(inputStream)).use { reader ->
-							val pattern = Pattern.compile("(\\d+)\\s*:\\s*(.*?)\\s*:\\s*(.*?)\\s*:\\s*(\\w*)")
+							val pattern = Pattern.compile("([\\d-]+)\\s*:\\s*(.*?)\\s*:\\s*(.*?)\\s*:\\s*(\\w*)")
 							var m: Matcher
 							var line: String? = reader.readLine()
 							while (line != null) {
 								m = pattern.matcher(line)
 								if (m.find()) {
-									val index = m.group(1).toInt()
-									val paramDesc = m.group(2)
-									val paramUnits = m.group(3)
-									val paramName = m.group(4)
-									paramList.add(Grib2Parameter(discipline,
-											category,
-											index,
-											paramName,
-											paramDesc,
-											paramUnits))
+									val indices = m.group(1)
+											.split('-')
+											.mapNotNull { it.toIntOrNull() }
+											.let { if (it.size == 2) it[0]..it[1] else it[0]..it[0] }
+									val description = m.group(2)
+									val units = m.group(3)
+									val name = m.group(4)
+									if (!arrayOf("RESERVED", "MISSING").contains(name)) {
+										val params = indices
+												.map { Grib2Parameter(discipline, category, it, name, description, units) }
+										//.onEach { Logger.debug("Param: ${it}") }
+										paramList.addAll(params)
+									}
 								}
 								line = reader.readLine()
 							}
@@ -84,4 +95,7 @@ class Grib2Parameter(private val discipline: ProductDiscipline,
 			return null
 		}
 	}
+
+	override fun toString() = "Grib2Parameter(discipline=${discipline}, category=${category}, index=${index}," +
+			" code='${code}', description='${description}', units='${units}')"
 }

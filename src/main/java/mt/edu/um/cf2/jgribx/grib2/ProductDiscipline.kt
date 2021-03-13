@@ -10,7 +10,8 @@ class ProductDiscipline private constructor(private val value: Int, private val 
 				2 to "LAND_SURFACE",
 				3 to "SATELLITE_REMOTE_SENSING",
 				10 to "OCEANOGRAPHIC")
-				.map { (k, v) -> ProductDiscipline(k, v) }
+				.map { (k, v) -> k to ProductDiscipline(k, v) }
+				.toMap()
 	}
 
 	val parameterCategories = getCategories(value)

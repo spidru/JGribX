@@ -1,0 +1,44 @@
+0		:	Parcel Lifted Index (to 500 hPa)							:	K		:	PLI
+1		:	Best Lifted Index (to 500 hPa)								:	K		:	BLI
+2		:	K Index														:	K		:	KX
+3		:	KO Index													:	K		:	KOX
+4		:	Total Totals Index											:	K		:	TOTALX
+5		:	Sweat Index													:			:	SX
+6		:	Convective Available Potential Energy						:	J kg-1	:	CAPE
+7		:	Convective Inhibition										:	J kg-1	:	CIN
+8		:	Storm Relative Helicity										:	m2 s-2	:	HLCY
+9		:	Energy Helicity Index										:			:	EHLX
+10		:	Surface Lifted Index										:	K		:	LFT X
+11		:	Best (4 layer) Lifted Index									:	K		:	4LFTX
+12		:	Richardson Number											:			:	RI
+13		:	Showalter Index												:	K		:	SHWINX
+14		:	Reserved 													:			:	RESERVED
+15		:	Updraft Helicity											:	m2 s-2	:	UPHL
+16		:	Bulk Richardson Number										:			:	BLKRN
+17		:	Gradient Richardson Number									:			:	GRDRN
+18		:	Flux Richardson Number										:			:	FLXRN
+19		:	Convective Available Potential Energy Shear					:	m2 s-2	:	CONAPES
+20-191	:	Reserved 													:			:	RESERVED
+192-254	:	Reserved for Local Use										:			:	RESERVED
+192		:	Surface Lifted Index										:	K		:	LFT X
+193		:	Best (4 layer) Lifted Index									:	K		:	4LFTX
+194		:	Richardson Number											:			:	RI
+195		:	Convective Weather Detection Index							:			:	CWDI
+196		:	Ultra Violet Index											:	W m-2	:	UVI
+197		:	Updraft Helicity											:	m2 s-2	:	UPHL
+198		:	Leaf Area Index												:			:	LAI
+199		:	Hourly Maximum of Updraft Helicity							:	m2 s-2	:	MXUPHL
+200		:	Hourly Minimum of Updraft Helicity							:	m2 s-2	:	MNUPHL
+201		:	Bourgoiun Negative Energy Layer (surface to freezing level)	:	J kg-1	:	BNEGELAY
+202		:	Bourgoiun Positive Energy Layer (2k ft AGL to 400 hPa)		:	J kg-1	:	BPOSELAY
+203		:	Downdraft CAPE												:	J kg-1	:	DCAPE
+204		:	Effective Storm Relative Helicity							:	m2 s-2	:	EFHL
+205		:	Enhanced Stretching Potential								:			:	ESP
+206		:	Critical Angle												:	°		:	CANGLE
+207		:	Effective Surface Helicity									:	m2 s-2	:	E3KH
+208		:	Significant Tornado Parameter with CIN-Effective Layer		:			:	STPC
+209		:	Significant Hail Parameter									:			:	SIGH
+210		:	Supercell Composite Parameter-Effective Layer				:			:	SCCP
+211		:	Significant Tornado parameter-Fixed Layer					:			:	SIGT
+212		:	Mixed Layer (100 mb) Virtual LFC							:			:	MLFC
+255		:	Missing														:			:	MISSING

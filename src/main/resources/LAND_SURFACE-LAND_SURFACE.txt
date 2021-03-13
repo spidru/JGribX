@@ -1,0 +1,4 @@
+1		:	Glacier Temperature		:	K	:	GLACTMP
+2-191	:	Reserved				:		:	RESERVED
+192-254	:	Reserved for Local Use	:		:	RESERVED
+255		:	Missing					:		:	MISSING

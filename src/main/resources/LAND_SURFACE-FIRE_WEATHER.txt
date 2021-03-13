@@ -1,0 +1,17 @@
+0		:	Fire Outlook											:		:	FIREOLK
+1		:	Fire Outlook Due to Dry Thunderstorm					:		:	FIREODT
+2		:	Haines Index											:		:	HINDEX
+3		:	Fire Burned Area										:	%	:	FBAREA
+4		:	Fosberg Index *											:		:	FOSINDX
+5		:	Fire Weath Index (Canadian Forest Service)				:		:	FWINX
+6		:	Fine Fuel Moisture Code (Canadian Forest Service)		:		:	FFMCODE
+7		:	Duff Moisture Code (Canadian Forest Service)			:		:	DUFMCODE
+8		:	Drought Code (Canadian Forest Service)					:		:	DRTCODE
+9		:	Initial Fire Spread Index (Canadian Forest Service)		:		:	INFSINX
+10		:	Fire Build Up Index (Canadian Forest Service)			:		:	FBUPINX
+11		:	Fire Daily Severity Rating (Canadian Forest Service)	:		:	FDSRTE
+12-191	:	Reserved												:		:	RESERVED
+192-254	:	Reserved for Local Use									:		:	RESERVED
+255		:	Missing													:		:	MISSING
+
+

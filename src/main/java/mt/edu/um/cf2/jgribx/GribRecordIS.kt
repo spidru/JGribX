@@ -62,7 +62,7 @@ class GribRecordIS(var gribEdition: Int,
 				}
 				2 -> {
 					length = 16
-					discipline = ProductDiscipline.VALUES.getOrNull(octets[6].toInt())
+					discipline = ProductDiscipline.VALUES[octets[6].toInt()]
 					gribInputStream.read(octets, 8, 8)
 					recordLength = bytesToLong(octets.copyOfRange(8, 16))
 				}
