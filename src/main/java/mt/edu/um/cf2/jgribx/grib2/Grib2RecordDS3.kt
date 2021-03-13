@@ -128,16 +128,6 @@ class Grib2RecordDS3 private constructor(gds: Grib2RecordGDS,
 			}
 
 			val data = Grib2RecordDS2.calculateData(drs, gds, valueX, dataBitMap)
-
-			// bit map is used
-			if (bms.indicator != Grib2RecordBMS.Indicator.BITMAP_NONE) {
-				Logger.error("Bitmap not supported yet")
-				//val idx = 0
-				//val tmp = FloatArray(gds.numberOfDataPoints)
-				//for (i in 0 until gds.numberOfDataPoints) {
-				//	if ((bitmap[i/8] & ))
-				//}
-			}
 			return Grib2RecordDS3(gds, drs, bms, data)
 		}
 	}

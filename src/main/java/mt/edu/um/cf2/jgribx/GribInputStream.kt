@@ -158,11 +158,13 @@ class GribInputStream(inputStream: InputStream?, private val onRead: (Long) -> U
 	 */
 	fun read(length: Int): ByteArray {
 		val data = ByteArray(length)
-		val numRead = read(data)
-		if (numRead < length) {
-			// retry reading
-			val numReadRetry = read(data, numRead, data.size - numRead)
-			if (numRead + numReadRetry < length) throw IOException("Unexpected end of input.")
+		if (length > 0) {
+			val numRead = read(data)
+			if (numRead < length) {
+				// retry reading
+				val numReadRetry = read(data, numRead, data.size - numRead)
+				if (numRead + numReadRetry < length) throw IOException("Unexpected end of input.")
+			}
 		}
 		return data
 	}

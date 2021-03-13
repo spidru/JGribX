@@ -2,7 +2,6 @@ package mt.edu.um.cf2.jgribx.grib2
 
 import mt.edu.um.cf2.jgribx.GribInputStream
 import mt.edu.um.cf2.jgribx.GribOutputStream
-import mt.edu.um.cf2.jgribx.Logger
 import kotlin.math.pow
 
 /**
@@ -253,17 +252,6 @@ open class Grib2RecordDS2 private constructor(gds: Grib2RecordGDS,
 			val (valueX, dataBitMap, _) = readPackedValues(gribInputStream, drs, gds, valueX1, groupWidth, groupLength)
 
 			val data = calculateData(drs, gds, valueX, dataBitMap)
-
-			// bit map is used
-			if (bms.indicator != Grib2RecordBMS.Indicator.BITMAP_NONE) {
-				Logger.error("Bitmap not supported yet")
-				//val idx = 0
-				//val tmp = FloatArray(gds.numberOfDataPoints)
-				//for (i in 0 until gds.numberOfDataPoints) {
-				//	if ((bitmap[i/8] & ))
-				//}
-			}
-
 			return Grib2RecordDS2(gds, drs, bms, data)
 		}
 	}

@@ -59,6 +59,7 @@ class Grib2Message(private val indicatorSection: GribRecordIS,
 			var gridDefinitionSection: Grib2RecordGDS? = null
 			var dataRepresentationSection: Grib2RecordDRS? = null
 			var bitmapSection: Grib2RecordBMS? = null
+			var bitmapSectionSelected: Grib2RecordBMS? = null
 
 			val gridDefinitionSectionList = mutableListOf<Grib2RecordGDS>()
 			val records = mutableListOf<Grib2Record>()
@@ -95,18 +96,32 @@ class Grib2Message(private val indicatorSection: GribRecordIS,
 							}
 						}
 						5 -> dataRepresentationSection = Grib2RecordDRS.readFromStream(gribInputStream)
-						6 -> bitmapSection = Grib2RecordBMS.readFromStream(gribInputStream)
+						6 -> bitmapSectionSelected = Grib2RecordBMS.readFromStream(gribInputStream).let {
+							when (it.indicator) {
+								Grib2RecordBMS.Indicator.BITMAP_SPECIFIED -> {
+									bitmapSection = it
+									it
+								}
+								Grib2RecordBMS.Indicator.BITMAP_PREDETERMINED -> it
+								Grib2RecordBMS.Indicator.BITMAP_PREDEFINED -> {
+									it.bitmap = bitmapSection?.bitmap?.clone()
+											?: throw NoValidGribException("No previous BMS defined")
+									it
+								}
+								Grib2RecordBMS.Indicator.BITMAP_NONE -> it
+							}
+						}
 						7 -> {
 							if (identificationSection == null) throw NoValidGribException("Missing required IDS section")
 							if (productDefinitionSection == null) throw NoValidGribException("Missing required PDS section")
 							if (gridDefinitionSection == null) throw NoValidGribException("Missing required GDS section")
 							if (dataRepresentationSection == null) throw NoValidGribException("Missing required DRS section")
-							if (bitmapSection == null) throw NoValidGribException("Missing required BMS section")
+							if (bitmapSectionSelected == null) throw NoValidGribException("Missing required BMS section")
 							val dataSection = Grib2RecordDS.readFromStream(
 									gribInputStream,
 									gridDefinitionSection,
 									dataRepresentationSection,
-									bitmapSection)
+									bitmapSectionSelected)
 									.also { productDefinitionSection.dataSections.add(it) }
 							Grib2Record(indicatorSection, identificationSection, productDefinitionSection, dataSection)
 									.also { records.add(it) }

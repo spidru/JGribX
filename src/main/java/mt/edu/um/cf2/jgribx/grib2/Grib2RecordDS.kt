@@ -38,7 +38,7 @@ import kotlin.math.roundToInt
  */
 abstract class Grib2RecordDS<DRS : Grib2RecordDRS> internal constructor(internal val gds: Grib2RecordGDS,
 																		internal val drs: DRS,
-																		internal val bms: Grib2RecordBMS,
+																		bms: Grib2RecordBMS,
 																		data: FloatArray) : Grib2Section {
 	companion object {
 		internal fun <DRS : Grib2RecordDRS> readFromStream(gribInputStream: GribInputStream,
@@ -62,7 +62,10 @@ abstract class Grib2RecordDS<DRS : Grib2RecordDRS> internal constructor(internal
 
 	override val number: Int = 7
 
-	internal var data: FloatArray = data
+	internal var bms: Grib2RecordBMS = bms
+		private set
+
+	internal var data: FloatArray
 		private set
 
 	/**
@@ -73,6 +76,10 @@ abstract class Grib2RecordDS<DRS : Grib2RecordDRS> internal constructor(internal
 	 */
 	internal val values: FloatArray
 		get() = gds.dataIndices.map { data[it] }.toList().toFloatArray()
+
+	init {
+		this.data = applyBitmapTo(data)
+	}
 
 	internal fun getValue(sequence: Int) = gds.getDataIndex(sequence).let { data[it] }
 
@@ -116,5 +123,29 @@ abstract class Grib2RecordDS<DRS : Grib2RecordDRS> internal constructor(internal
 		result = 31 * result + number
 		result = 31 * result + data.contentHashCode()
 		return result
+	}
+
+	/** Applies bit-map to raw read data and sets missing data as [Float.NaN]. */
+	private fun applyBitmapTo(data: FloatArray): FloatArray = when (bms.indicator) {
+		Grib2RecordBMS.Indicator.BITMAP_SPECIFIED,
+		Grib2RecordBMS.Indicator.BITMAP_PREDEFINED -> { // Predefined BM gets bitmap from previously loaded one
+			var d = 0
+			bms.bitmap.asSequence().map { bit -> if (bit) data[d++] else Float.NaN }.toList().toFloatArray()
+		}
+		else -> data
+	}
+
+	/** Filters data based on bit-map for writing */
+	protected fun filterBitmapFrom(data: FloatArray): FloatArray = when (bms.indicator) {
+		Grib2RecordBMS.Indicator.BITMAP_SPECIFIED,
+		Grib2RecordBMS.Indicator.BITMAP_PREDEFINED -> {
+			bms.bitmap.mapIndexed { i, b -> if (b) data[i] else null }.filterNotNull().toFloatArray()
+		}
+		else -> data
+	}
+
+	/** Recalculates bitmap */
+	fun calculateBitmap() {
+		bms = Grib2RecordBMS(0, data.map { it.isFinite() }.toBooleanArray())
 	}
 }

@@ -72,7 +72,7 @@ class Grib2RecordDS0Test {
 				decimalScaleFactor,
 				nBits,
 				Random.nextInt(1.byteSpace()))
-		val bms = Grib2RecordBMS(Grib2RecordBMS.MISSING)
+		val bms = Grib2RecordBMS(Grib2RecordBMS.MISSING, booleanArrayOf())
 
 		val expected = Grib2RecordDS0(
 				gds, drs, bms, data)

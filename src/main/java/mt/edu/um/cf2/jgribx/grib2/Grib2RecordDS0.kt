@@ -60,7 +60,12 @@ class Grib2RecordDS0 internal constructor(gds: Grib2RecordGDS,
 	}
 
 	override val length: Int
-		get() = 5 + ceil(data.size.toDouble() * drs.nBits.toDouble() / 8.0).toInt()
+		get() = 5 + ceil(when (bms.indicator) {
+			Grib2RecordBMS.Indicator.BITMAP_SPECIFIED,
+			Grib2RecordBMS.Indicator.BITMAP_PREDEFINED -> bms.bitmap.filter { it }.size
+			Grib2RecordBMS.Indicator.BITMAP_PREDETERMINED,
+			Grib2RecordBMS.Indicator.BITMAP_NONE -> data.size
+		}.toDouble() * drs.nBits.toDouble() / 8.0).toInt()
 
 	private fun calculateDataRepresentationParameters() {
 		// "D" Scaling
@@ -108,6 +113,7 @@ class Grib2RecordDS0 internal constructor(gds: Grib2RecordGDS,
 
 		val decimalFactor = 10.0.pow(drs.decimalScaleFactor).toFloat()
 		val binaryFactor = 2.0.pow(drs.binaryScaleFactor).toFloat()
+		val data = filterBitmapFrom(data)
 		repeat(gds.numberOfDataPoints) { i ->
 			//    X   = (   Y    *     10^D      -       R     ) /     2^E
 			val value = (data[i] * decimalFactor - drs.refValue) / binaryFactor

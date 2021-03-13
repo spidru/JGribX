@@ -24,7 +24,7 @@ class Grib2RecordBMSTest {
 	@Test
 	fun testWriting() {
 		// Given
-		val expected = Grib2RecordBMS(Grib2RecordBMS.MISSING)
+		val expected = Grib2RecordBMS(Grib2RecordBMS.MISSING, booleanArrayOf())
 
 		// When
 		val bos = ByteArrayOutputStream()

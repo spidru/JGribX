@@ -14,6 +14,7 @@ import mt.edu.um.cf2.jgribx.GribInputStream
 import mt.edu.um.cf2.jgribx.GribOutputStream
 import mt.edu.um.cf2.jgribx.Logger
 import mt.edu.um.cf2.jgribx.NoValidGribException
+import kotlin.math.ceil
 
 /**
  * ### [Section 6: Bit-Map Section](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_sect6.shtml)
@@ -32,7 +33,8 @@ import mt.edu.um.cf2.jgribx.NoValidGribException
  * @author AVLAB-USER3
  * @author Jan Kubovy [jan@kubovy.eu]
  */
-class Grib2RecordBMS internal constructor(private val indicatorValue: Int) : Grib2Section {
+class Grib2RecordBMS internal constructor(private val indicatorValue: Int,
+										  internal var bitmap: BooleanArray) : Grib2Section {
 	/**
 	 * ### [Table 6.0: Bit Map Indicator](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table6-0.shtml)
 	 *
@@ -61,6 +63,7 @@ class Grib2RecordBMS internal constructor(private val indicatorValue: Int) : Gri
 
 	companion object {
 		internal const val MISSING = 255
+		private val BITMASK = intArrayOf(128, 64, 32, 16, 8, 4, 2, 1)
 
 		internal fun readFromStream(gribInputStream: GribInputStream): Grib2RecordBMS {
 			/* [1-5] Length, section number */
@@ -68,14 +71,28 @@ class Grib2RecordBMS internal constructor(private val indicatorValue: Int) : Gri
 
 			/* [6] Bitmap indicator */
 			val indicatorValue = gribInputStream.readUInt(1)
-			if (indicatorValue != MISSING) throw TODO("BMS bitmap not yet supported (indicator: ${indicatorValue})")
-			return Grib2RecordBMS(indicatorValue)
+			if (indicatorValue in 1..253) throw TODO("BMS not yet supported (indicator: ${indicatorValue})")
+
+			/* [7-nn] Bit-map */
+			val bytes = gribInputStream.read(length - 6)
+			val bitmap = BooleanArray((length - 6) * 8)
+			bitmap.indices.forEach { i -> // fill bit map
+				bitmap[i] = bytes[i / 8].toInt() and BITMASK[i % 8] != 0
+			}
+
+			return Grib2RecordBMS(indicatorValue, bitmap)
 					.takeIf { it.length == length }
 					?: throw NoValidGribException("BMS length mismatch")
 		}
 	}
 
-	override val length: Int = 6 // TODO
+	override val length: Int
+		get() = 6 + when (indicator) {
+			Indicator.BITMAP_SPECIFIED -> ceil(bitmap.size.toDouble() / 8).toInt()
+			Indicator.BITMAP_PREDETERMINED,
+			Indicator.BITMAP_PREDEFINED,
+			Indicator.BITMAP_NONE -> 0
+		}
 
 	override val number: Int = 6
 
@@ -90,6 +107,20 @@ class Grib2RecordBMS internal constructor(private val indicatorValue: Int) : Gri
 		Logger.debug("Writing GRIB2 Bit Map Section (BMS) - ${length} bytes")
 		super.writeTo(outputStream) // [1-5] length, section number
 		outputStream.writeUInt(indicatorValue, bytes = 1)
+		when (indicator) {
+			Indicator.BITMAP_SPECIFIED -> bitmap.toList()
+					.map { if (it) 0x01 else 0x00 }
+					.mapIndexed { i, bit -> bit shl (8 - i % 8 - 1) }
+					.windowed(8, 8)
+					.map { it.sum() }
+					.map { it.toByte() }
+					.toByteArray()
+					.also { outputStream.write(it) }
+			Indicator.BITMAP_PREDETERMINED,
+			Indicator.BITMAP_PREDEFINED,
+			Indicator.BITMAP_NONE -> {
+			}
+		}
 	}
 
 	override fun equals(other: Any?) = this === other
@@ -97,11 +128,13 @@ class Grib2RecordBMS internal constructor(private val indicatorValue: Int) : Gri
 			&& length == other.length
 			&& number == other.number
 			&& indicatorValue == other.indicatorValue
+			&& bitmap.contentEquals(other.bitmap)
 
 	override fun hashCode(): Int {
 		var result = length
 		result = 31 * result + number
 		result = 31 * result + indicatorValue
+		result = 31 * result + bitmap.contentHashCode()
 		return result
 	}
 }
