@@ -12,6 +12,7 @@ package mt.edu.um.cf2.jgribx.grib1
 
 import mt.edu.um.cf2.jgribx.*
 import mt.edu.um.cf2.jgribx.api.GribGridDefinitionSectionInternal
+import java.util.*
 
 /**
  * ### [SSection 2: Grid description section](https://apps.ecmwf.int/codes/grib/format/grib1/sections/2/)
@@ -90,7 +91,7 @@ import mt.edu.um.cf2.jgribx.api.GribGridDefinitionSectionInternal
  */
 abstract class Grib1RecordGDS(
 		internal val numberOfVerticalCoordinateValues: Int,
-		internal val pvlLocation: Int) : Grib1Section, GribGridDefinitionSectionInternal {
+		internal val pvlLocation: Int) : Grib1Section, GribGridDefinitionSectionInternal, Comparable<Grib1RecordGDS> {
 
 	companion object {
 		/** Radius of earth used in calculating projections per table 7 - assumes spheroid */
@@ -168,12 +169,26 @@ abstract class Grib1RecordGDS(
 	/**
 	 * rdg - added this method to be used in a comparator for sorting while extracting records.
 	 * Not currently used in the JGrib library, but is used in a library I'm using that uses JGrib.
-	 * @param gds - GribRecordGDS
-	 * @return - -1 if gds is "less than" this, 0 if equal, 1 if gds is "greater than" this.
 	 *
-	 * @see java.util.Comparator.compare
+	 * TODO JK: Should this be part of the default API (not consistent with GRIB2), other solutions:
+	 *   - Define comparators outside this class (utility) - different comparators for one class possible
+	 *   - Leave definition of custom comparators to users of this library (remove it here)
+	 *   - Implement [Comparable] interface across the library (e.g. as a part of
+	 *     [GribSection][mt.edu.um.cf2.jgribx.api.GribSection] and [mt.edu.um.cf2.jgribx.api.GribRecord]).
+	 *
+	 * @param other - GribRecordGDS to compare to
+	 * @return - -1 if gds is "less than" this, 0 if equal, 1 if gds is "greater than" this.
 	 */
-	abstract fun compare(gds: Grib1RecordGDS): Int
+	override fun compareTo(other: Grib1RecordGDS): Int = Comparator
+			.comparingInt(Grib1RecordGDS::dataRepresentationType)
+			.thenComparingInt(Grib1RecordGDS::scanningMode)
+			.thenComparingInt(Grib1RecordGDS::cols)
+			.thenComparingInt(Grib1RecordGDS::rows)
+			.thenComparingDouble(Grib1RecordGDS::deltaX)
+			.thenComparingDouble(Grib1RecordGDS::deltaY)
+			.thenComparingDouble(Grib1RecordGDS::latitudeOfFirstGridPoint)
+			.thenComparingDouble(Grib1RecordGDS::longitudeOfFirstGridPoint)
+			.compare(this, other)
 
 	override fun equals(other: Any?) = this === other
 			|| other is Grib1RecordGDS
