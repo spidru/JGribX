@@ -13,16 +13,22 @@ interface GribMessage {
 	companion object {
 		internal fun readFromStream(gribInputStream: GribInputStream): GribMessage {
 			val indicatorSection = GribRecordIS.readFromStream(gribInputStream)
-			val message = when (indicatorSection.gribEdition) {
-				1 -> Grib1Message.readFromStream(gribInputStream, indicatorSection)
-				2 -> indicatorSection.discipline?.let { discipline ->
-					Grib2Message.readFromStream(gribInputStream, indicatorSection, discipline)
-				} ?: throw NoValidGribException("Missing discipline for GRIB2 edition")
-				else -> throw NoValidGribException("Unsupported GRIB edition ${indicatorSection.gribEdition}")
+
+			// In case of an error skip the whole message to speed up reading (GribRecordIS is slow)
+			gribInputStream.createByteCounter(
+					initial = indicatorSection.length.toLong(),
+					length = indicatorSection.messageLength).use {
+				val message = when (indicatorSection.gribEdition) {
+					1 -> Grib1Message.readFromStream(gribInputStream, indicatorSection)
+					2 -> indicatorSection.discipline?.let { discipline ->
+						Grib2Message.readFromStream(gribInputStream, indicatorSection, discipline)
+					} ?: throw NoValidGribException("Missing discipline for GRIB2 edition")
+					else -> throw NoValidGribException("Unsupported GRIB edition ${indicatorSection.gribEdition}")
+				}
+				val es = GribRecordES.readFromStream(gribInputStream)
+				if (!es.isValid) throw NoValidGribException("Grib End Section is invalid")
+				return message
 			}
-			val es = GribRecordES.readFromStream(gribInputStream)
-			if (!es.isValid) throw NoValidGribException("Grib End Section is invalid")
-			return message
 		}
 	}
 

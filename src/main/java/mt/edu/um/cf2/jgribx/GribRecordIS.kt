@@ -100,25 +100,21 @@ class GribRecordIS internal constructor(var gribEdition: Int,
 		 * If a valid header is found, the input stream is repositioned to the position just before the found header.
 		 *
 		 * @param gribInputStream GRIB input stream to read from
-		 * @throws IOException
+		 * @return Whether an IS header was found till end of stream or not
 		 */
-		fun seekNext(gribInputStream: GribInputStream) {
-			val code = ByteArray(4)
+		fun seekNext(gribInputStream: GribInputStream): Boolean {
 			var bytesSkipped = 0
+			var found = false
 			while (gribInputStream.available() > 0) {
-				gribInputStream.mark(4)
-				gribInputStream.read(code)
-				if (code.contentEquals("GRIB".toByteArray())) {
-					gribInputStream.reset()
-					break
-				}
-				gribInputStream.reset()
+				found = gribInputStream.peek(4).contentEquals("GRIB".toByteArray())
+				if (found) break
 				gribInputStream.skip(1) // skip 1 byte
 				bytesSkipped++
 			}
 			if (bytesSkipped > 0) {
 				Logger.warning("Extra ${bytesSkipped} bytes were found between end of last record and start of next record")
 			}
+			return found
 		}
 	}
 

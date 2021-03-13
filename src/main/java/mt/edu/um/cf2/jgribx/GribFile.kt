@@ -128,22 +128,19 @@ class GribFile(gribInputStream: GribInputStream) {
 			this(GribInputStream(BufferedInputStream(inputStream), onRead))
 
 	init {
-		// Initialise fields
 		/**
 		 * Initialise the Parameter Tables with the information in the parameter
 		 * table lookup file.  See GribPDSParamTable for details
 		 */
-		//GribPDSParamTable.readParameterTableLookup(); done in static initializer
 		var count = 0
 		while (gribInputStream.available() > 0) {
-			// There may be data on the beginning of the file, e.g. when using get_gfs.pl script
-			// (https://www.cpc.ncep.noaa.gov/products/wesley/get_gfs.html)
-			GribRecordIS.seekNext(gribInputStream)
-
-			count++
-			try {
-				val message = GribMessage.readFromStream(gribInputStream)
+			// There may be non-GRIB data on the beginning of the file or between GRIB messages, e.g. when using
+			// get_gfs.pl script (https://www.cpc.ncep.noaa.gov/products/wesley/get_gfs.html)
+			if (GribRecordIS.seekNext(gribInputStream)) try {
+				count++
 				Logger.info("GRIB Message $count")
+
+				val message = GribMessage.readFromStream(gribInputStream)
 				message.records.forEachIndexed { index, record ->
 					Logger.info("\tGRIB Record $index")
 					Logger.info("\t\tReference Time: ${record.referenceTime.time}")
@@ -160,8 +157,6 @@ class GribFile(gribInputStream: GribInputStream) {
 			} catch (e: NoValidGribException) {
 				Logger.warning("Skipping GRIB record ${count} (${e.message})", e)
 				messagesSkippedCount++
-			} finally {
-				GribRecordIS.seekNext(gribInputStream) // Skip to end of current record
 			}
 		}
 		gribInputStream.close()
