@@ -90,7 +90,7 @@ class Grib2Message(private val indicatorSection: GribRecordIS,
 									discipline,
 									identificationSection.referenceTime)
 									.also { gridDefinitionSection.productDefinitionSections.add(it) }
-							productDefinitionSection.log(messageIndex, records.size, identificationSection.referenceTime)
+							productDefinitionSection.log(messageIndex, records.size)
 							if (!parameterFilter(productDefinitionSection.parameter.code)) {
 								throw SkipException("Parameter filter applied")
 							}

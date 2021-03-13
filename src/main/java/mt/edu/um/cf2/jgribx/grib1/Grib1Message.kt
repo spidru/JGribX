@@ -62,7 +62,7 @@ class Grib1Message private constructor(override val indicator: GribRecordIS,
 			val productDefinitionSection = Grib1RecordPDS.readFromStream(gribInputStream)
 			if (gribInputStream.byteCounter != productDefinitionSection.length)
 				throw NoValidGribException("Incorrect PDS length")
-			productDefinitionSection.log(messageIndex, 0, productDefinitionSection.referenceTime)
+			productDefinitionSection.log(messageIndex, 0)
 
 			if (!parameterFilter(productDefinitionSection.parameter.code)) {
 				throw SkipException("Parameter: ${productDefinitionSection.parameter.code} filtered out")

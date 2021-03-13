@@ -55,6 +55,7 @@ abstract class Grib2RecordPDS protected constructor(val numberOfCoordinates: Int
 			val templateId = gribInputStream.readUInt(2)
 			return when (templateId) {
 				0 -> Grib2RecordPDS0.readFromStream(gribInputStream, discipline, referenceTime, numberOfCoordinates)
+				8 -> Grib2RecordPDS8.readFromStream(gribInputStream, discipline, referenceTime, numberOfCoordinates)
 				else -> TODO("Unsupported template number: ${templateId}")
 			}.takeIf { it.length == length } ?: throw NoValidGribException("PDS length mismatch")
 		}

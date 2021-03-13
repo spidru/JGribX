@@ -1,7 +1,6 @@
 package mt.edu.um.cf2.jgribx
 
 import mt.edu.um.cf2.jgribx.api.GribProductDefinitionSection
-import mt.edu.um.cf2.jgribx.api.GribRecord
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.abs
@@ -26,10 +25,7 @@ internal fun Double.formatDegrees(hemisphere: Pair<Char, Char>, degDigits: Int):
 	return "%0${degDigits}d°%02d'%02d\"%s".format(degrees, minutes, seconds, symbol)
 }
 
-internal fun GribRecord.log(messageIndex: Int, recordIndex: Int) = productDefinition
-		.log(messageIndex, recordIndex, referenceTime)
-
-internal fun GribProductDefinitionSection.log(messageIndex: Int, recordIndex: Int, referenceTime: Calendar) = Logger
+internal fun GribProductDefinitionSection.log(messageIndex: Int, recordIndex: Int) = Logger
 		.info("GRIB[msg=%02d, rec=%02d, ref=%s]: %s - %s @ %s".format(messageIndex, recordIndex,
 				ISO_DATE_FORMAT.format(referenceTime.time),
 				ISO_DATE_FORMAT.format(forecastTime.time),

@@ -53,22 +53,22 @@ import kotlin.math.pow
  *
  * @author Jan Kubovy [jan@kubovy.eu]
  */
-class Grib2RecordPDS0 internal constructor(numberOfCoordinates: Int,
-										   parameter: Grib2Parameter,
-										   private val genProcessType: Int,
-										   private val backgroundGeneratingProcessId: Int,
-										   processId: Int,
-										   private val observationalHours: Int,
-										   private val cutoffMinutes: Int,
-										   private val timeRangeUnitIndicator: Int,
-										   private val forecastTimeAhead: Int,
-										   referenceTime: Calendar,
-										   private val level1Type: Int,
-										   private val level1ScaleFactor: Int,
-										   private val level1ScaledValue: Int,
-										   private val level2Type: Int,
-										   private val level2ScaleFactor: Int,
-										   private val level2ScaledValue: Int) :
+open class Grib2RecordPDS0 internal constructor(numberOfCoordinates: Int,
+												parameter: Grib2Parameter,
+												internal val genProcessType: Int,
+												internal val backgroundGeneratingProcessId: Int,
+												processId: Int,
+												internal val observationalHours: Int,
+												internal val cutoffMinutes: Int,
+												internal val timeRangeUnitIndicator: Int,
+												internal val forecastTimeAhead: Int,
+												final override val referenceTime: Calendar,
+												internal val level1Type: Int,
+												internal val level1ScaleFactor: Int,
+												internal val level1ScaledValue: Int,
+												internal val level2Type: Int,
+												internal val level2ScaleFactor: Int,
+												internal val level2ScaledValue: Int) :
 		Grib2RecordPDS(numberOfCoordinates, parameter, processId) {
 
 
@@ -160,8 +160,8 @@ class Grib2RecordPDS0 internal constructor(numberOfCoordinates: Int,
 
 	override val forecastTime: Calendar = calculateForecastTime(referenceTime, timeRangeUnitIndicator, forecastTimeAhead)
 
-	override val level1: Grib2Level
-	override val level2: Grib2Level?
+	final override val level1: Grib2Level
+	final override val level2: Grib2Level?
 
 	private val generatingProcessType: String
 		get() = when (genProcessType) {
