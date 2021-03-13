@@ -10,87 +10,56 @@
  */
 package mt.edu.um.cf2.jgribx.grib2
 
-import mt.edu.um.cf2.jgribx.Bytes2Number
 import mt.edu.um.cf2.jgribx.GribInputStream
 import mt.edu.um.cf2.jgribx.Logger
-import mt.edu.um.cf2.jgribx.NotSupportedException
 
 /**
+ * [Section 5: Data Representation Section](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_sect5.shtml)
+ *
+ *    | Octet | # | Value                                                                                        |
+ *    |-------|---|----------------------------------------------------------------------------------------------|
+ *    | 1-4   | 4 | Length of the section in octets (nn)                                                         |
+ *    | 5     | 1 | Number of the section (5)                                                                    |
+ *    | 6-9   | 4 | Number of data points where one or more values are specified in Section 7 when a bit map is  |
+ *    |       |   | present, total number of data points when a bit map is absent.                               |
+ *    | 10-11 | 2 | Data representation template number (See Table 5.0)                                          |
+ *    | 12-nn |   | Data representation template (See Template 5.X, where X is the number given in octets 10-11) |
+ *
+ * @param length         (`1-4`) Length of the section in octets (nn)
+ * @param nDataPoints    (`6-9`) Number of data points where one or more values are specified in Section 7 when a bit
+ *                               map is present, total number of data points when a bit map is absent.
+ * @param templateNumber (`10-11`) Data representation template number [Table 5.0](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table5-0.shtml)
  *
  * @author AVLAB-USER3
+ * @author Jan Kubovy [jan@kubovy.eu]
  */
-class Grib2RecordDRS {
+abstract class Grib2RecordDRS protected constructor(internal val length: Int,
+													internal val nDataPoints: Int,
+													internal val templateNumber: Int) {
+
 	companion object {
 		fun readFromStream(gribInputStream: GribInputStream): Grib2RecordDRS? {
-			val drs = Grib2RecordDRS()
-			drs.length = gribInputStream.readUINT(4)
+			/*  [1-4] Length of the section in octets (nn) */
+			val length = gribInputStream.readUINT(4)
+
+			/* [5] Number of the section (5) */
 			val section = gribInputStream.readUINT(1)
 			if (section != 5) {
-				Logger.error("DRS contains an incorrect section number")
+				Logger.error("DRS contains an incorrect section number ${section}!")
 				return null
 			}
-			drs.nDataPoints = gribInputStream.readUINT(4)
+
+			/* [6-9] Number of data points */
+			val nDataPoints = gribInputStream.readUINT(4)
 
 			/* [10-11] Data representation template number */
-			val packingType = gribInputStream.readUINT(2)
-			when (packingType) {
-				3 -> {
-					/* Grid Point Data - Complex Packing and Spatial Differencing */drs.refValue =
-							gribInputStream.readFloat(4, Bytes2Number.FLOAT_IEEE754)
-					drs.binaryScaleFactor = gribInputStream.readINT(2, Bytes2Number.INT_SM)
-					drs.decimalScaleFactor = gribInputStream.readINT(2, Bytes2Number.INT_SM)
-					drs.nBits = gribInputStream.readUINT(1)
-					/*val type = */gribInputStream.readUINT(1)
-					/*val splitMethod = */gribInputStream.readUINT(1)
-					drs.missingValueManagement = gribInputStream.readUINT(1)
-					val missing1 = gribInputStream.readUINT(4)
-					val missing2 = gribInputStream.readUINT(4)
-					drs.nGroups = gribInputStream.readUINT(4)
-					drs.refGroupWidths = gribInputStream.readUINT(1)
-					drs.groupWidthBits = gribInputStream.readUINT(1)
-					drs.refGroupLengths = gribInputStream.readUINT(4)
-					drs.groupLengthIncrement = gribInputStream.readUINT(1)
-					drs.lastGroupLength = gribInputStream.readUINT(4)
-					drs.nBitsScaledGroupLengths = gribInputStream.readUINT(1)
-					drs.spatialDiffOrder = gribInputStream.readUINT(1)
-					drs.spatialDescriptorOctets = gribInputStream.readUINT(1)
-					when (drs.missingValueManagement) {
-						0 -> drs.missingValue = Float.NaN
-						1 -> drs.missingValue = missing1.toFloat()
-						2 -> drs.missingValue = missing2.toFloat() // FIXME not sure about this
-						else -> {
-						}
-					}
-				}
-				else -> throw NotSupportedException("Data Representation type ${packingType} not supported")
+			val templateNumber = gribInputStream.readUINT(2)
+			return when (templateNumber) {
+				0 -> Grib2RecordDRS0.readFromStream(gribInputStream, length, nDataPoints, templateNumber)
+				2 -> Grib2RecordDRS2.readFromStream(gribInputStream, length, nDataPoints, templateNumber)
+				3 -> Grib2RecordDRS3.readFromStream(gribInputStream, length, nDataPoints, templateNumber)
+				else -> TODO("Data Representation type ${templateNumber} not supported yet")
 			}
-			return drs
 		}
 	}
-
-	internal var binaryScaleFactor = 0
-	internal var decimalScaleFactor = 0
-
-	// Number of octets required in the data section to specify extra descriptors needed for spatial differencing
-	internal var spatialDescriptorOctets = 0
-
-	/** Length increment for the group lengths (see Note 14) */
-	internal var groupLengthIncrement = 0
-
-	/** Number of bits used for the group widths (after the reference value in octet 36 has been removed) */
-	internal var groupWidthBits = 0
-
-	/** True length of last group */
-	internal var lastGroupLength = 0
-	protected var length = 0
-	internal var missingValue = 0f
-	internal var missingValueManagement = 0
-	internal var nBits = 0
-	internal var nBitsScaledGroupLengths = 0
-	internal var nDataPoints = 0
-	internal var nGroups = 0
-	internal var refGroupLengths = 0
-	internal var refGroupWidths = 0
-	internal var refValue = 0f
-	internal var spatialDiffOrder = 0
 }
