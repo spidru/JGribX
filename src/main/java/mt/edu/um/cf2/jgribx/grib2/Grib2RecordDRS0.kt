@@ -37,10 +37,10 @@ import mt.edu.um.cf2.jgribx.GribOutputStream
  * @author Jan Kubovy [jan@kubovy.eu]
  */
 open class Grib2RecordDRS0 internal constructor(nDataPoints: Int,
-												internal val refValue: Float,
-												internal val binaryScaleFactor: Int,
-												internal val decimalScaleFactor: Int,
-												internal val nBits: Int,
+												internal var refValue: Float,
+												internal var binaryScaleFactor: Int,
+												internal var decimalScaleFactor: Int,
+												internal var nBits: Int,
 												internal val type: Int) :
 		Grib2RecordDRS(nDataPoints) {
 
@@ -69,6 +69,9 @@ open class Grib2RecordDRS0 internal constructor(nDataPoints: Int,
 	override val length: Int = 21
 
 	override val templateNumber: Int = 0
+
+	internal constructor(drs: Grib2RecordDRS0) :
+			this(drs.nDataPoints, drs.refValue, drs.binaryScaleFactor, drs.decimalScaleFactor, drs.nBits, drs.type)
 
 	override fun writeTo(outputStream: GribOutputStream) {
 		super.writeTo(outputStream) // [1-5] length, section number, [6-11] DRS common stuff

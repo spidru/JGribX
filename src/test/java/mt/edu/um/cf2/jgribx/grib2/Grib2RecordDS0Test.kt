@@ -6,6 +6,7 @@ import org.junit.BeforeClass
 import org.junit.Test
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import kotlin.math.ceil
 import kotlin.math.pow
 import kotlin.random.Random
 
@@ -88,8 +89,8 @@ class Grib2RecordDS0Test {
 
 		Assert.assertNotNull(expected)
 		Assert.assertEquals(expected, actual)
-		Assert.assertEquals(5 + expected.values.size, expected.length)
-		Assert.assertEquals(5 + actual.values.size, actual.length)
+		Assert.assertEquals(5 + ceil(expected.data.size.toDouble() * drs.nBits.toDouble() / 8.0).toInt(), expected.length)
+		Assert.assertEquals(5 + ceil(actual.data.size.toDouble() * drs.nBits.toDouble() / 8.0).toInt(), actual.length)
 		Assert.assertEquals(7, expected.number)
 		Assert.assertEquals(7, actual.number)
 		Assert.assertNotNull(expected.values)

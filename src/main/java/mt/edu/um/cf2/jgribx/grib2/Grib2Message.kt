@@ -12,6 +12,7 @@ package mt.edu.um.cf2.jgribx.grib2
 
 import mt.edu.um.cf2.jgribx.*
 import mt.edu.um.cf2.jgribx.api.GribMessage
+import kotlin.reflect.KClass
 
 /**
  * GRIB2 Message implementation based on "Guide to the WMO Table Driven Code Form Used for the Representation and
@@ -140,6 +141,9 @@ class Grib2Message(private val indicatorSection: GribRecordIS,
 			return Grib2Message(indicatorSection, identificationSection, gridDefinitionSectionList, records)
 		}
 	}
+
+	fun <DRS : Grib2RecordDRS> convertDataRepresentationTo(type: KClass<DRS>) = records
+			.forEach { it.convertDataRepresentationTo(type) }
 
 	override fun writeTo(gribOutputStream: GribOutputStream) {
 		indicatorSection.messageLength = calculateMessageLength()
