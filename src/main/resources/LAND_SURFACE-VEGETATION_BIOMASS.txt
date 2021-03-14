@@ -1,0 +1,84 @@
+0		:	Land Cover (0=sea, 1=land)											:	Proportion			:	LAND
+1		:	Surface Roughness													:	m					:	SFCR
+2		:	Soil Temperature ***												:	K					:	TSOIL
+3		:	Soil Moisture Content *												:	kg m-2				:	SOILM
+4		:	Vegetation															:	%					:	VEG
+5		:	Water Runoff														:	kg m-2				:	WATR
+6		:	Evapotranspiration (See note 1)										:	kg-2 s-1			:	EVAPT
+7		:	Model Terrain Height												:	m					:	MTERH
+8		:	Land Use															:						:	LANDU
+9		:	Volumetric Soil Moisture Content **									:	Proportion			:	SOILW
+10		:	Ground Heat Flux *													:	W m-2				:	GFLUX
+11		:	Moisture Availability												:	%					:	MSTAV
+12		:	Exchange Coefficient												:	kg m-2 s-1			:	SFEXC
+13		:	Plant Canopy Surface Water											:	kg m-2				:	CNWAT
+14		:	Blackadar's Mixing Length Scale										:	m					:	BMIXL
+15		:	Canopy Conductance													:	m s-1				:	CCOND
+16		:	Minimal Stomatal Resistance											:	s m-1				:	RSMIN
+17		:	Wilting Point *														:						:	WILT
+18		:	Solar parameter in canopy conductance								:						:	RCS
+19		:	Temperature parameter in canopy										:						:	RCT
+20		:	Humidity parameter in canopy conductance							:						:	RCQ
+21		:	Soil moisture parameter in canopy conductance						:						:	RCSOL
+22		:	Soil Moisture ***													:	kg m-3				:	SOILM
+23		:	Column-Integrated Soil Water ***									:	kg m-2				:	CISOILW
+24		:	Heat Flux															:	W m-2				:	HFLUX
+25		:	Volumetric Soil Moisture											:	m3 m-3				:	VSOILM
+26		:	Wilting Point														:	kg m-3				:	WILT
+27		:	Volumetric Wilting Point											:	m3 m-3				:	VWILTP
+28		:	Leaf Area Index														:						:	LEAINX
+29		:	Evergreen Forest Cover												:						:	EVGFC
+30		:	Deciduous Forest Cover												:						:	DECFC
+31		:	Normalized Differential Vegetation Index (NDVI)						:						:	NDVINX
+32		:	Root Depth of Vegetation											:	m					:	RDVEG
+33		:	Water Runoff and Drainage ****										:	kg m-2				:	WROD
+34		:	Surface Water Runoff ****											:	kg m-2				:	SFCWRO
+35		:	Tile Class															:						:	TCLASS
+36		:	Tile Fraction														:						:	TFRCT
+37		:	Tile Percentage														:	%					:	TPERCT
+38		:	Soil Volumetric Ice Content (Water Equivalent) (See note 2)			:	m3 m-3				:	SOILVIC
+39		:	Evapotranspiration Rate												:	kg m-2 s-1			:	EVAPTRAT
+39-191	:	Reserved															:						:	RESERVED
+192-254	:	Reserved for Local Use												:						:	RESERVED
+192		:	Volumetric Soil Moisture Content									:						:	SOILW
+193		:	Ground Heat Flux													:	W m-2				:	GFLUX
+194		:	Moisture Availability												:	%					:	MSTAV
+195		:	Exchange Coefficient												:	(kg m-3) (m s-1)	:	SFEXC
+196		:	Plant Canopy Surface Water											:	kg m-2				:	CNWAT
+197		:	Blackadar’s Mixing Length Scale										:	m					:	BMIXL
+198		:	Vegetation Type														:						:	VGTYP
+199		:	Canopy Conductance													:	m s-1				:	CCOND
+200		:	Minimal Stomatal Resistance											:	s m-1				:	RSMIN
+201		:	Wilting Point														:						:	WILT
+202		:	Solar parameter in canopy conductance								:						:	RCS
+203		:	Temperature parameter in canopy conductance							:						:	RCT
+204		:	Humidity parameter in canopy conductance							:						:	RCQ
+205		:	Soil moisture parameter in canopy conductance						:						:	RCSOL
+206		:	Rate of water dropping from canopy to ground						:						:	RDRIP
+207		:	Ice-free water surface												:	%					:	ICWAT
+208		:	Surface exchange coefficients for T and Q divided by delta z		:	m s-1				:	AKHS
+209		:	Surface exchange coefficients for U and V divided by delta z		:	m s-1				:	AKMS
+210		:	Vegetation canopy temperature										:	K					:	VEGT
+211		:	Surface water storage												:	Kg m-2				:	SSTOR
+212		:	Liquid soil moisture content (non-frozen)							:	Kg m-2				:	LSOIL
+213		:	Open water evaporation (standing water)								:	W m-2				:	EWATR
+214		:	Groundwater recharge												:	Kg m-2				:	GWREC
+215		:	Flood plain recharge												:	Kg m-2				:	QREC
+216		:	Roughness length for heat											:	m					:	SFCRH
+217		:	Normalized Difference Vegetation Index								:						:	NDVI
+218		:	Land-sea coverage (nearest neighbor) [land=1,sea=0]					:						:	LANDN
+219		:	Asymptotic mixing length scale										:	m					:	AMIXL
+220		:	Water vapor added by precip assimilation							:	Kg m-2				:	WVINC
+221		:	Water condensate added by precip assimilation						:	Kg m-2				:	WCINC
+222		:	Water Vapor Flux Convergance (Vertical Int)							:	Kg m-2				:	WVCONV
+223		:	Water Condensate Flux Convergance (Vertical Int)					:	Kg m-2				:	WCCONV
+224		:	Water Vapor Zonal Flux (Vertical Int)								:	Kg m-2				:	WVUFLX
+225		:	Water Vapor Meridional Flux (Vertical Int)							:	Kg m-2				:	WVVFLX
+226		:	Water Condensate Zonal Flux (Vertical Int)							:	Kg m-2				:	WCUFLX
+227		:	Water Condensate Meridional Flux (Vertical Int)						:	Kg m-2				:	WCVFLX
+228		:	Aerodynamic conductance												:	m s-1				:	ACOND
+229		:	Canopy water evaporation											:	W m-2				:	EVCW
+230		:	Transpiration														:	W m-2				:	TRANS
+231		:	Seasonally Minimum Green Vegetation Fraction (over 1-year period)	:	%					:	VEGMIN
+232		:	Seasonally Maximum Green Vegetation Fraction (over 1-year period)	:	%					:	VEGMAX
+255		:	Missing																:						:	MISSING

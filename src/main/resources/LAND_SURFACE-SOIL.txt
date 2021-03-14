@@ -1,0 +1,44 @@
+0		:	Soil Type											:				:	SOTYP
+1		:	Upper Layer Soil Temperature *						:	K			:	UPLST
+2		:	Upper Layer Soil Moisture *							:	kg m-3		:	UPLSM
+3		:	Lower Layer Soil Moisture *							:	kg m-3		:	LOWLSM
+4		:	Bottom Layer Soil Temperature *						:	K			:	BOTLST
+5		:	Liquid Volumetric Soil Moisture (non-frozen)**		:				:	SOILL
+6		:	Number of Soil Layers in Root Zone					:				:	RLYRS
+7		:	Transpiration Stress-onset (soil moisture)**		:				:	SMREF
+8		:	Direct Evaporation Cease (soil moisture)**			:				:	SMDRY
+9		:	Soil Porosity**										:				:	POROS
+10		:	Liquid Volumetric Soil Moisture (Non-Frozen)		:	m3 m-3		:	LIQVSM
+11		:	Volumetric Transpiration Stree-Onset(Soil Moisture)	:	m3 m-3		:	VOLTSO
+12		:	Transpiration Stree-Onset(Soil Moisture)			:	kg m-3		:	TRANSO
+13		:	Volumetric Direct Evaporation Cease(Soil Moisture)	:	m3 m-3		:	VOLDEC
+14		:	Direct Evaporation Cease(Soil Moisture)				:	kg m-3		:	DIREC
+15		:	Soil Porosity										:	m3 m-3		:	SOILP
+16		:	Volumetric Saturation Of Soil Moisture				:	m3 m-3		:	VSOSM
+17		:	Saturation Of Soil Moisture							:	kg m-3		:	SATOSM
+18		:	Soil Temperature									:	K			:	SOILTMP
+19		:	Soil Moisture										:	kg m-3		:	SOILMOI
+20		:	Column-Integrated Soil Moisture						:	kg m-2		:	CISOILM
+21		:	Soil Ice											:	kg m-3		:	SOILICE
+22		:	Column-Integrated Soil Ice							:	kg m-2		:	CISICE
+23		:	Liquid Water in Snow Pack							:	kg m-2		:	LWSNWP
+24		:	Frost Index											:	kg day-1	:	FRSTINX
+25		:	Snow Depth at Elevation Bands						:	kg m-2		:	SNWDEB
+26		:	Soil Heat Flux										:	W m-2		:	SHFLX
+27		:	Soil Depth											:	m			:	SOILDEP
+28-191	:	Reserved											:				:	RESERVED
+192-254	:	Reserved for Local Use								:				:	RESERVED
+192		:	Liquid Volumetric Soil Moisture (non Frozen)		:				:	SOILL
+193		:	Number of Soil Layers in Root Zone					:	non-dim		:	RLYRS
+194		:	Surface Slope Type									:				:	SLTYP
+195		:	Transpiration Stress-onset (soil moisture)			:				:	SMREF
+196		:	Direct Evaporation Cease (soil moisture)			:				:	SMDRY
+197		:	Soil Porosity										:				:	POROS
+198		:	Direct Evaporation from Bare Soil					:	W m-2		:	EVBS
+199		:	Land Surface Precipitation Accumulation				:	kg m-2		:	LSPA
+200		:	Bare Soil Surface Skin temperature					:	K			:	BARET
+201		:	Average Surface Skin Temperature					:	K			:	AVSFT
+202		:	Effective Radiative Skin Temperature				:	K			:	RADT
+203		:	Field Capacity 										:				:	FLDCP
+204		:	Soil Moisture Availability In The Top Soil Layer	:	%			:	MSTAV
+255		:	Missing												:				:	MISSING

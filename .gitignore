@@ -12,3 +12,8 @@ out
 # IDE generated
 .idea/
 nbproject/
+
+# wgrib/wgrib2
+/grib2/
+/wgrib*
+/dump

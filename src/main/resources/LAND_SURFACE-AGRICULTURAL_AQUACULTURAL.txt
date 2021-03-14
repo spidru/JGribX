@@ -1,0 +1,6 @@
+0-191	:	Reserved								:	:	RESERVED
+192-254	:	Reserved for Local Use					:	:	RESERVED
+192		:	Cold Advisory for Newborn Livestock		:	:	CANL
+255		:	Missing									:	:	MISSING
+
+

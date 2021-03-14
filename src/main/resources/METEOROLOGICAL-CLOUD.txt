@@ -1,0 +1,58 @@
+0		:	Cloud Ice										:	kg m-2	:	CICE
+1		:	Total Cloud Cover								:	%		:	TCDC
+2		:	Convective Cloud Cover							:	%		:	CDCON
+3		:	Low Cloud Cover									:	%		:	LCDC
+4		:	Medium Cloud Cover								:	%		:	MCDC
+5		:	High Cloud Cover								:	%		:	HCDC
+6		:	Cloud Water										:	kg m-2	:	CWAT
+7		:	Cloud Amount									:	%		:	CDCA
+8		:	Cloud Type										:			:	CDCT
+9		:	Thunderstorm Maximum Tops						:	m		:	TMAXT
+10		:	Thunderstorm Coverage							:			:	THUNC
+11		:	Cloud Base										:	m		:	CDCB
+12		:	Cloud Top										:	m		:	CDCTOP
+13		:	Ceiling											:	m		:	CEIL
+14		:	Non-Convective Cloud Cover						:	%		:	CDLYR
+15		:	Cloud Work Function								:	J kg-1	:	CWORK
+16		:	Convective Cloud Efficiency						:			:	CUEFI
+17		:	Total Condensate 								:	kg kg-1	:	TCONDO
+18		:	Total Column-Integrated Cloud Water				:	kg m-2	:	TCOLWO
+19		:	Total Column-Integrated Cloud Ice				:	kg m-2	:	TCOLIO
+20		:	Total Column-Integrated Condensate				:	kg m-2	:	TCOLC
+21		:	Ice fraction of total condensate				:			:	FICE
+22		:	Cloud Cover										:	%		:	CDCC
+23		:	Cloud Ice Mixing Ratio							:	kg kg-1	:	CDCIMR
+24		:	Sunshine										:	Numeric	:	SUNS
+25		:	Horizontal Extent of Cumulonimbus (CB)			:	%		:	CBHE
+26		:	Height of Convective Cloud Base					:	m		:	HCONCB
+27		:	Height of Convective Cloud Top					:	m		:	HCONCT
+28		:	Number Concentration of Cloud Droplets			:	kg-1	:	NCONCD
+29		:	Number Concentration of Cloud Ice				:	kg-1	:	NCCICE
+30		:	Number Density of Cloud Droplets				:	m-3		:	NDENCD
+31		:	Number Density of Cloud Ice						:	m-3		:	NDCICE
+32		:	Fraction of Cloud Cover							:			:	FRACCC
+33		:	Sunshine Duration								:	s		:	SUNSD
+34		: 	Surface Long Wave Effective Total Cloudiness	:			:	SLWTC
+35		: 	Surface Short Wave Effective Total Cloudiness	:			:	SSWTC
+36		: 	Fraction of Stratiform Precipitation Cover		:			:	FSTRPC
+37		: 	Fraction of Convective Precipitation Cover		:			:	FCONPC
+38		: 	Mass Density of Cloud Droplets					:	kg m-3	:	MASSDCD
+39		: 	Mass Density of Cloud Ice						:	kg m-3	:	MASSDCI
+40		: 	Mass Density of Convective Cloud Water Droplets	:	kg m-3	:	MDCCWD
+41-46	:	Reserved 										:			:	RESERVED
+47		: 	Volume Fraction of Cloud Water Droplets			:			:	VFRCWD
+48		: 	Volume Fraction of Cloud Ice Particles			:			:	VFRCICE
+49		: 	Volume Fraction of Cloud (Ice and/or Water)		:			:	VFRCIW
+50-191	:	Reserved 										:			:	RESERVED
+192-254	:	Reserved for Local Use							:			:	RESERVED
+192		:	Non-Convective Cloud Cover						:	%		:	CDLYR
+193		:	Cloud Work Function								:	J kg-1	:	CWORK
+194		:	Convective Cloud Efficiency 					:	non-dim	:	CUEFI
+195		:	Total Condensate								:	kg kg-1 :	TCOND
+196		:	Total Column-Integrated Cloud Water				:	kg m-2	:	TCOLW
+197		:	Total Column-Integrated Cloud Ice				:	kg m-2	:	TCOLI
+198		:	Total Column-Integrated Condensate				:	kg m-2	:	TCOLC
+199		:	Ice fraction of total condensate				:	non-dim	:	FICE
+200		:	Convective Cloud Mass Flux						:	Pa s-1	:	MFLUX
+201		:	Sunshine Duration								:	s		:	SUNSD
+255		:	Missing											:			:	MISSING

@@ -1,0 +1,16 @@
+0		:	Ice Cover																	:			:	ICEC
+1		:	Ice Thickness																:	m		:	ICETK
+2		:	Direction of Ice Drift														:	° true	:	DICED
+3		:	Speed of Ice Drift															:	m s-1	:	SICED
+4		:	U-Component of Ice Drift													:	m s-1	:	UICE
+5		:	V-Component of Ice Drift													:	m s-1	:	VICE
+6		:	Ice Growth Rate																:	m s-1	:	ICEG
+7		:	Ice Divergence																:	s-1		:	ICED
+8		:	Ice Temperature																:	K		:	ICETMP
+9		:	Module of Ice Internal Pressure												:	Pa m	:	ICEPRS
+10		:	Zonal Vector Component of Vertically Integrated Ice Internal Pressure		:	Pa m	:	ZVCICEP
+11		:	Meridional Vector Component of Vertically Integrated Ice Internal Pressure	:	Pa m	:	MVCICEP
+12		:	Compressive Ice Strength													:	N m-1	:	CICES
+13-191	:	Reserved																	:			:	RESERVED
+192-254	:	Reserved for Local Use														:			:	RESERVED
+255		:	Missing																		:			:	MISSING
