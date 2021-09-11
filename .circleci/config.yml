@@ -79,7 +79,7 @@ jobs:
       - restore_cache:
           name: Restore wgrib from cache
           keys:
-            - wgrib-cache
+            - v1-wgrib-cache
       
       # Download and install wgrib
       - run:
@@ -98,8 +98,8 @@ jobs:
       # Cache wgrib binary
       - save_cache:
           name: Cache wgrib
-          paths: $WGRIB
-          key: wgrib-cache
+          paths: /usr/local/bin/wgrib
+          key: v1-wgrib-cache
 
       # run tests!
       - run: gradle test
