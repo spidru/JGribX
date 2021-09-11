@@ -20,6 +20,7 @@ jobs:
       # Customize the JVM maximum heap limit
       JVM_OPTS: -Xmx3200m
       TERM: dumb
+      WGRIB: /usr/local/bin/wgrib
 
     steps:
       - checkout
@@ -72,17 +73,29 @@ jobs:
           paths:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
+          
+      - restore_cache:
+          name: Restore wgrib from cache
+          keys:
+            - wgrib-cache
       
       # Download and install wgrib
       - run:
             name: Install wgrib
             command: |
-                sudo apt-get install gcc
-                wget ftp://ftp.cpc.ncep.noaa.gov/wd51we/wgrib/wgrib.c
-                gcc --version
-                gcc wgrib.c -o wgrib
-                ./wgrib || echo
-                sudo mv ./wgrib /usr/local/bin/
+                if [ ! -f "$WGRIB" ]; then
+                    sudo apt-get install gcc
+                    wget ftp://ftp.cpc.ncep.noaa.gov/wd51we/wgrib/wgrib.c
+                    gcc --version
+                    gcc wgrib.c -o $WGRIB
+                fi
+                wgrib || echo
+    
+      # Cache wgrib binary
+      - save_cache:
+          name: Cache wgrib
+          paths: $WGRIB
+          key: wgrib-cache
 
       # run tests!
       - run: gradle test
