@@ -47,6 +47,7 @@ jobs:
             name: Install Git LFS
             command: |
                 curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
+                sudo apt-get update
                 sudo apt-get install git-lfs
                 
       - restore_cache:
