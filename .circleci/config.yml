@@ -86,10 +86,12 @@ jobs:
             name: Install wgrib
             command: |
                 if [ ! -f "$WGRIB" ]; then
-                    sudo apt-get install gcc
+                    sudo apt install libcrypt1
+                    sudo apt install gcc
                     wget ftp://ftp.cpc.ncep.noaa.gov/wd51we/wgrib/wgrib.c
                     gcc --version
-                    gcc wgrib.c -o $WGRIB
+                    gcc wgrib.c -o wgrib
+                    sudo mv wgrib $WGRIB
                 fi
                 wgrib || echo
     
