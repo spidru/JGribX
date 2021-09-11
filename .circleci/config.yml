@@ -47,6 +47,7 @@ jobs:
             name: Install Git LFS
             command: |
                 curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
+                sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 648ACFD622F3D138 
                 sudo apt-get update
                 sudo apt-get install git-lfs
                 
