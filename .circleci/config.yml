@@ -24,6 +24,13 @@ jobs:
 
     steps:
       - checkout
+
+      # Print some diagnostic info
+      - run:
+          name: Print diagnostic info
+          command: |
+              echo $(cat /etc/os-release)
+              echo $(java -version)
       
       # Compute checksum of test resources
       - run:
