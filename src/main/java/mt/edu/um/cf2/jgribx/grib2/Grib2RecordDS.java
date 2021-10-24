@@ -13,30 +13,99 @@ package mt.edu.um.cf2.jgribx.grib2;
 import java.io.IOException;
 import static mt.edu.um.cf2.jgribx.Bytes2Number.INT_SM;
 import mt.edu.um.cf2.jgribx.GribInputStream;
+import mt.edu.um.cf2.jgribx.Logger;
 import mt.edu.um.cf2.jgribx.NotSupportedException;
 import mt.edu.um.cf2.jgribx.grib2.Grib2RecordBMS.Indicator;
 
-/**
- *
- * @author AVLAB-USER3
- */
 public class Grib2RecordDS
 {
     protected int length;
-    protected float data[]; 
+    protected float[] data;
     
     public static Grib2RecordDS readFromStream(GribInputStream in, Grib2RecordDRS drs, Grib2RecordGDS gds, Grib2RecordBMS bms) throws IOException, NotSupportedException
     {
         Grib2RecordDS ds = new Grib2RecordDS();
-        
+
         ds.length = in.readUINT(4);
         int section = in.readUINT(1);
-        if (section != 7)
-        {
+        if (section != 7) {
             System.err.println("Invalid DS");
             return null;
         }
-        
+
+        float[] data = null;
+        switch (drs.packingType)
+        {
+            case 0:
+                data = unpackSimplePacking(in, drs, gds, bms);
+                break;
+            case 3:
+                data = unpackComplexPackingAndSpatialDifferencing(in, drs, gds, bms);
+                break;
+            default:
+                throw new NotSupportedException("Unsupported packing type " + drs.packingType);
+        }
+
+        // Sanity checking of data
+        if (data == null)
+        {
+            throw new NotSupportedException("Unpacked data is null");
+        }
+        ds.data = data;
+        return ds;
+    }
+
+    private static float[] unpackSimplePacking(
+            GribInputStream in, Grib2RecordDRS drs, Grib2RecordGDS gds, Grib2RecordBMS bms
+    ) throws IOException, NotSupportedException {
+        float ref = (float) (Math.pow(10, -drs.decimalScaleFactor) * drs.refValue);
+        float scale = (float) (Math.pow(10, -drs.decimalScaleFactor) * Math.pow(2, drs.binaryScaleFactor));
+        boolean isConstant = drs.nBits == 0;
+        float[] values;
+        int nPoints = gds.nDataPoints;
+
+        if (bms.bitmap != null)
+        {
+            // Obtain values from bitmap
+            if (gds.nDataPoints != bms.bitmap.length * 8)
+            {
+                Logger.println("Number of grid data points does not match bitmap size", Logger.WARNING);
+                nPoints = Math.min(gds.nDataPoints, bms.bitmap.length * 8);
+            }
+            values = new float[nPoints];
+
+            for (int i = 0; i < values.length; i++)
+            {
+                // Check if current bit in bitmap is set
+                if ((bms.bitmap[i/8] & (1 << (i % 8))) != 0)
+                {
+                    if (!isConstant)
+                    {
+                        values[i] = ref + scale * in.readUBits(drs.nBits);
+                    }
+                    else
+                    {
+                        values[i] = ref;
+                    }
+                }
+                else
+                {
+                    // Missing grid value
+                    values[i] = drs.missingValue;
+                }
+            }
+        }
+        else
+        {
+            throw new NotSupportedException("Not supported yet!");
+        }
+
+        return values;
+    }
+
+    private static float[] unpackComplexPackingAndSpatialDifferencing(
+            GribInputStream in, Grib2RecordDRS drs, Grib2RecordGDS gds, Grib2RecordBMS bms
+    ) throws IOException, NotSupportedException {
         float DD = (float) Math.pow(10, drs.decimalScaleFactor);
         float R = drs.refValue;
         float EE = (float) Math.pow(2, drs.binaryScaleFactor);
@@ -69,8 +138,7 @@ public class Grib2RecordDS
             {
                 data[i] = drs.missingValue;
             }
-            ds.data = data;
-            return ds;
+            return data;
         }
         
         // Get reference values for groups
@@ -145,8 +213,7 @@ public class Grib2RecordDS
                 {
                     data[i] = drs.missingValue;
                 }
-                ds.data = data;
-                return ds;
+                return data;
             }
         }
         
@@ -310,8 +377,7 @@ public class Grib2RecordDS
             }
         }
         
-        ds.data = data;
-        return ds;
+        return data;
     }
     
     

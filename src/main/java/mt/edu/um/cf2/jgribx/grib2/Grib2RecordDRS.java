@@ -52,6 +52,8 @@ public class Grib2RecordDRS
     protected int refGroupWidths;
     protected float refValue;
     protected int spatialDiffOrder;
+    protected int originalFieldValuesType;
+    protected int packingType;
     
     public static Grib2RecordDRS readFromStream(GribInputStream in) throws IOException, NotSupportedException
     {
@@ -66,20 +68,28 @@ public class Grib2RecordDRS
         drs.nDataPoints = in.readUINT(4);
         
         /* [10-11] Data representation template number */
-        int packingType = in.readUINT(2);
-        switch (packingType)
+        drs.packingType = in.readUINT(2);
+        switch (drs.packingType)
         {
+            case 0:
+                /* Grid Point Data - Simple Packing */
+                drs.refValue = in.readFloat(4, FLOAT_IEEE754);
+                drs.binaryScaleFactor = in.readINT(2, INT_SM);
+                drs.decimalScaleFactor = in.readINT(2, INT_SM);
+                drs.nBits = in.readUINT(1);
+                drs.originalFieldValuesType = in.readUINT(1);
+                break;
             case 3:
                 /* Grid Point Data - Complex Packing and Spatial Differencing */
                 drs.refValue = in.readFloat(4, FLOAT_IEEE754);
                 drs.binaryScaleFactor = in.readINT(2, INT_SM);
                 drs.decimalScaleFactor = in.readINT(2, INT_SM);
                 drs.nBits = in.readUINT(1);
-                int type = in.readUINT(1);
+                drs.originalFieldValuesType = in.readUINT(1);
                 int splitMethod = in.readUINT(1);
                 drs.missingValueManagement = in.readUINT(1);
-                int missing1 = in.readUINT(4);
-                int missing2 = in.readUINT(4);
+                int primaryMissingValue = in.readUINT(4);
+                int secondaryMissingValue = in.readUINT(4);
                 drs.nGroups = in.readUINT(4);
                 drs.refGroupWidths = in.readUINT(1);
                 drs.groupWidthBits = in.readUINT(1);
@@ -97,17 +107,19 @@ public class Grib2RecordDRS
                         drs.missingValue = Float.NaN;
                         break;
                     case 1:
-                        drs.missingValue = missing1;
+                        drs.missingValue = primaryMissingValue;
                         break;
                     case 2:
-                        drs.missingValue = missing2;  // FIXME not sure about this
+                        drs.missingValue = secondaryMissingValue;
                         break;
                     default:
+                        Logger.println("Unexpected value for missingValueManagement", Logger.WARNING);
+                        drs.missingValue = Float.NaN;
                         break;
                 }
                 break;
             default:
-                throw new NotSupportedException("Data Representation type "+packingType+" not supported");
+                throw new NotSupportedException("Data Representation type "+ drs.packingType +" not supported");
         }
         return drs;
     }
