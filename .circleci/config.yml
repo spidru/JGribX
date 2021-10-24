@@ -20,7 +20,7 @@ jobs:
       # Customize the JVM maximum heap limit
       JVM_OPTS: -Xmx3200m
       TERM: dumb
-      WGRIB: /usr/local/bin/wgrib
+      WGRIB: /home/circleci/repo/wgrib
 
     steps:
       - checkout
@@ -76,10 +76,10 @@ jobs:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
           
-      # - restore_cache:
-          # name: Restore wgrib from cache
-          # keys:
-            # - v1-wgrib-cache
+      - restore_cache:
+          name: Restore wgrib from cache
+          keys:
+            - v2-wgrib-cache
       
       # Download and install wgrib
       - run:
@@ -91,15 +91,15 @@ jobs:
                     wget ftp://ftp.cpc.ncep.noaa.gov/wd51we/wgrib/wgrib.c
                     gcc --version
                     gcc wgrib.c -o wgrib
-                    sudo mv wgrib $WGRIB
                 fi
-                wgrib || echo
+                # Print out wgrib version (note: running wgrib without arguments makes it return code 8)
+                $WGRIB || [[ $? -eq 8 ]]
     
       # Cache wgrib binary
       - save_cache:
           name: Cache wgrib
-          paths: /usr/local/bin/wgrib
-          key: v1-wgrib-cache
+          paths: /home/circleci/repo/wgrib
+          key: v2-wgrib-cache
 
       # run tests!
       - run: gradle test
