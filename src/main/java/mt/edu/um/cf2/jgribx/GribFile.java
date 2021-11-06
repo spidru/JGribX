@@ -10,12 +10,7 @@
  */
 package mt.edu.um.cf2.jgribx;
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -118,11 +113,16 @@ public class GribFile
             }
             finally
             {
-                GribRecordIS.seekNext(in);
+                try
+                {
+                    GribRecordIS.seekNext(in);
+                }
+                catch (EOFException ignored){}
             }
 
             Logger.println("GRIB Record "+count, Logger.INFO);
             Logger.println("\tReference Time: "+record.getReferenceTime().getTime().toString(), Logger.INFO);
+            Logger.println("\tForecast Time: " + record.getForecastTime().getTime().toString(), Logger.INFO);
             Logger.println("\tParameter: "+record.getParameterCode()+" ("+record.getParameterDescription()+")", Logger.INFO);
             Logger.println("\tLevel: "+record.getLevelCode()+" ("+record.getLevelDescription()+")", Logger.INFO);
             

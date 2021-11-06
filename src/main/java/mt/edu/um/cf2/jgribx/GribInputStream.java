@@ -10,6 +10,7 @@
  */
 package mt.edu.um.cf2.jgribx;
 
+import java.io.EOFException;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -289,6 +290,79 @@ public class GribInputStream extends FilterInputStream
       }
 
       return (int) uBits;
+   }
+
+    /**
+     * Seek the input stream for the specified pattern.
+     * The seek functionality is implemented by reading out chunks of data at a time.
+     * Successive chunks overlap by {@code pattern.length} bytes to ensure the full pattern will appear in a chunk.
+     * If the pattern is found, the next byte in the input stream is the byte directly following the pattern.
+     * @param pattern The pattern for which to seek
+     * @param consumePattern Determines whether the pattern is consumed or not
+     * @return Number of bytes consumed from the input stream
+     * @throws IOException
+     */
+   public int seekBytePattern(byte[] pattern, boolean consumePattern) throws IOException
+   {
+       boolean endPatternFound = false;
+       int iChunkByte = 0;
+       int nAvailableBytes = 0;
+       int iStartPos = this.getByteCounter();
+       final int N_BYTES_PER_CHUNK = 1000;
+
+       assert pattern.length > 0 && pattern.length < N_BYTES_PER_CHUNK;
+
+       while ((nAvailableBytes = this.available()) > 0)
+       {
+           // Limit the number of bytes to be read
+           if (nAvailableBytes > N_BYTES_PER_CHUNK)
+           {
+               nAvailableBytes = N_BYTES_PER_CHUNK;
+           }
+
+           this.mark(nAvailableBytes);
+           int[] bytes = this.readUI8(nAvailableBytes);
+           iChunkByte = 0;
+           while (!endPatternFound && iChunkByte <= nAvailableBytes - pattern.length)
+           {
+               endPatternFound = true;
+               for (int iPattern = 0; iPattern < pattern.length; iPattern++)
+               {
+                   if (bytes[iChunkByte + iPattern] != pattern[iPattern])
+                   {
+                       endPatternFound = false;
+                       iChunkByte++;
+                       break;
+                   }
+               }
+           }
+           if (endPatternFound) break;
+
+           this.reset();
+           if (this.skip(nAvailableBytes - pattern.length) != nAvailableBytes - pattern.length)
+           {
+               throw new IOException("Skipped less bytes than expected");
+           }
+
+       }
+
+       if (!endPatternFound)
+       {
+           throw new EOFException("Reached end of stream without finding pattern");
+       }
+
+       // Backtrack stream position until it's just before/after the last byte of the pattern
+       this.reset();
+       int offset = consumePattern ? pattern.length : 0;
+       if (this.skip(iChunkByte + offset) != iChunkByte + offset) {
+           throw new IOException("Skipped less bytes than expected");
+       }
+
+       // Calculate amount of bytes consumed
+       int iEndPos = this.getByteCounter();
+       int nBytesConsumed = iEndPos - iStartPos;
+
+       return nBytesConsumed;
    }
 
 }

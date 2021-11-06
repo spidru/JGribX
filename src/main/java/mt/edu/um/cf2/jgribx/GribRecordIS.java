@@ -44,7 +44,9 @@ public class GribRecordIS
     * Edition of GRIB specification used.
     */
    private int edition;
-   
+
+   private static String PATTERN = "GRIB";
+
    protected ProductDiscipline discipline;
 
     /**
@@ -63,7 +65,7 @@ public class GribRecordIS
         in.read(octets, 0, 8);
         
         String startCode = new String(Arrays.copyOfRange(octets, 0, 4));
-        if (!startCode.equals("GRIB"))
+        if (!startCode.equals(PATTERN))
         {
             Logger.println("Start code not recognised: " + startCode, Logger.INFO);
             throw new NoValidGribException("Record does not have a valid GRIB header");
@@ -139,22 +141,8 @@ public class GribRecordIS
      */
     public static void seekNext(GribInputStream in) throws IOException
     {
-        byte code[] = new byte[4];
-        int nBytesSkipped = 0;
-        
-        while (in.available() > 0)
-        {
-            in.mark(4);
-            in.read(code);
-            if (Arrays.equals(code, "GRIB".getBytes()))
-            {
-                in.reset();
-                break;
-            }
-            in.reset();
-            in.read(1);     // skip 1 byte
-            nBytesSkipped++;
-        }
+        int nBytesConsumed = in.seekBytePattern(PATTERN.getBytes(), false);
+        int nBytesSkipped = nBytesConsumed - PATTERN.length();
 
         if (nBytesSkipped > 0)
         {
@@ -162,7 +150,7 @@ public class GribRecordIS
                     + "and start of next record", Logger.WARNING);
         }
     }
-   
+
    /**
     * Get a string representation of this IS.
     *
