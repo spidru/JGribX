@@ -28,6 +28,7 @@ public class Grib2RecordBMS
     
     protected Indicator indicator;
     protected int length;
+    protected int[] bitmap;
     
     public static Grib2RecordBMS readFromStream(GribInputStream in) throws IOException, NotSupportedException
     {
@@ -47,10 +48,16 @@ public class Grib2RecordBMS
         /* [6] Bitmap indicator */
         int bmIndicator = in.readUINT(1);
         bms.indicator = bms.determineIndicator(bmIndicator);
-        if (bms.indicator != Indicator.BITMAP_NONE)
+        switch (bms.indicator)
         {
-            throw new NotSupportedException("BMS bitmap not yet supported");
-//            in.skip(bms.length - 6);
+            case BITMAP_NONE:
+                bms.bitmap = null;
+                break;
+            case BITMAP_SPECIFIED:
+                bms.bitmap = in.readUI8(bms.length - 6);
+                break;
+            default:
+                throw new NotSupportedException("BMS bitmap not yet supported");
         }
         return bms;
     }

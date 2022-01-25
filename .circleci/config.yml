@@ -2,17 +2,17 @@
 #
 # Check https://circleci.com/docs/2.0/language-java/ for more details
 #
-version: 2
+version: 2.1
+
 jobs:
   build:
+    parameters:
+      docker_image:
+        type: string
+        default: ""
     docker:
-      # specify the version you desire here
-      - image: circleci/openjdk:9-jdk
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
+      # Reference: https://circleci.com/docs/2.0/circleci-images/
+      - image: << parameters.docker_image >>
 
     working_directory: ~/repo
 
@@ -24,6 +24,13 @@ jobs:
 
     steps:
       - checkout
+
+      # Print some diagnostic info
+      - run:
+          name: Print diagnostic info
+          command: |
+              echo $(cat /etc/os-release)
+              echo $(java -version)
       
       # Compute checksum of test resources
       - run:
@@ -49,6 +56,7 @@ jobs:
                 curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
                 sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 648ACFD622F3D138 
                 sudo apt-get update
+                sudo apt-get install libcrypt1 || [[ $? -eq 100 ]]
                 sudo apt-get install git-lfs
                 
       - restore_cache:
@@ -86,7 +94,6 @@ jobs:
             name: Install wgrib
             command: |
                 if [ ! -f "$WGRIB" ]; then
-                    sudo apt install libcrypt1
                     sudo apt install gcc
                     wget ftp://ftp.cpc.ncep.noaa.gov/wd51we/wgrib/wgrib.c
                     gcc --version
@@ -125,3 +132,11 @@ jobs:
       - store_artifacts:
             path: build/libs
       
+workflows:
+  version: 2
+  workflow:
+    jobs:
+      - build:
+          matrix:
+            parameters:
+              docker_image: ["circleci/openjdk:8u141-jdk", "circleci/openjdk:9-jdk"]
