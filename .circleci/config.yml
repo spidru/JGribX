@@ -139,4 +139,4 @@ workflows:
       - build:
           matrix:
             parameters:
-              docker_image: ["circleci/openjdk:8u141-jdk", "circleci/openjdk:9-jdk"]
+              docker_image: ["cimg/openjdk:8.0", "cimg/openjdk:11.0"]
