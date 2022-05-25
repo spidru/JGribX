@@ -209,16 +209,9 @@ public class Grib1RecordPDS
         /* Parameter */
         if (tableVersion == 255)
         {
-            parameter_table = null;
-            parameter = new Grib1Parameter(255, "missing", "missing parameter", "");
-        } else
-        {
-            // Before getting parameter table values, must get the appropriate table for this center, subcenter (not yet implemented) and parameter table.
-//            parameter_table = GribPDSParamTable.getParameterTable(center_id, subcenter_id, table_version);
-//            parameter = parameter_table.getParameter(data[5]);
-//            parameter = GribPDSParamTable.getParameterFromFile(centreId, subcenter_id, table_version, parameterId);
-            parameter = Grib1Parameter.getParameter(tableVersion, parameterId, centreId);
+            Logger.println("Parameter table version is 255 (missing). Falling back to default table.", Logger.DEBUG);
         }
+        parameter = Grib1Parameter.getParameter(tableVersion, parameterId, centreId);
         if (parameter == null)
             throw new NotSupportedException("Unsupported Parameter "+ parameterId + " in Table " + tableVersion);
 
