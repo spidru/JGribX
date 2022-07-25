@@ -28,6 +28,7 @@ public abstract class Grib2RecordGDS
     protected double gridDj;
     protected int gridNi;
     protected int gridNj;
+    protected int[] quasiRegularGridPoints;
     private int gridType;
     protected int earthShape;
     protected ScanMode scanMode;

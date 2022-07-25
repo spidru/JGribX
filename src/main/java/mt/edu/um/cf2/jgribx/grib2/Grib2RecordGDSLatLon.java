@@ -33,6 +33,12 @@ public class Grib2RecordGDSLatLon extends Grib2RecordGDS
         int minorScaledValue = in.readUINT(4);
         gridNi = in.readUINT(4);
         gridNj = in.readUINT(4);
+
+        if (gridNj == -1)
+        {
+            throw new NotSupportedException("Quasi-regular grids with variable Nj is not yet supported");
+        }
+
         int basicAngle = in.readUINT(4);
         int basicAngleSubdiv = in.readUINT(4);
         if (basicAngle == 0)
@@ -75,12 +81,24 @@ public class Grib2RecordGDSLatLon extends Grib2RecordGDS
         if (!scanMode.jDirectionPositive) gridDj *= -1;
         
         if (scanMode.iDirectionEvenRowsOffset || scanMode.iDirectionOddRowsOffset || scanMode.jDirectionOffset || !scanMode.rowsNiNjPoints || scanMode.rowsZigzag)
+        {
             throw new NotSupportedException("Unsupported scan mode found");
+        }
+
+        if (gridNi == -1 || gridNj == -1)
+        {
+            quasiRegularGridPoints = new int[this.length - 72];
+            for (int i = 0; i < quasiRegularGridPoints.length; i++)
+            {
+                quasiRegularGridPoints[i] = in.readUINT(1);
+            }
+        }
     }
     
     @Override
     protected double[][] getGridCoords()
     {
+        if (gridNi == -1 || gridNj == -1) { return this.getQuasiRegularGridCoords(); }
         double[][] coords = new double[gridNi*gridNj][2];
 
         int k = 0;
@@ -105,6 +123,53 @@ public class Grib2RecordGDSLatLon extends Grib2RecordGDS
          }
       }
       return coords;
+    }
+
+    private double[][] getQuasiRegularGridCoords()
+    {
+        double[][] coords = new double[nDataPoints][2];
+
+        // Assuming gridNj is fixed and gridNi is variable
+        int k = 0;
+        for (int j = 0; j < gridNj; j++)
+        {
+            int gridNi = quasiRegularGridPoints[j];
+            for (int i = 0; i < gridNi; i++)
+            {
+                double gridDi = (lat2 - lat1 + 1) / gridNi;
+
+                double lon = lon1 + i * gridDi;
+                double lat = lat1 + j * gridDj;
+
+                coords[k][0] = normalizeAngle(lon);
+                coords[k][1] = normalizeAngle(lat);
+                k++;
+            }
+        }
+        return coords;
+    }
+
+    /**
+     * Normalizes the specified angle to fit into the range ]-180, 180]
+     * @param angle The angle to normalize (units: degrees)
+     * @return The normalized angle (units: degrees)
+     * Adapted from: https://stackoverflow.com/questions/2320986/easy-way-to-keeping-angles-between-179-and-180-degrees
+     */
+    private static double normalizeAngle(double angle)
+    {
+        // Reduce the angle
+        angle %= 360;
+
+        // Force it to become the positive remainder, so that it fits in the range [0, 360]
+        angle = (angle + 360) % 360;
+
+        // Force into the minimum absolute value residue class, so that -180 < angle <= 180
+        if (angle > 180)
+        {
+            angle -= 360;
+        }
+
+        return angle;
     }
     
     @Override
