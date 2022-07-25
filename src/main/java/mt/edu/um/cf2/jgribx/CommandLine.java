@@ -85,6 +85,7 @@ public class CommandLine {
                 {
                     System.out.print(param + " ");
                 }
+                System.out.println();
             }
             catch (FileNotFoundException e)
             {

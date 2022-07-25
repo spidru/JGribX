@@ -11,14 +11,12 @@
 package mt.edu.um.cf2.jgribx.grib2;
 
 import java.io.IOException;
-import mt.edu.um.cf2.jgribx.Bytes2Number;
+
+import mt.edu.um.cf2.jgribx.*;
 import mt.edu.um.cf2.jgribx.GribCodes.DataRepresentation;
-import mt.edu.um.cf2.jgribx.GribInputStream;
 import mt.edu.um.cf2.jgribx.grib2.Grib2RecordPDS;
 import static mt.edu.um.cf2.jgribx.Bytes2Number.FLOAT_IEEE754;
 import static mt.edu.um.cf2.jgribx.Bytes2Number.INT_SM;
-import mt.edu.um.cf2.jgribx.Logger;
-import mt.edu.um.cf2.jgribx.NotSupportedException;
 
 /**
  *
@@ -54,9 +52,10 @@ public class Grib2RecordDRS
     protected int spatialDiffOrder;
     protected int originalFieldValuesType;
     protected int packingType;
+    protected CompressionType compressionType;
+    protected int compressionRatio;
     
-    public static Grib2RecordDRS readFromStream(GribInputStream in) throws IOException, NotSupportedException
-    {
+    public static Grib2RecordDRS readFromStream(GribInputStream in) throws IOException, NotSupportedException, NoValidGribException {
         Grib2RecordDRS drs = new Grib2RecordDRS();
         drs.length = in.readUINT(4);
         int section = in.readUINT(1);
@@ -118,9 +117,43 @@ public class Grib2RecordDRS
                         break;
                 }
                 break;
+            case 40:
+                /* Grid Point Data - JPEG 2000 code stream format */
+                drs.refValue = in.readFloat(4, FLOAT_IEEE754);
+                drs.binaryScaleFactor = in.readINT(2, INT_SM);
+                drs.decimalScaleFactor = in.readINT(2, INT_SM);
+                drs.nBits = in.readUINT(1);
+                if (drs.nBits == 0 || drs.nBits > 38)
+                {
+                    throw new NoValidGribException("JPEG 2000 bit depth must be in the range [1, 38] (found: " + drs.nBits + ")");
+                }
+                drs.originalFieldValuesType = in.readUINT(1);
+                drs.compressionType = getCompressionType(in.readUINT(1));
+                drs.compressionRatio = in.readUINT(1);
+                if (drs.compressionType != CompressionType.LOSSY && drs.compressionRatio != GribCodes.MISSING)
+                {
+                    throw new NoValidGribException("JPEG 2000 compression ratio should be set to missing if compression type is not lossy");
+                }
+                break;
             default:
                 throw new NotSupportedException("Data Representation type "+ drs.packingType +" not supported");
         }
         return drs;
+    }
+
+    private enum CompressionType
+    {
+        LOSSLESS,
+        LOSSY,
+        RESERVED,
+        MISSING
+    }
+
+    private static CompressionType getCompressionType(int code)
+    {
+        if (code == 0) return CompressionType.LOSSLESS;
+        else if (code == 1) return CompressionType.LOSSY;
+        else if (code >= 2 && code <= 254) return CompressionType.RESERVED;
+        else return CompressionType.MISSING;
     }
 }

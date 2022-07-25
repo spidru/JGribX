@@ -14,16 +14,17 @@ import java.io.IOException;
 import static mt.edu.um.cf2.jgribx.Bytes2Number.INT_SM;
 import mt.edu.um.cf2.jgribx.GribInputStream;
 import mt.edu.um.cf2.jgribx.Logger;
+import mt.edu.um.cf2.jgribx.NoValidGribException;
 import mt.edu.um.cf2.jgribx.NotSupportedException;
 import mt.edu.um.cf2.jgribx.grib2.Grib2RecordBMS.Indicator;
+import ucar.nc2.grib.grib2.Grib2JpegDecoder;
 
 public class Grib2RecordDS
 {
     protected int length;
     protected float[] data;
     
-    public static Grib2RecordDS readFromStream(GribInputStream in, Grib2RecordDRS drs, Grib2RecordGDS gds, Grib2RecordBMS bms) throws IOException, NotSupportedException
-    {
+    public static Grib2RecordDS readFromStream(GribInputStream in, Grib2RecordDRS drs, Grib2RecordGDS gds, Grib2RecordBMS bms) throws IOException, NotSupportedException, NoValidGribException {
         Grib2RecordDS ds = new Grib2RecordDS();
 
         ds.length = in.readUINT(4);
@@ -33,7 +34,7 @@ public class Grib2RecordDS
             return null;
         }
 
-        float[] data = null;
+        float[] data;
         switch (drs.packingType)
         {
             case 0:
@@ -41,6 +42,9 @@ public class Grib2RecordDS
                 break;
             case 3:
                 data = unpackComplexPackingAndSpatialDifferencing(in, drs, gds, bms);
+                break;
+            case 40:
+                data = unpackJpeg2000(in, ds.length, drs, gds, bms);
                 break;
             default:
                 throw new NotSupportedException("Unsupported packing type " + drs.packingType);
@@ -69,7 +73,8 @@ public class Grib2RecordDS
             // Obtain values from bitmap
             if (gds.nDataPoints != bms.bitmap.length * 8)
             {
-                Logger.println("Number of grid data points does not match bitmap size", Logger.WARNING);
+                Logger.println("Number of grid data points (" + gds.nDataPoints + ") does not match bitmap size ("
+                    + bms.bitmap.length * 8 + ")", Logger.WARNING);
                 nPoints = Math.min(gds.nDataPoints, bms.bitmap.length * 8);
             }
             values = new float[nPoints];
@@ -380,5 +385,69 @@ public class Grib2RecordDS
         return data;
     }
     
-    
+    private static float[] unpackJpeg2000(GribInputStream in, int dsLength, Grib2RecordDRS drs, Grib2RecordGDS gds,
+        Grib2RecordBMS bms) throws IOException, NoValidGribException {
+        float DD = (float) Math.pow(10, drs.decimalScaleFactor);
+        float EE = (float) Math.pow(2, drs.binaryScaleFactor);
+        float R = drs.refValue;
+        Grib2JpegDecoder jpegDecoder = null;
+        if (drs.nBits > 0)
+        {
+            jpegDecoder = new Grib2JpegDecoder(drs.nBits, false);
+            byte[] buf = in.read(dsLength - 5);
+            jpegDecoder.decode(buf);
+        }
+
+        float[] result = new float[gds.nDataPoints];
+
+        // In case of no data to decode, set to reference value
+        if (drs.nBits == 0)
+        {
+            for (int i = 0; i < drs.nDataPoints; i++) {
+                result[i] = R / DD;
+            }
+        }
+
+        int[] idata = jpegDecoder.getGdata();
+        if (bms.bitmap == null)
+        {
+            // Check data length
+            if (idata.length != drs.nDataPoints)
+            {
+                throw new NoValidGribException("Number of points in data section (" + idata.length +
+                    ") and in data representation section (" + drs.nDataPoints + ") do not match");
+            }
+
+            for (int i = 0; i < drs.nDataPoints; i++)
+            {
+                result[i] = (R + idata[i] * EE) / DD;
+            }
+        }
+        else
+        {
+            for (int i = 0, j = 0; i < drs.nDataPoints; i++)
+            {
+                if (isBitSet(bms.bitmap[i / 8], i % 8))
+                {
+                    if (j >= idata.length)
+                    {
+                        break;
+                    }
+                    int indata = idata[j];
+                    result[i] = (R + indata * EE) / DD;
+                    j++;
+                }
+                else
+                {
+                    result[i] = drs.missingValue;
+                }
+            }
+        }
+        return result;
+    }
+
+    private static boolean isBitSet(int data, int iBit)
+    {
+        return ((data & (1 << iBit)) != 0);
+    }
 }
