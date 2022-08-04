@@ -76,7 +76,7 @@ public class GribTest
                 e.printStackTrace();
             }
             ProcessBuilder pb = new ProcessBuilder(
-                    "wgrib",
+                    System.getenv("WGRIB"),
                     gribFilepath,
                     "-d", String.valueOf(i_record + 1),
                     "-text",
