@@ -31,7 +31,7 @@ jobs:
           command: |
               echo $(cat /etc/os-release)
               echo $(java -version)
-      
+
       # Compute checksum of test resources
       - run:
           name: Compute checksum of test resources
@@ -49,28 +49,34 @@ jobs:
             - v1-dependencies-
 
       - run: gradle dependencies
-      
+
       - run:
             name: Install Git LFS
             command: |
                 curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
-                sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 648ACFD622F3D138 
+                sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 648ACFD622F3D138
                 sudo apt-get update
                 sudo apt-get install libcrypt1 || [[ $? -eq 100 ]]
                 sudo apt-get install git-lfs
-                
+
       - restore_cache:
           name: Restore Git LFS files from cache
           keys:
             - git-lfs-cache-{{ checksum "RESOURCES_MD5" }}
             - git-lfs-cache-
-      
+
       - run:
             name: Pull Git LFS files
             command: |
                 git lfs install
                 git lfs pull
-                
+
+      # Download additional GRIB files from Dropbox
+      - run:
+          name: "Download GRIB files from Dropbox"
+          command: |
+            wget --output-document=src/test/resources/fh.000_tl.press_ar.octanti https://www.dropbox.com/s/u32knq1pjm7cq60/fh.000_tl.press_ar.octanti?dl=1
+
       # Cache Git LFS files
       - save_cache:
             name: Cache Git LFS files
@@ -83,12 +89,12 @@ jobs:
           paths:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
-          
+
       - restore_cache:
           name: Restore wgrib from cache
           keys:
             - v2-wgrib-cache
-      
+
       # Download and install wgrib
       - run:
             name: Install wgrib
@@ -101,7 +107,7 @@ jobs:
                 fi
                 # Print out wgrib version (note: running wgrib without arguments makes it return code 8)
                 $WGRIB || [[ $? -eq 8 ]]
-    
+
       # Cache wgrib binary
       - save_cache:
           name: Cache wgrib
@@ -110,7 +116,7 @@ jobs:
 
       # run tests!
       - run: gradle test
-      
+
       - run:
             name: Save test results
             command: |
@@ -123,7 +129,7 @@ jobs:
             path: ~/test-results
       - store_artifacts:
             path: ~/test-results/junit
-            
+
       # Deploy application as JAR
       - run:
             name: Deploy Application
@@ -131,7 +137,7 @@ jobs:
                 gradle jar
       - store_artifacts:
             path: build/libs
-      
+
 workflows:
   version: 2
   workflow:

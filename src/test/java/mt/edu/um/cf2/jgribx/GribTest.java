@@ -178,4 +178,22 @@ public class GribTest
         assertArrayEquals("Generating processes", GENERATING_PROCESSES, file.getProcessIDs());
     }
 
+    @Test
+    public void testGrib2QuasiRegularGrid() throws IOException, NoValidGribException, NotSupportedException
+    {
+        /* TODO
+         * - Resolve warnings: Record contains multiple PDS's
+         * - Resolve error: Second surface is not yet supported
+         */
+        final String FILENAME = "/fh.000_tl.press_ar.octanti";
+
+        // Define expected data
+        final int EDITION = 2;
+
+        URL url = GribTest.class.getResource(FILENAME);
+        GribFile file = new GribFile(url.openStream());
+
+        assertEquals("GRIB edition", EDITION, file.getEdition());
+    }
+
 }

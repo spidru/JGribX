@@ -652,4 +652,6 @@ public class GribCodes
         GridPointData_SimplePacking, MatrixValueAtGridPoint_SimplePacking,
         GridPointData_ComplexPacking, GridPointData_ComplexPackingAndSpatialDifferencing
     }
+
+    public static final int MISSING = 255;
 }
