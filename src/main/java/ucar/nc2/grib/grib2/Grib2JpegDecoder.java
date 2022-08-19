@@ -4,21 +4,21 @@
  */
 package ucar.nc2.grib.grib2;
 
-import ucar.jpeg.jj2000.j2k.quantization.dequantizer.*;
-import ucar.jpeg.jj2000.j2k.image.invcomptransf.*;
-import ucar.jpeg.jj2000.j2k.fileformat.reader.*;
-import ucar.jpeg.jj2000.j2k.codestream.reader.*;
-import ucar.jpeg.jj2000.j2k.wavelet.synthesis.*;
-import ucar.jpeg.jj2000.j2k.entropy.decoder.*;
-import ucar.jpeg.jj2000.j2k.decoder.*;
-import ucar.jpeg.jj2000.j2k.image.output.*;
-import ucar.jpeg.jj2000.j2k.codestream.*;
-import ucar.jpeg.jj2000.j2k.image.*;
-import ucar.jpeg.jj2000.j2k.util.*;
-import ucar.jpeg.jj2000.j2k.roi.*;
-import ucar.jpeg.jj2000.j2k.io.*;
-import ucar.jpeg.colorspace.*;
-import ucar.jpeg.icc.*;
+import jj2000.j2k.quantization.dequantizer.*;
+import jj2000.j2k.image.invcomptransf.*;
+import jj2000.j2k.fileformat.reader.*;
+import jj2000.j2k.codestream.reader.*;
+import jj2000.j2k.wavelet.synthesis.*;
+import jj2000.j2k.entropy.decoder.*;
+import jj2000.j2k.decoder.*;
+import jj2000.j2k.image.output.*;
+import jj2000.j2k.codestream.*;
+import jj2000.j2k.image.*;
+import jj2000.j2k.util.*;
+import jj2000.j2k.roi.*;
+import jj2000.j2k.io.*;
+import colorspace.*;
+import icc.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.*;
@@ -418,7 +418,7 @@ public class Grib2JpegDecoder {
       for (i = str.length - 1; i >= 0; i--)
         vec.add(str[i]);
 
-    str = ucar.jpeg.jj2000.j2k.decoder.Decoder.getParameterInfo();
+    str = jj2000.j2k.decoder.Decoder.getParameterInfo();
     if (str != null)
       for (i = str.length - 1; i >= 0; i--)
         vec.add(str[i]);

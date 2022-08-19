@@ -51,7 +51,7 @@ dependencies {
     extraLibs(
         [group: 'commons-cli', name: 'commons-cli', version: '1.4'],
         ['org.slf4j:slf4j-api:1.7.25'],
-        [files('./jj2000/target/jj2000-5.2-SNAPSHOT.jar')]
+        ['edu.ucar:jj2000:5.2']
     )
     configurations.implementation.extendsFrom(configurations.extraLibs)
 

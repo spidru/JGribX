@@ -66,16 +66,6 @@ jobs:
             - git-lfs-cache-
 
       - run:
-          name: Install Ant
-          command: sudo apt-get install ant
-
-      - run:
-          name: Download/build jj2000
-          command: |
-            git clone https://github.com/spidru/jj2000.git
-            cd jj2000 && ant
-
-      - run:
             name: Pull Git LFS files
             command: |
                 git lfs install

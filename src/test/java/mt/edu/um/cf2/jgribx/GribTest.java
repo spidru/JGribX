@@ -182,7 +182,8 @@ public class GribTest
     public void testGrib2QuasiRegularGrid() throws IOException, NoValidGribException, NotSupportedException
     {
         /* TODO
-         * [GDS] Quasi-regular grids are currently not handled properly
+         * - Resolve warnings: Record contains multiple PDS's
+         * - Resolve error: Second surface is not yet supported
          */
         final String FILENAME = "/fh.000_tl.press_ar.octanti";
 
