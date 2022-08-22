@@ -1,0 +1,215 @@
+0	:	Parcel Lifted Index (to 500 hPa)	:	K	:	PLI
+1	:	Best Lifted Index (to 500 hPa)	:	K	:	BLI
+2	:	K Index	:	K	:	KX
+3	:	KO Index	:	K	:	KOX
+4	:	Total Totals Index	:	K	:	TOTALX
+5	:	Sweat Index	:	Numeric	:	SX
+6	:	Convective Available PotentialEnergy	:	J kg^-1	:	CAPE
+7	:	Convective Inhibition	:	J kg^-1	:	CIN
+8	:	Storm Relative Helicity	:	m^2 s^-2	:	HLCY
+9	:	Energy Helicity Index	:	Numeric	:	EHLX
+10	:	Surface Lifted Index	:	K	:	LFT X
+11	:	Best (4 layer) Lifted Index	:	K	:	4LFTX
+12	:	Richardson Number	:	Numeric	:	RI
+13	:	Showalter Index	:	K	:	SHWINX
+14	:	Reserved	:		:	
+15	:	Updraft Helicity	:	m^2 s^-2	:	UPHL
+16	:	Bulk Richardson Number	:	Numeric	:	BLKRN
+17	:	Gradient Richardson Number	:	Numeric	:	GRDRN
+18	:	Flux Richardson Number	:	Numeric	:	FLXRN
+19	:	Convective Available Potential Energy Shear	:	m^2 s^-2	:	CONAPES
+20	:	Thunderstorm intensity index	:		:	TIIDEX
+21	:	Reserved	:		:	
+22	:	Reserved	:		:	
+23	:	Reserved	:		:	
+24	:	Reserved	:		:	
+25	:	Reserved	:		:	
+26	:	Reserved	:		:	
+27	:	Reserved	:		:	
+28	:	Reserved	:		:	
+29	:	Reserved	:		:	
+30	:	Reserved	:		:	
+31	:	Reserved	:		:	
+32	:	Reserved	:		:	
+33	:	Reserved	:		:	
+34	:	Reserved	:		:	
+35	:	Reserved	:		:	
+36	:	Reserved	:		:	
+37	:	Reserved	:		:	
+38	:	Reserved	:		:	
+39	:	Reserved	:		:	
+40	:	Reserved	:		:	
+41	:	Reserved	:		:	
+42	:	Reserved	:		:	
+43	:	Reserved	:		:	
+44	:	Reserved	:		:	
+45	:	Reserved	:		:	
+46	:	Reserved	:		:	
+47	:	Reserved	:		:	
+48	:	Reserved	:		:	
+49	:	Reserved	:		:	
+50	:	Reserved	:		:	
+51	:	Reserved	:		:	
+52	:	Reserved	:		:	
+53	:	Reserved	:		:	
+54	:	Reserved	:		:	
+55	:	Reserved	:		:	
+56	:	Reserved	:		:	
+57	:	Reserved	:		:	
+58	:	Reserved	:		:	
+59	:	Reserved	:		:	
+60	:	Reserved	:		:	
+61	:	Reserved	:		:	
+62	:	Reserved	:		:	
+63	:	Reserved	:		:	
+64	:	Reserved	:		:	
+65	:	Reserved	:		:	
+66	:	Reserved	:		:	
+67	:	Reserved	:		:	
+68	:	Reserved	:		:	
+69	:	Reserved	:		:	
+70	:	Reserved	:		:	
+71	:	Reserved	:		:	
+72	:	Reserved	:		:	
+73	:	Reserved	:		:	
+74	:	Reserved	:		:	
+75	:	Reserved	:		:	
+76	:	Reserved	:		:	
+77	:	Reserved	:		:	
+78	:	Reserved	:		:	
+79	:	Reserved	:		:	
+80	:	Reserved	:		:	
+81	:	Reserved	:		:	
+82	:	Reserved	:		:	
+83	:	Reserved	:		:	
+84	:	Reserved	:		:	
+85	:	Reserved	:		:	
+86	:	Reserved	:		:	
+87	:	Reserved	:		:	
+88	:	Reserved	:		:	
+89	:	Reserved	:		:	
+90	:	Reserved	:		:	
+91	:	Reserved	:		:	
+92	:	Reserved	:		:	
+93	:	Reserved	:		:	
+94	:	Reserved	:		:	
+95	:	Reserved	:		:	
+96	:	Reserved	:		:	
+97	:	Reserved	:		:	
+98	:	Reserved	:		:	
+99	:	Reserved	:		:	
+100	:	Reserved	:		:	
+101	:	Reserved	:		:	
+102	:	Reserved	:		:	
+103	:	Reserved	:		:	
+104	:	Reserved	:		:	
+105	:	Reserved	:		:	
+106	:	Reserved	:		:	
+107	:	Reserved	:		:	
+108	:	Reserved	:		:	
+109	:	Reserved	:		:	
+110	:	Reserved	:		:	
+111	:	Reserved	:		:	
+112	:	Reserved	:		:	
+113	:	Reserved	:		:	
+114	:	Reserved	:		:	
+115	:	Reserved	:		:	
+116	:	Reserved	:		:	
+117	:	Reserved	:		:	
+118	:	Reserved	:		:	
+119	:	Reserved	:		:	
+120	:	Reserved	:		:	
+121	:	Reserved	:		:	
+122	:	Reserved	:		:	
+123	:	Reserved	:		:	
+124	:	Reserved	:		:	
+125	:	Reserved	:		:	
+126	:	Reserved	:		:	
+127	:	Reserved	:		:	
+128	:	Reserved	:		:	
+129	:	Reserved	:		:	
+130	:	Reserved	:		:	
+131	:	Reserved	:		:	
+132	:	Reserved	:		:	
+133	:	Reserved	:		:	
+134	:	Reserved	:		:	
+135	:	Reserved	:		:	
+136	:	Reserved	:		:	
+137	:	Reserved	:		:	
+138	:	Reserved	:		:	
+139	:	Reserved	:		:	
+140	:	Reserved	:		:	
+141	:	Reserved	:		:	
+142	:	Reserved	:		:	
+143	:	Reserved	:		:	
+144	:	Reserved	:		:	
+145	:	Reserved	:		:	
+146	:	Reserved	:		:	
+147	:	Reserved	:		:	
+148	:	Reserved	:		:	
+149	:	Reserved	:		:	
+150	:	Reserved	:		:	
+151	:	Reserved	:		:	
+152	:	Reserved	:		:	
+153	:	Reserved	:		:	
+154	:	Reserved	:		:	
+155	:	Reserved	:		:	
+156	:	Reserved	:		:	
+157	:	Reserved	:		:	
+158	:	Reserved	:		:	
+159	:	Reserved	:		:	
+160	:	Reserved	:		:	
+161	:	Reserved	:		:	
+162	:	Reserved	:		:	
+163	:	Reserved	:		:	
+164	:	Reserved	:		:	
+165	:	Reserved	:		:	
+166	:	Reserved	:		:	
+167	:	Reserved	:		:	
+168	:	Reserved	:		:	
+169	:	Reserved	:		:	
+170	:	Reserved	:		:	
+171	:	Reserved	:		:	
+172	:	Reserved	:		:	
+173	:	Reserved	:		:	
+174	:	Reserved	:		:	
+175	:	Reserved	:		:	
+176	:	Reserved	:		:	
+177	:	Reserved	:		:	
+178	:	Reserved	:		:	
+179	:	Reserved	:		:	
+180	:	Reserved	:		:	
+181	:	Reserved	:		:	
+182	:	Reserved	:		:	
+183	:	Reserved	:		:	
+184	:	Reserved	:		:	
+185	:	Reserved	:		:	
+186	:	Reserved	:		:	
+187	:	Reserved	:		:	
+188	:	Reserved	:		:	
+189	:	Reserved	:		:	
+190	:	Reserved	:		:	
+191	:	Reserved	:		:	
+192-254	:	Reserved for Local Use	:		:	
+192	:	Surface Lifted Index	:	K	:	LFT X
+193	:	Best (4 layer) Lifted Index	:	K	:	4LFTX
+194	:	Richardson Number	:	Numeric	:	RI
+195	:	Convective Weather Detection Index	:		:	CWDI
+196	:	Ultra Violet Index	:	W m^-2	:	UVI
+197	:	Updraft Helicity	:	m^2 s^-2	:	UPHL
+198	:	Leaf Area Index	:	Numeric	:	LAI
+199	:	Hourly Maximum of Updraft Helicity	:	m^2 s^-2	:	MXUPHL
+200	:	Hourly Minimum of Updraft Helicity	:	m^2 s^-2	:	MNUPHL
+201	:	Bourgoiun Negative Energy Layer (surface to freezing level)	:	J kg^-1	:	BNEGELAY
+202	:	Bourgoiun Positive Energy Layer (2k ft AGL to 400 hPa)	:	J kg^-1	:	BPOSELAY
+203	:	Downdraft CAPE	:	J kg^-1	:	DCAPE
+204	:	Effective Storm Relative Helicity	:	m^2 s^-2	:	EFHL
+205	:	Enhanced Stretching Potential	:	Numeric	:	ESP
+206	:	Critical Angle	:	Degree	:	CANGLE
+207	:	Effective Surface Helicity	:	m^2 s^-2	:	E3KH
+208	:	Significant Tornado Parameter with CIN-Effective Layer	:	numeric	:	STPC
+209	:	Significant Hail Parameter	:	numeric	:	SIGH
+210	:	Supercell Composite Parameter-Effective Layer	:	numeric	:	SCCP
+211	:	Significant Tornado parameter-Fixed Layer	:	numeric	:	SIGT
+212	:	Mixed Layer (100 mb) Virtual LFC	:	numeric	:	MLFC
+255	:	Missing	:		:	

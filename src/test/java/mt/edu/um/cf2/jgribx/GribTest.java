@@ -144,15 +144,6 @@ public class GribTest
     public void testGrib2Gfs3() throws IOException, NoValidGribException, NotSupportedException
     {
         /* TODO
-         * Unsupported parameter: D:LAND_SURFACE C:4 N:2
-         * Unsupported parameter: D:LAND_SURFACE C:0 N:2
-         * Unsupported parameter: D:LAND_SURFACE C:0 N:192
-         * Unsupported parameter: D:LAND_SURFACE C:0 N:201
-         * Unsupported parameter: D:LAND_SURFACE C:3 N:203
-         * Unsupported parameter: D:METEOROLOGICAL C:6 N:201
-         * Unsupported parameter: D:METEOROLOGICAL C:7 N:192
-         * Unsupported parameter: D:METEOROLOGICAL C:7 N:6
-         * Unsupported parameter: D:METEOROLOGICAL C:7 N:7
          * Skipping GRIB record 274 (Record does not have a valid GRIB header)
          * Unsupported level of type 104
          * Skipping GRIB record 337 (Record does not have a valid GRIB header)
@@ -162,7 +153,7 @@ public class GribTest
         final String FILENAME = "/gfsanl_3_20170512_0000_000.grb2";
 
         // Define expected data
-        final int N_RECORDS_EXPECTED = 306;
+        final int N_RECORDS_EXPECTED = 329;
         final int EDITION = 2;
         final int[] WEATHER_CENTRES = {7};
         final int[] GENERATING_PROCESSES = {81};

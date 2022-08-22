@@ -1,0 +1,207 @@
+0	:	Soil Type	:		:	SOTYP
+1	:	Upper Layer Soil Temperature<sup><b> </b></sup>	:	K	:	UPLST
+2	:	Upper Layer Soil Moisture<sup><b> </b></sup>	:	kg m^-3	:	UPLSM
+3	:	Lower Layer Soil Moisture<sup><b> </b></sup>	:	kg m^-3	:	LOWLSM
+4	:	Bottom Layer Soil Temperature<sup><b> </b></sup>	:	K	:	BOTLST
+5	:	Liquid Volumetric Soil Moisture(non-frozen)<sup><b></b></sup>	:	Proportion	:	SOILL
+6	:	Number of Soil Layers in Root Zone	:	Numeric	:	RLYRS
+7	:	Transpiration Stress-onset (soilmoisture)<sup><b></b></sup>	:	Proportion	:	SMREF
+8	:	Direct Evaporation Cease (soilmoisture)<sup><b></b></sup>	:	Proportion	:	SMDRY
+9	:	Soil Porosity<sup><b></b></sup>	:	Proportion	:	POROS
+10	:	Liquid Volumetric Soil Moisture (Non-Frozen)	:	m^3 m^-3	:	LIQVSM
+11	:	Volumetric Transpiration Stree-Onset(Soil Moisture)	:	m^3 m^-3	:	VOLTSO
+12	:	Transpiration Stree-Onset(Soil Moisture)	:	kg m^-3	:	TRANSO
+13	:	Volumetric Direct Evaporation Cease(Soil Moisture)	:	m^3 m^-3	:	VOLDEC
+14	:	Direct Evaporation Cease(Soil Moisture)	:	kg m^-3	:	DIREC
+15	:	Soil Porosity	:	m^3 m^-3	:	SOILP
+16	:	Volumetric Saturation Of Soil Moisture	:	m^3 m^-3	:	VSOSM
+17	:	Saturation Of Soil Moisture	:	kg m^-3	:	SATOSM
+18	:	Soil Temperature	:	K	:	SOILTMP
+19	:	Soil Moisture	:	kg m^-3	:	SOILMOI
+20	:	Column-Integrated Soil Moisture	:	kg m^-2	:	CISOILM
+21	:	Soil Ice	:	kg m^-3	:	SOILICE
+22	:	Column-Integrated Soil Ice	:	kg m^-2	:	CISICE
+23	:	Liquid Water in Snow Pack	:	kg m^-2	:	LWSNWP
+24	:	Frost Index	:	kg day^-1	:	FRSTINX
+25	:	Snow Depth at Elevation Bands	:	kg m^-2	:	SNWDEB
+26	:	Soil Heat Flux	:	W m^-2	:	SHFLX
+27	:	Soil Depth	:	m	:	SOILDEP
+28	:	Snow Temperature	:	K	:	SNOWTMP
+29	:	Ice Temperature	:	K	:	ICETEMP
+30	:	Reserved	:		:	
+31	:	Reserved	:		:	
+32	:	Reserved	:		:	
+33	:	Reserved	:		:	
+34	:	Reserved	:		:	
+35	:	Reserved	:		:	
+36	:	Reserved	:		:	
+37	:	Reserved	:		:	
+38	:	Reserved	:		:	
+39	:	Reserved	:		:	
+40	:	Reserved	:		:	
+41	:	Reserved	:		:	
+42	:	Reserved	:		:	
+43	:	Reserved	:		:	
+44	:	Reserved	:		:	
+45	:	Reserved	:		:	
+46	:	Reserved	:		:	
+47	:	Reserved	:		:	
+48	:	Reserved	:		:	
+49	:	Reserved	:		:	
+50	:	Reserved	:		:	
+51	:	Reserved	:		:	
+52	:	Reserved	:		:	
+53	:	Reserved	:		:	
+54	:	Reserved	:		:	
+55	:	Reserved	:		:	
+56	:	Reserved	:		:	
+57	:	Reserved	:		:	
+58	:	Reserved	:		:	
+59	:	Reserved	:		:	
+60	:	Reserved	:		:	
+61	:	Reserved	:		:	
+62	:	Reserved	:		:	
+63	:	Reserved	:		:	
+64	:	Reserved	:		:	
+65	:	Reserved	:		:	
+66	:	Reserved	:		:	
+67	:	Reserved	:		:	
+68	:	Reserved	:		:	
+69	:	Reserved	:		:	
+70	:	Reserved	:		:	
+71	:	Reserved	:		:	
+72	:	Reserved	:		:	
+73	:	Reserved	:		:	
+74	:	Reserved	:		:	
+75	:	Reserved	:		:	
+76	:	Reserved	:		:	
+77	:	Reserved	:		:	
+78	:	Reserved	:		:	
+79	:	Reserved	:		:	
+80	:	Reserved	:		:	
+81	:	Reserved	:		:	
+82	:	Reserved	:		:	
+83	:	Reserved	:		:	
+84	:	Reserved	:		:	
+85	:	Reserved	:		:	
+86	:	Reserved	:		:	
+87	:	Reserved	:		:	
+88	:	Reserved	:		:	
+89	:	Reserved	:		:	
+90	:	Reserved	:		:	
+91	:	Reserved	:		:	
+92	:	Reserved	:		:	
+93	:	Reserved	:		:	
+94	:	Reserved	:		:	
+95	:	Reserved	:		:	
+96	:	Reserved	:		:	
+97	:	Reserved	:		:	
+98	:	Reserved	:		:	
+99	:	Reserved	:		:	
+100	:	Reserved	:		:	
+101	:	Reserved	:		:	
+102	:	Reserved	:		:	
+103	:	Reserved	:		:	
+104	:	Reserved	:		:	
+105	:	Reserved	:		:	
+106	:	Reserved	:		:	
+107	:	Reserved	:		:	
+108	:	Reserved	:		:	
+109	:	Reserved	:		:	
+110	:	Reserved	:		:	
+111	:	Reserved	:		:	
+112	:	Reserved	:		:	
+113	:	Reserved	:		:	
+114	:	Reserved	:		:	
+115	:	Reserved	:		:	
+116	:	Reserved	:		:	
+117	:	Reserved	:		:	
+118	:	Reserved	:		:	
+119	:	Reserved	:		:	
+120	:	Reserved	:		:	
+121	:	Reserved	:		:	
+122	:	Reserved	:		:	
+123	:	Reserved	:		:	
+124	:	Reserved	:		:	
+125	:	Reserved	:		:	
+126	:	Reserved	:		:	
+127	:	Reserved	:		:	
+128	:	Reserved	:		:	
+129	:	Reserved	:		:	
+130	:	Reserved	:		:	
+131	:	Reserved	:		:	
+132	:	Reserved	:		:	
+133	:	Reserved	:		:	
+134	:	Reserved	:		:	
+135	:	Reserved	:		:	
+136	:	Reserved	:		:	
+137	:	Reserved	:		:	
+138	:	Reserved	:		:	
+139	:	Reserved	:		:	
+140	:	Reserved	:		:	
+141	:	Reserved	:		:	
+142	:	Reserved	:		:	
+143	:	Reserved	:		:	
+144	:	Reserved	:		:	
+145	:	Reserved	:		:	
+146	:	Reserved	:		:	
+147	:	Reserved	:		:	
+148	:	Reserved	:		:	
+149	:	Reserved	:		:	
+150	:	Reserved	:		:	
+151	:	Reserved	:		:	
+152	:	Reserved	:		:	
+153	:	Reserved	:		:	
+154	:	Reserved	:		:	
+155	:	Reserved	:		:	
+156	:	Reserved	:		:	
+157	:	Reserved	:		:	
+158	:	Reserved	:		:	
+159	:	Reserved	:		:	
+160	:	Reserved	:		:	
+161	:	Reserved	:		:	
+162	:	Reserved	:		:	
+163	:	Reserved	:		:	
+164	:	Reserved	:		:	
+165	:	Reserved	:		:	
+166	:	Reserved	:		:	
+167	:	Reserved	:		:	
+168	:	Reserved	:		:	
+169	:	Reserved	:		:	
+170	:	Reserved	:		:	
+171	:	Reserved	:		:	
+172	:	Reserved	:		:	
+173	:	Reserved	:		:	
+174	:	Reserved	:		:	
+175	:	Reserved	:		:	
+176	:	Reserved	:		:	
+177	:	Reserved	:		:	
+178	:	Reserved	:		:	
+179	:	Reserved	:		:	
+180	:	Reserved	:		:	
+181	:	Reserved	:		:	
+182	:	Reserved	:		:	
+183	:	Reserved	:		:	
+184	:	Reserved	:		:	
+185	:	Reserved	:		:	
+186	:	Reserved	:		:	
+187	:	Reserved	:		:	
+188	:	Reserved	:		:	
+189	:	Reserved	:		:	
+190	:	Reserved	:		:	
+191	:	Reserved	:		:	
+192-254	:	Reservedfor Local Use	:		:	
+192	:	Liquid Volumetric Soil Moisture(non Frozen)	:	Proportion	:	SOILL
+193	:	Number of Soil Layers in Root Zone	:	non-dim	:	RLYRS
+194	:	Surface Slope Type	:	Index	:	SLTYP
+195	:	Transpiration Stress-onset (soilmoisture)	:	Proportion	:	SMREF
+196	:	Direct Evaporation Cease (soilmoisture)	:	Proportion	:	SMDRY
+197	:	Soil Porosity	:	Proportion	:	POROS
+198	:	Direct Evaporation from Bare Soil	:	W m^-2	:	EVBS
+199	:	Land Surface Precipitation Accumulation	:	kg m^-2	:	LSPA
+200	:	Bare Soil Surface Skin temperature	:	K	:	BARET
+201	:	Average Surface Skin Temperature	:	K	:	AVSFT
+202	:	Effective Radiative Skin Temperature	:	K	:	RADT
+203	:	Field Capacity	:	Fraction	:	FLDCP
+204	:	Soil Moisture Availability In The Top Soil Layer	:	%	:	MSTAV
+255	:	Missing	:		:	

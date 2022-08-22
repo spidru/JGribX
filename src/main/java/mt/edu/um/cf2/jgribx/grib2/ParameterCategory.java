@@ -69,6 +69,8 @@ public abstract class ParameterCategory
             entries.put(1, "MOISTURE");
             entries.put(2, "MOMENTUM");
             entries.put(3, "MASS");
+            entries.put(6, "CLOUD");
+            entries.put(7, "THERMODYNAMIC");
             entries.put(14, "TRACE_GASES");
         }
 
@@ -131,6 +133,8 @@ public abstract class ParameterCategory
         static {
             entries.put(0, "VEGETATION_BIOMASS");
             entries.put(1, "AGRICULTURAL_AQUACULTURAL");
+            entries.put(3, "SOIL");
+            entries.put(4, "FIRE_WEATHER");
         }
 
         public LandSurface(int categoryId)

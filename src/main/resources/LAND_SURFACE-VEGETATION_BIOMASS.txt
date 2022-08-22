@@ -1,0 +1,242 @@
+0	:	Land Cover (0=sea, 1=land)	:	Proportion	:	LAND
+1	:	Surface Roughness	:	m	:	SFCR
+2	:	Soil Temperature 	:	K	:	TSOIL
+3	:	Parameter deprecated - use another parameter instead.	:		:	
+4	:	Vegetation	:	%	:	VEG
+5	:	Water Runoff	:	kg m^-2	:	WATR
+6	:	Evapotranspiration (See note 1)	:	kg^-2 s^-1	:	EVAPT
+7	:	Model Terrain Height	:	m	:	MTERH
+8	:	Land Use	:		:	LANDU
+9	:	Volumetric Soil Moisture Content<sup><b> </b></sup>	:	Proportion	:	SOILW
+10	:	Ground Heat Flux<sup><b> </b></sup>	:	W m^-2	:	GFLUX
+11	:	Moisture Availability	:	%	:	MSTAV
+12	:	Exchange Coefficient	:	kg m^-2 s^-1	:	SFEXC
+13	:	Plant Canopy Surface Water	:	kg m^-2	:	CNWAT
+14	:	Blackadar\'s Mixing Length Scale	:	m	:	BMIXL
+15	:	Canopy Conductance	:	m s^-1	:	CCOND
+16	:	Minimal Stomatal Resistance	:	s m^-1	:	RSMIN
+17	:	Wilting Point<sup><b> </b></sup>	:	Proportion	:	WILT
+18	:	Solar parameter in canopyconductance	:	Proportion	:	RCS
+19	:	Temperature parameter in canopy	:	Proportion	:	RCT
+20	:	Humidity parameter in canopy conductance	:	Proportion	:	RCQ
+21	:	Soil moisture parameter in canopy conductance	:	Proportion	:	RCSOL
+22	:	Parameter deprecated - use another parameter instead.	:		:	
+23	:	Column-Integrated Soil Water 	:	kg m^-2	:	CISOILW
+24	:	Heat Flux	:	W m^-2	:	HFLUX
+25	:	Volumetric Soil Moisture	:	m^3 m^-3	:	VSOILM
+26	:	Wilting Point	:	kg m^-3	:	WILT
+27	:	Volumetric Wilting Point	:	m^3 m^-3	:	VWILTP
+28	:	Leaf Area Index	:	Numeric	:	LEAINX
+29	:	Evergreen Forest Cover	:	Proportion	:	EVGFC
+30	:	Deciduous Forest Cover	:	Proportion	:	DECFC
+31	:	Normalized Differential Vegetation Index (NDVI)	:	Numeric	:	NDVINX
+32	:	Root Depth of Vegetation	:	m	:	RDVEG
+33	:	Water Runoff and Drainage 	:	kg m^-2	:	WROD
+34	:	Surface Water Runoff 	:	kg m^-2	:	SFCWRO
+35	:	Tile Class	:		:	TCLASS
+36	:	Tile Fraction	:	Proportion	:	TFRCT
+37	:	Tile Percentage	:	%	:	TPERCT
+38	:	Soil Volumetric Ice Content (Water Equivalent) (See note 2)	:	m^3 m^-3	:	SOILVIC
+39	:	Evapotranspiration Rate	:	kg m^-2 s^-1	:	EVAPTRAT
+40	:	Potential Evapotranspiration Rate	:	kg m^-2 s^-1	:	PERATE
+41	:	Snow Melt Rate	:	kg m^-2 s^-1	:	SMRATE
+42	:	Water Runoff and Drainage Rate	:	kg m^-2 s^-1	:	WRDRATE
+43	:	Drainage direction	:		:	DRAINDIR
+44	:	Upstream Area	:	m^2	:	UPSAREA
+45	:	Reserved	:		:	
+46	:	Reserved	:		:	
+47	:	Reserved	:		:	
+48	:	Reserved	:		:	
+49	:	Reserved	:		:	
+50	:	Reserved	:		:	
+51	:	Reserved	:		:	
+52	:	Reserved	:		:	
+53	:	Reserved	:		:	
+54	:	Reserved	:		:	
+55	:	Reserved	:		:	
+56	:	Reserved	:		:	
+57	:	Reserved	:		:	
+58	:	Reserved	:		:	
+59	:	Reserved	:		:	
+60	:	Reserved	:		:	
+61	:	Reserved	:		:	
+62	:	Reserved	:		:	
+63	:	Reserved	:		:	
+64	:	Reserved	:		:	
+65	:	Reserved	:		:	
+66	:	Reserved	:		:	
+67	:	Reserved	:		:	
+68	:	Reserved	:		:	
+69	:	Reserved	:		:	
+70	:	Reserved	:		:	
+71	:	Reserved	:		:	
+72	:	Reserved	:		:	
+73	:	Reserved	:		:	
+74	:	Reserved	:		:	
+75	:	Reserved	:		:	
+76	:	Reserved	:		:	
+77	:	Reserved	:		:	
+78	:	Reserved	:		:	
+79	:	Reserved	:		:	
+80	:	Reserved	:		:	
+81	:	Reserved	:		:	
+82	:	Reserved	:		:	
+83	:	Reserved	:		:	
+84	:	Reserved	:		:	
+85	:	Reserved	:		:	
+86	:	Reserved	:		:	
+87	:	Reserved	:		:	
+88	:	Reserved	:		:	
+89	:	Reserved	:		:	
+90	:	Reserved	:		:	
+91	:	Reserved	:		:	
+92	:	Reserved	:		:	
+93	:	Reserved	:		:	
+94	:	Reserved	:		:	
+95	:	Reserved	:		:	
+96	:	Reserved	:		:	
+97	:	Reserved	:		:	
+98	:	Reserved	:		:	
+99	:	Reserved	:		:	
+100	:	Reserved	:		:	
+101	:	Reserved	:		:	
+102	:	Reserved	:		:	
+103	:	Reserved	:		:	
+104	:	Reserved	:		:	
+105	:	Reserved	:		:	
+106	:	Reserved	:		:	
+107	:	Reserved	:		:	
+108	:	Reserved	:		:	
+109	:	Reserved	:		:	
+110	:	Reserved	:		:	
+111	:	Reserved	:		:	
+112	:	Reserved	:		:	
+113	:	Reserved	:		:	
+114	:	Reserved	:		:	
+115	:	Reserved	:		:	
+116	:	Reserved	:		:	
+117	:	Reserved	:		:	
+118	:	Reserved	:		:	
+119	:	Reserved	:		:	
+120	:	Reserved	:		:	
+121	:	Reserved	:		:	
+122	:	Reserved	:		:	
+123	:	Reserved	:		:	
+124	:	Reserved	:		:	
+125	:	Reserved	:		:	
+126	:	Reserved	:		:	
+127	:	Reserved	:		:	
+128	:	Reserved	:		:	
+129	:	Reserved	:		:	
+130	:	Reserved	:		:	
+131	:	Reserved	:		:	
+132	:	Reserved	:		:	
+133	:	Reserved	:		:	
+134	:	Reserved	:		:	
+135	:	Reserved	:		:	
+136	:	Reserved	:		:	
+137	:	Reserved	:		:	
+138	:	Reserved	:		:	
+139	:	Reserved	:		:	
+140	:	Reserved	:		:	
+141	:	Reserved	:		:	
+142	:	Reserved	:		:	
+143	:	Reserved	:		:	
+144	:	Reserved	:		:	
+145	:	Reserved	:		:	
+146	:	Reserved	:		:	
+147	:	Reserved	:		:	
+148	:	Reserved	:		:	
+149	:	Reserved	:		:	
+150	:	Reserved	:		:	
+151	:	Reserved	:		:	
+152	:	Reserved	:		:	
+153	:	Reserved	:		:	
+154	:	Reserved	:		:	
+155	:	Reserved	:		:	
+156	:	Reserved	:		:	
+157	:	Reserved	:		:	
+158	:	Reserved	:		:	
+159	:	Reserved	:		:	
+160	:	Reserved	:		:	
+161	:	Reserved	:		:	
+162	:	Reserved	:		:	
+163	:	Reserved	:		:	
+164	:	Reserved	:		:	
+165	:	Reserved	:		:	
+166	:	Reserved	:		:	
+167	:	Reserved	:		:	
+168	:	Reserved	:		:	
+169	:	Reserved	:		:	
+170	:	Reserved	:		:	
+171	:	Reserved	:		:	
+172	:	Reserved	:		:	
+173	:	Reserved	:		:	
+174	:	Reserved	:		:	
+175	:	Reserved	:		:	
+176	:	Reserved	:		:	
+177	:	Reserved	:		:	
+178	:	Reserved	:		:	
+179	:	Reserved	:		:	
+180	:	Reserved	:		:	
+181	:	Reserved	:		:	
+182	:	Reserved	:		:	
+183	:	Reserved	:		:	
+184	:	Reserved	:		:	
+185	:	Reserved	:		:	
+186	:	Reserved	:		:	
+187	:	Reserved	:		:	
+188	:	Reserved	:		:	
+189	:	Reserved	:		:	
+190	:	Reserved	:		:	
+191	:	Reserved	:		:	
+192-254	:	Reservedfor Local Use	:		:	
+192	:	Volumetric Soil Moisture Content	:	Fraction	:	SOILW
+193	:	Ground Heat Flux	:	W m^-2	:	GFLUX
+194	:	Moisture Availability	:	%	:	MSTAV
+195	:	Exchange Coefficient	:	(kg m^-3) (m s^-1)	:	SFEXC
+196	:	Plant Canopy Surface Water	:	kg m^-2	:	CNWAT
+197	:	Blackadar&#8217;s Mixing Length Scale	:	m	:	BMIXL
+198	:	Vegetation Type	:	Integer (0-13)	:	VGTYP
+199	:	CanopyConductance	:	m s^-1	:	CCOND
+200	:	Minimal Stomatal Resistance	:	s m^-1	:	RSMIN
+201	:	Wilting Point	:	Fraction	:	WILT
+202	:	Solarparameter in canopy conductance	:	Fraction	:	RCS
+203	:	Temperature parameter in canopyconductance	:	Fraction	:	RCT
+204	:	Humidity parameter in canopyconductance	:	Fraction	:	RCQ
+205	:	Soil moisture parameter incanopy conductance	:	Fraction	:	RCSOL
+206	:	Rate of water dropping from canopy to ground	:		:	RDRIP
+207	:	Ice-free water surface	:	%	:	ICWAT
+208	:	Surface exchange coefficients for T and Q divided by delta z	:	m s^-1	:	AKHS
+209	:	Surface exchange coefficients for U and V divided by delta z	:	m s^-1	:	AKMS
+210	:	Vegetation canopy temperature	:	K	:	VEGT
+211	:	Surface water storage	:	Kg m^-2	:	SSTOR
+212	:	Liquid soil moisture content (non-frozen)	:	Kg m^-2	:	LSOIL
+213	:	Open water evaporation (standing water)	:	W m^-2	:	EWATR
+214	:	Groundwater recharge	:	Kg m^-2	:	GWREC
+215	:	Flood plain recharge	:	Kg m^-2	:	QREC
+216	:	Roughness length for heat	:	m	:	SFCRH
+217	:	Normalized Difference Vegetation Index	:		:	NDVI
+218	:	Land-sea coverage (nearest neighbor) [land=1,sea=0]	:		:	LANDN
+219	:	Asymptotic mixing length scale	:	m	:	AMIXL
+220	:	Water vapor added by precip assimilation	:	Kg m^-2	:	WVINC
+221	:	Water condensate added by precip assimilation	:	Kg m^-2	:	WCINC
+222	:	Water Vapor Flux Convergance (Vertical Int)	:	Kg m^-2	:	WVCONV
+223	:	Water Condensate Flux Convergance (Vertical Int)	:	Kg m^-2	:	WCCONV
+224	:	Water Vapor Zonal Flux (Vertical Int)	:	Kg m^-2	:	WVUFLX
+225	:	Water Vapor Meridional Flux (Vertical Int)	:	Kg m^-2	:	WVVFLX
+226	:	Water Condensate Zonal Flux (Vertical Int)	:	Kg m^-2	:	WCUFLX
+227	:	Water Condensate Meridional Flux (Vertical Int)	:	Kg m^-2	:	WCVFLX
+228	:	Aerodynamic conductance	:	m s^-1	:	ACOND
+229	:	Canopy water evaporation	:	W m^-2	:	EVCW
+230	:	Transpiration	:	W m^-2	:	TRANS
+231	:	Seasonally Minimum Green Vegetation Fraction (over 1-year period)	:	%	:	VEGMIN
+232	:	Seasonally Maximum Green Vegetation Fraction (over 1-year period)	:	%	:	VEGMAX
+233	:	Land Fraction	:	Fraction	:	LANDFRC
+234	:	Lake Fraction	:	Fraction	:	LAKEFRC
+235	:	Precipitation Advected Heat Flux	:	W m^-2	:	PAHFLX
+236	:	Water Storage in Aquifer	:	Kg m^-2	:	WATERSA
+237	:	Evaporation of Intercepted Water	:	Kg m^-2	:	EIWATER
+238	:	Plant Transpiration	:	Kg m^-2	:	PLANTTR
+239	:	Soil Surface Evaporation	:	Kg m^-2	:	SOILSE
+255	:	Missing	:		:	
