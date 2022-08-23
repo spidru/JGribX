@@ -161,7 +161,7 @@ public class GribTest
         GribFile file = new GribFile(url.openStream());
 
         assertEquals("GRIB edition", EDITION, file.getEdition());
-        assertEquals("Reference time(s)", file.getReferenceTimes(), refTimes);
+        assertEquals("Reference time(s)", refTimes, file.getReferenceTimes());
         assertArrayEquals("Weather centres", WEATHER_CENTRES, file.getCentreIDs());
         assertArrayEquals("Generating processes", GENERATING_PROCESSES, file.getProcessIDs());
         assertEquals("Records read successfully", N_RECORDS_EXPECTED, file.getRecordCount());
@@ -178,11 +178,13 @@ public class GribTest
 
         // Define expected data
         final int EDITION = 2;
+        final int[] WEATHER_CENTRES = {7};
 
         URL url = GribTest.class.getResource(FILENAME);
         GribFile file = new GribFile(url.openStream());
 
         assertEquals("GRIB edition", EDITION, file.getEdition());
+        assertArrayEquals("Weather centres", WEATHER_CENTRES, file.getCentreIDs());
     }
 
 }
