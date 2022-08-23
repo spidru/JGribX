@@ -144,16 +144,13 @@ public class GribTest
     public void testGrib2Gfs3() throws IOException, NoValidGribException, NotSupportedException
     {
         /* TODO
-         * Skipping GRIB record 274 (Record does not have a valid GRIB header)
-         * Unsupported level of type 104
-         * Skipping GRIB record 337 (Record does not have a valid GRIB header)
          * Unsupported parameter: D:OCEANOGRAPHIC C:2 N:0
          * Unsupported level of type 109
          */
         final String FILENAME = "/gfsanl_3_20170512_0000_000.grb2";
 
         // Define expected data
-        final int N_RECORDS_EXPECTED = 329;
+        final int N_RECORDS_EXPECTED = 314;
         final int EDITION = 2;
         final int[] WEATHER_CENTRES = {7};
         final int[] GENERATING_PROCESSES = {81};

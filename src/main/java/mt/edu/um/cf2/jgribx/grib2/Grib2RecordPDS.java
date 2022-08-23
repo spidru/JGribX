@@ -220,14 +220,14 @@ public class Grib2RecordPDS
                 }
                 
                 if (level2Type != 255)
-                    Logger.println("Second surface is not yet supported", Logger.ERROR);
+                    throw new NotSupportedException("Second surface is not yet supported");
                 
 //                levelValues = new float[2];
 //                levelValues[0] = level1Value;
                 
                 break;
             default:
-                throw new NotSupportedException("Unsupported template number");
+                throw new NotSupportedException("Unsupported template number: " + templateId);
         }        
     }
     

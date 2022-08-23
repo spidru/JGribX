@@ -25,6 +25,7 @@ public class Grib2Level
      * Constructor for an instance of {@link Grib2Level} matching the specified type and value
      * @param type  the type designator of the level
      * @param value the value associated with the specified level
+     * Reference: https://fossies.org/linux/gdal/frmts/grib/degrib/data/grib2_table_4_5.csv
      */
     public Grib2Level()
     {
@@ -84,11 +85,17 @@ public class Grib2Level
                 level.description = level.value1 + " " + level.units + " above MSL";
                 break;
             case 103:
-                level.code = "TGL";
+                level.code = "HTGL";
                 level.name = "Specified height level above ground";
                 level.units = "m";
                 level.value1 = value;
                 level.description = (int) level.value1 + " " + level.units + " above ground";
+                break;
+            case 104:
+                level.code = "SIGL";
+                level.description = level.name = "Sigma Level";
+                level.units = "%";
+                level.value1 = value;
                 break;
             case 105:
                 level.code = "HYBL";
