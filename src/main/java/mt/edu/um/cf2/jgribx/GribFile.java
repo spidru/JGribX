@@ -20,9 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,7 +37,6 @@ import java.util.regex.Pattern;
 
 public class GribFile
 {
-    private String filename;
     private int nRecordsSkipped;
     
     /**
@@ -50,18 +47,17 @@ public class GribFile
    /**
     * Constructs a {@link GribFile} object from a file.
     *
-    * @param filename name of the GRIB file
+    * @param filepath name of the GRIB file
     *
     * @throws FileNotFoundException if file cannot be found
     * @throws IOException           if file cannot be opened etc.
     * @throws NotSupportedException if file contains features not yet supported
     * @throws NoValidGribException  if file is no valid GRIB file
     */
-    public GribFile(String filename) throws FileNotFoundException,
+    public GribFile(String filepath) throws FileNotFoundException,
         IOException, NotSupportedException, NoValidGribException
     {
-        this(new FileInputStream(filename));
-        this.filename = filename;
+        this(new FileInputStream(filepath));
     }
 
    /**
@@ -96,7 +92,7 @@ public class GribFile
         nRecordsSkipped = 0;
         records = new ArrayList();
 
-        /**
+        /*
         * Initialise the Parameter Tables with the information in the parameter
         * table lookup file.  See GribPDSParamTable for details
         */
@@ -109,6 +105,7 @@ public class GribFile
             GribRecord record;
             try
             {
+                Logger.println("Reading next record: " + count, Logger.DEBUG);
                 record = GribRecord.readFromStream(in);
             }
             catch (NotSupportedException|NoValidGribException e)
@@ -176,16 +173,7 @@ public class GribFile
         
         return edition;
     }
-    
-    /**
-     * Returns the GRIB filename.
-     * @return the GRIB filename
-     */
-    public String getFilename()
-    {
-        return filename;
-    }
-    
+
     public List<Calendar> getForecastTimes()
     {
         boolean matchFound;
@@ -423,7 +411,6 @@ public class GribFile
         
         // Print out generic GRIB file info
         out.println("---------------------------------------");
-        out.println("Reading file: " + this.filename);
         out.println("GRIB Edition: " + this.getEdition());
         out.println("Records successfully read: " + this.getRecordCount() + " of "
                 + (this.getRecordCount() + this.getRecordsSkippedCount()));
