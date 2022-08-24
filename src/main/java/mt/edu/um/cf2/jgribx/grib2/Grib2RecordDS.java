@@ -373,13 +373,20 @@ public class Grib2RecordDS
         // bit map is used
         if (bms.indicator != Indicator.BITMAP_NONE)
         {
-            System.err.println("Bitmap not supported yet");
             int idx = 0;
             float tmp[] = new float[gds.getNumberOfDataPoints()];
             for (int i = 0; i < gds.getNumberOfDataPoints(); i++)
             {
-//                if ((bitmap[i/8] & ))
+                if ((isBitSet(bms.bitmap[i / 8], i % 8)))
+                {
+                    tmp[i] = data[idx++];
+                }
+                else
+                {
+                    tmp[i] = drs.missingValue;
+                }
             }
+            data = tmp;
         }
         
         return data;
