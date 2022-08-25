@@ -114,6 +114,7 @@ public class Grib2Level
                 level.units = "hPa";
                 level.value1 = value;
                 level.description = level.value1 + " " + level.units + " pressure difference from ground";
+                break;
             case 200:
                 level.code = "EATM";
                 level.description = level.name = "entire atmosphere (considered as a single layer)";
