@@ -93,7 +93,8 @@ public class Grib2Record extends GribRecord
             }
             if (in.getByteCounter() != sectionLength)
             {
-                Logger.println("Length of Section "+section+" does not match actual amount of bytes read", Logger.ERROR);
+                Logger.println("Indicated length (" + sectionLength + ") of Section " + section +
+                    " does not match actual amount of bytes read (" + in.getByteCounter() + ")", Logger.ERROR);
             }
             recordLength -= sectionLength;
         }
