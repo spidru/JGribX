@@ -108,7 +108,14 @@ public class GribFile
                 Logger.println("Skipping GRIB record "+count+" ("+e.getMessage()+")", Logger.WARNING);
                 nRecordsSkipped++;
                 // Skip to end of current record
-                GribRecordES.seekNext(in);
+                try
+                {
+                    GribRecordES.seekNext(in);
+                }
+                catch (EOFException eofe)
+                {
+                    Logger.println("EOFException while seeking ES: " + eofe.getMessage(), Logger.INFO);
+                }
                 continue;
             }
             finally
@@ -117,7 +124,7 @@ public class GribFile
                 {
                     GribRecordIS.seekNext(in);
                 }
-                catch (EOFException ignored){}
+                catch (EOFException ignored) {}
             }
 
             Logger.println("GRIB Record "+count, Logger.INFO);

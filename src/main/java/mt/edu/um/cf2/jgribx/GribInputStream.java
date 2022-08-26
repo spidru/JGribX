@@ -323,9 +323,12 @@ public class GribInputStream extends FilterInputStream
            this.mark(nAvailableBytes);
            int[] bytes = this.readUI8(nAvailableBytes);
            iChunkByte = 0;
+
+           // Search for pattern within chunk
            while (!endPatternFound && iChunkByte <= nAvailableBytes - pattern.length)
            {
                endPatternFound = true;
+               // Compare next bytes with pattern
                for (int iPattern = 0; iPattern < pattern.length; iPattern++)
                {
                    if (bytes[iChunkByte + iPattern] != pattern[iPattern])
@@ -336,14 +339,16 @@ public class GribInputStream extends FilterInputStream
                    }
                }
            }
-           if (endPatternFound) break;
 
+           // Backtrack stream position until it's just before/after the last byte of the pattern
            this.reset();
-           if (this.skip(nAvailableBytes - pattern.length) != nAvailableBytes - pattern.length)
+           int offset = consumePattern ? pattern.length : 0;
+           if (this.skip(iChunkByte + offset) != iChunkByte + offset)
            {
                throw new IOException("Skipped less bytes than expected");
            }
 
+           if (endPatternFound) break;
        }
 
        if (!endPatternFound)
@@ -351,18 +356,10 @@ public class GribInputStream extends FilterInputStream
            throw new EOFException("Reached end of stream without finding pattern");
        }
 
-       // Backtrack stream position until it's just before/after the last byte of the pattern
-       this.reset();
-       int offset = consumePattern ? pattern.length : 0;
-       if (this.skip(iChunkByte + offset) != iChunkByte + offset) {
-           throw new IOException("Skipped less bytes than expected");
-       }
-
        // Calculate amount of bytes consumed
        int iEndPos = this.getByteCounter();
-       int nBytesConsumed = iEndPos - iStartPos;
 
-       return nBytesConsumed;
+       return iEndPos - iStartPos;
    }
 
 }
