@@ -117,18 +117,17 @@ public class GribTest
                 int i = 0;
                 while ((line = reader.readLine()) != null)
                 {
-                    double tolerance = 0.1;
-                    float expectedValue = Float.parseFloat(line);
+		    // Calculate the tolerance based on the maximum data value
+                    double tolerance = 0;
+                    double maxValue = GribTest.getMaxValue(obtainedValues);
+                    if (maxValue >= 100e3) { tolerance = 0.9; }
+                    else if (maxValue >= 10e3) { tolerance = 0.5; }
+                    else if (maxValue >= 1e3) { tolerance = 0.05; }
+                    else if (maxValue >= 100) { tolerance = 0.005; }
+                    else if (maxValue >= 10) { tolerance = 0.0005; }
+                    else { tolerance = 0.00005; }
 
-                    /* WORKAROUND
-                     * It seems that wgrib occasionally outputs values as integers for some reason.
-                     * To avoid false positive assertions, we increase the tolerance to 0.5
-                     */
-                    int expectedValueAsInt = (int) expectedValue;
-                    if (expectedValue - expectedValueAsInt == 0)
-                    {
-                        tolerance = 0.5;
-                    }
+                    float expectedValue = Float.parseFloat(line);
 
                     assertEquals(String.format("Record %d entry %d", i_record, i),
                             expectedValue, obtainedValues[i], tolerance);
@@ -187,4 +186,13 @@ public class GribTest
         assertArrayEquals("Weather centres", WEATHER_CENTRES, file.getCentreIDs());
     }
 
+    private static float getMaxValue(float[] values)
+    {
+        float max = values[0];
+        for (int i = 1; i < values.length; i++)
+        {
+            if (values[i] > max) { max = values[i]; }
+        }
+        return max;
+    }
 }
