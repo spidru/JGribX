@@ -120,6 +120,7 @@ public class Grib2Record extends GribRecord
     {
         if (pdsList.size() > 1)
             Logger.println("Record contains multiple PDS's", Logger.WARNING);
+
         return pdsList.get(0).getLevelCode();
     }
     
@@ -128,6 +129,7 @@ public class Grib2Record extends GribRecord
     {
         if (pdsList.size() > 1)
             Logger.println("Record contains multiple PDS's", Logger.WARNING);
+
         return pdsList.get(0).getLevelDescription();
     }
     
@@ -144,7 +146,7 @@ public class Grib2Record extends GribRecord
     {
         if (pdsList.size() > 1)
             Logger.println("Record contains multiple PDS's", Logger.WARNING);
-        return pdsList.get(0).getLevel().getValues();
+        return pdsList.get(0).getLayer().getValues();
     }
        
     @Override

@@ -18,13 +18,10 @@ public class Grib2Level
     protected String name;          // provides a generic name for the level
     protected int index;
     protected String units;
-    protected float value1;
-    protected float value2;
-    
+    protected float value;
+
     /**
      * Constructor for an instance of {@link Grib2Level} matching the specified type and value
-     * @param type  the type designator of the level
-     * @param value the value associated with the specified level
      * Reference: https://fossies.org/linux/gdal/frmts/grib/degrib/data/grib2_table_4_5.csv
      */
     public Grib2Level()
@@ -70,8 +67,8 @@ public class Grib2Level
                 level.code = "ISBL";
                 level.name = "isobaric surface";
                 level.units = "hPa";
-                level.value1 = value / 100;
-                level.description = "pressure at " + (int) level.value1 + " " + level.units;
+                level.value = value / 100;
+                level.description = "pressure at " + (int) level.value + " " + level.units;
                 break;
             case 101:
                 level.code = "MSL";
@@ -81,39 +78,41 @@ public class Grib2Level
                 level.code = "GPML";
                 level.name = "specified altitude above MSL";
                 level.units = "m";
-                level.value1 = value;
-                level.description = level.value1 + " " + level.units + " above MSL";
+                level.value = value;
+                level.description = level.value + " " + level.units + " above MSL";
                 break;
             case 103:
                 level.code = "HTGL";
                 level.name = "Specified height level above ground";
                 level.units = "m";
-                level.value1 = value;
-                level.description = (int) level.value1 + " " + level.units + " above ground";
+                level.value = value;
+                level.description = (int) level.value + " " + level.units + " above ground";
                 break;
             case 104:
                 level.code = "SIGL";
                 level.description = level.name = "Sigma Level";
                 level.units = "%";
-                level.value1 = value;
+                level.value = value;
                 break;
             case 105:
                 level.code = "HYBL";
                 level.name = "Hybrid level";
-                level.value1 = value;
+                level.value = value;
                 level.description = (int) value + " hybrid level(s)";
                 break;
             case 106:
                 level.code = "DBLL";
-                level.description = "depth below land surface";
+                level.name = "Depth below land surface";
+                level.value = value;
                 level.units = "m";
+                level.description = level.value + " " + level.units + " depth below land surface";
                 break;
             case 108:
                 level.code = "SPDL";
                 level.name = "level at specified pressure difference from ground to level";
                 level.units = "hPa";
-                level.value1 = value;
-                level.description = level.value1 + " " + level.units + " pressure difference from ground";
+                level.value = value;
+                level.description = level.value + " " + level.units + " pressure difference from ground";
                 break;
             case 200:
                 level.code = "EATM";
@@ -151,7 +150,7 @@ public class Grib2Level
     
     public String getLevelIdentifier()
     {
-        return code+":"+value1;
+        return code+":"+ value;
     }
     
     public String getName()
@@ -164,9 +163,8 @@ public class Grib2Level
         return units;
     }
     
-    public float[] getValues()
+    public float getValue()
     {
-        float[] values = {value1, value2};
-        return values;
+        return value;
     }
 }

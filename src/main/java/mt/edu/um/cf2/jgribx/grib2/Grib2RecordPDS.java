@@ -10,6 +10,7 @@
  */
 package mt.edu.um.cf2.jgribx.grib2;
 
+import mt.edu.um.cf2.jgribx.GribCodes;
 import mt.edu.um.cf2.jgribx.GribInputStream;
 import mt.edu.um.cf2.jgribx.Logger;
 import mt.edu.um.cf2.jgribx.NotSupportedException;
@@ -22,6 +23,43 @@ import java.util.Calendar;
  */
 public class Grib2RecordPDS
 {
+    protected class Layer
+    {
+        private Grib2Level level1;
+        private Grib2Level level2;
+
+        public Layer(Grib2Level level1, Grib2Level level2)
+        {
+            this.level1 = level1;
+            this.level2 = level2;
+        }
+
+        public Grib2Level getFirstLevel()
+        {
+            return level1;
+        }
+
+        public Grib2Level getSecondLevel()
+        {
+            return level2;
+        }
+
+        public float[] getValues()
+        {
+            return new float[] {level1.getValue(), level2.getValue()};
+        }
+
+        public boolean isSingleLayer()
+        {
+            return level2 == null;
+        }
+
+        @Override
+        public String toString()
+        {
+            return "Layer [" + level1.getDescription() + " - " + level2.getDescription() + "]";
+        }
+    }
     /**
      * The time at which the forecast applies.
      */
@@ -51,11 +89,11 @@ public class Grib2RecordPDS
      */
     private int genProcessType;
     
-    private Grib2Level level;
-    
     private int nCoords;
     
     private int paramCategory;
+
+    private Layer layer;
     
     /**
      * Parameter Number (used when the appropriate parameter is not found)
@@ -210,21 +248,22 @@ public class Grib2RecordPDS
                 
                 ///////////////////////////////////////////////////////////////
                 /* PROCESSING */
-                float level1Value = level1ScaledValue / (float) Math.pow(10, level1ScaleFactor);
-                float level2Value = level2ScaledValue / (float) Math.pow(10, level2ScaleFactor);
-                
-                level = Grib2Level.getLevel(level1Type, level1Value);
-                if (level == null)
+                int[] scaledValues = {level1ScaledValue, level2ScaledValue};
+                int[] scaleFactors = {level1ScaleFactor, level2ScaleFactor};
+                int[] types = {level1Type, level2Type};
+                float[] levelValues = new float[2];
+                Grib2Level[] levels = new Grib2Level[2];
+
+                for (int i = 0; i < levelValues.length; i++)
                 {
-                    throw new NotSupportedException("Unsupported level of type " + level1Type);
+                    levelValues[i] = scaledValues[i] / (float) Math.pow(10, scaleFactors[i]);
+                    levels[i] = Grib2Level.getLevel(types[i], levelValues[i]);
+                    if (levels[i] == null && types[i] != GribCodes.MISSING)
+                    {
+                        throw new NotSupportedException("Unsupported level of type " + types[i]);
+                    }
                 }
-                
-                if (level2Type != 255)
-                    throw new NotSupportedException("Second surface is not yet supported");
-                
-//                levelValues = new float[2];
-//                levelValues[0] = level1Value;
-                
+                layer = new Layer(levels[0], levels[1]);
                 break;
             default:
                 throw new NotSupportedException("Unsupported template number: " + templateId);
@@ -308,24 +347,47 @@ public class Grib2RecordPDS
         return parameter.getUnits();
     }
     
-    public Grib2Level getLevel()
+    public Layer getLayer()
     {
-        return level;
+        return layer;
     }
     
+    public String getLayerDescription()
+    {
+        return layer.toString();
+    }
+
     public String getLevelCode()
+    {
+        String code = layer.getFirstLevel().getCode();
+        if (!layer.isSingleLayer() && !code.equals(layer.getSecondLevel().getCode()))
         {
-            return level.code;
+            Logger.println("Layer contains different level types. Only showing first level", Logger.WARNING);
         }
-    
+        return code;
+    }
+
     public String getLevelDescription()
+    {
+        String desc = "";
+        if (layer.isSingleLayer())
         {
-            return level.description;
+            desc = layer.getFirstLevel().getDescription();
         }
+        else
+        {
+            desc = "Layer from (" + layer.getFirstLevel().getDescription() + ") down to (" + layer.getSecondLevel().getDescription() + ")";
+        }
+        return desc;
+    }
     
     public String getLevelIdentifier()
     {
-        return level.getLevelIdentifier();
+        if (!layer.isSingleLayer())
+        {
+            Logger.println("Layer contains two levels. Only showing first level", Logger.WARNING);
+        }
+        return layer.getFirstLevel().getLevelIdentifier();
     }
 
     /**

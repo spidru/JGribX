@@ -149,7 +149,7 @@ public class GribTest
         final String FILENAME = "/gfsanl_3_20170512_0000_000.grb2";
 
         // Define expected data
-        final int N_RECORDS_EXPECTED = 314;
+        final int N_RECORDS_EXPECTED = 339;
         final int EDITION = 2;
         final int[] WEATHER_CENTRES = {7};
         final int[] GENERATING_PROCESSES = {81};
