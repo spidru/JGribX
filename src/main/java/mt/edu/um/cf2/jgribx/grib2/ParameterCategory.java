@@ -102,7 +102,7 @@ public abstract class ParameterCategory
 
         static {
             entries.put(0, "BASIC");
-            entries.put(1, "PROBABILITIES");
+//            entries.put(1, "PROBABILITIES");
         }
 
         public Hydrological(int categoryId)
@@ -132,7 +132,7 @@ public abstract class ParameterCategory
 
         static {
             entries.put(0, "VEGETATION_BIOMASS");
-            entries.put(1, "AGRICULTURAL_AQUACULTURAL");
+//            entries.put(1, "AGRICULTURAL_AQUACULTURAL");
             entries.put(3, "SOIL");
             entries.put(4, "FIRE_WEATHER");
         }
@@ -163,8 +163,8 @@ public abstract class ParameterCategory
         private static final Map<Integer, String> entries = new HashMap<>();
 
         static {
-            entries.put(0, "IMAGE_FORMAT");
-            entries.put(1, "QUANTITATIVE");
+//            entries.put(0, "IMAGE_FORMAT");
+//            entries.put(1, "QUANTITATIVE");
         }
 
         public SatelliteRemoteSensing(int categoryId)
@@ -193,8 +193,6 @@ public abstract class ParameterCategory
         private static final Map<Integer, String> entries = new HashMap<>();
 
         static {
-            entries.put(0, "WAVES");
-            entries.put(1, "CURRENTS");
         }
 
         public Oceanographic(int categoryId)
