@@ -114,6 +114,13 @@ public class Grib2Level
                 level.value = value;
                 level.description = level.value + " " + level.units + " pressure difference from ground";
                 break;
+            case 109:
+                level.code = "PVL";
+                level.name = "Potential vorticity surface";
+                level.units = "K m^2 kg^-1 s^-1";
+                level.value = value;
+                level.description = level.name + " " + level.value + " " + level.units;
+                break;
             case 200:
                 level.code = "EATM";
                 level.description = level.name = "entire atmosphere (considered as a single layer)";
