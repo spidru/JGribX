@@ -193,6 +193,7 @@ public abstract class ParameterCategory
         private static final Map<Integer, String> entries = new HashMap<>();
 
         static {
+            entries.put(2, "ICE");
         }
 
         public Oceanographic(int categoryId)
