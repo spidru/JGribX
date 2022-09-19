@@ -85,7 +85,7 @@ public class GribFile
     {
         // Initialise fields
         nRecordsSkipped = 0;
-        records = new ArrayList();
+        records = new ArrayList<>();
 
         /*
         * Initialise the Parameter Tables with the information in the parameter

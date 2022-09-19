@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+
+import mt.edu.um.cf2.jgribx.GeneratingProcess;
 import mt.edu.um.cf2.jgribx.GribInputStream;
 import mt.edu.um.cf2.jgribx.GribRecord;
 import mt.edu.um.cf2.jgribx.GribRecordIS;
@@ -178,7 +180,28 @@ public class Grib2Record extends GribRecord
     {
         return ids.referenceTime;
     }
-    
+
+    public GeneratingProcess getGeneratingProcess()
+    {
+        int refTimeSig = ids.getReferenceTimeSignificance();
+        GeneratingProcess.Type genProcessType;
+
+        switch (refTimeSig)
+        {
+            case 0:
+                genProcessType = GeneratingProcess.Type.ANALYSIS;
+                break;
+            case 1:
+            case 2:
+                genProcessType = GeneratingProcess.Type.FORECAST;
+                break;
+            default:
+                genProcessType = GeneratingProcess.Type.UNKNOWN;
+                break;
+        }
+        return new GeneratingProcess(genProcessType);
+    }
+
     @Override
     public double getValue(double latitude, double longitude)
     {

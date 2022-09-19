@@ -1,8 +1,16 @@
 
 package mt.edu.um.cf2.jgribx;
 
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -26,7 +34,7 @@ public class CommandLine {
         version.setRequired(false);
         options.addOption(version);
         
-        /* File Information */
+        /* Input File */
         Option inputFile = new Option("i", "input", true, "Specify an input file");
         inputFile.setRequired(false);
         options.addOption(inputFile);
@@ -35,6 +43,11 @@ public class CommandLine {
         Option logLevel = new Option("l", "loglevel", true, "Specify the logging level");
         logLevel.setRequired(false);
         options.addOption(logLevel);
+
+        /* Inventory file */
+        Option invFile = new Option("g", "generate-inventory", false, "Generate inventory file");
+        invFile.setRequired(false);
+        options.addOption(invFile);
         
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
@@ -50,7 +63,7 @@ public class CommandLine {
             formatter.printHelp("JGribX", options);
             System.exit(1);
         }
-        
+
         /* If no arguments have been specified, display help */
         if (cmd.getOptions().length == 0)
         {
@@ -69,7 +82,7 @@ public class CommandLine {
                 JGribX.setLoggingLevel(level - 1);
             }
         }
-        
+
         if (cmd.hasOption("i"))
         {
             String inputFilePath = cmd.getOptionValue("i");
@@ -87,6 +100,44 @@ public class CommandLine {
                     System.out.print(param + " ");
                 }
                 System.out.println();
+
+                // Generate inventory file if specified
+                // Reference: https://ftp.cpc.ncep.noaa.gov/wd51we/wgrib/readme
+                if (cmd.hasOption("g"))
+                {
+                    String invFilePath = inputFilePath + ".inv";
+                    Logger.println("Generating inventory in: " + invFilePath, Logger.INFO);
+                    List<String> lines = new ArrayList<>();
+                    for (int iRecord = 0; iRecord < gribFile.getRecordCount(); iRecord++)
+                    {
+                        GribRecord record = gribFile.getRecords().get(iRecord);
+                        long byteOffset = record.getIS().getByteOffset();
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHH");
+                        Date forecastDate = record.getReferenceTime().getTime();
+                        long forecastDelta_s = (record.getForecastTime().getTimeInMillis() - record.getReferenceTime().getTimeInMillis()) / 1000;
+                        int forecastDelta_h = Math.round((float) forecastDelta_s / 3600);
+                        String genProcessTypeAcronym = record.getGeneratingProcess().getAcronym();
+                        if (record.getGeneratingProcess().getType() == GeneratingProcess.Type.FORECAST)
+                        {
+                            genProcessTypeAcronym += " " + forecastDelta_h + "h";
+                        }
+
+                        String line = String.format(
+                            "%d:%d:d=%s:%s:%s:%s",
+                            iRecord + 1,
+                            byteOffset,
+                            dateFormat.format(forecastDate),
+                            record.getParameterCode(),
+                            record.getLevelCode(),
+                            genProcessTypeAcronym
+                        );
+
+                        lines.add(line);
+                    }
+
+                    // Write to file
+                    Files.write(Paths.get(invFilePath), lines, StandardCharsets.UTF_8);
+                }
             }
             catch (FileNotFoundException e)
             {
@@ -112,6 +163,5 @@ public class CommandLine {
             System.out.println("\nExternal Modules:");
             System.out.println("jj2000 " + JJ2KInfo.version + " (JPEG 2000 decoder)");
         }
-        
     }
 }

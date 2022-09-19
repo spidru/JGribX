@@ -12,6 +12,8 @@ package mt.edu.um.cf2.jgribx.grib1;
 
 import java.io.IOException;
 import java.util.Calendar;
+
+import mt.edu.um.cf2.jgribx.GeneratingProcess;
 import mt.edu.um.cf2.jgribx.GribInputStream;
 import mt.edu.um.cf2.jgribx.GribRecord;
 import mt.edu.um.cf2.jgribx.GribRecordIS;
@@ -347,6 +349,11 @@ public class Grib1Record extends GribRecord
     public float[] getLevelValues()
     {
         return pds.level.getValues();
+    }
+
+    public GeneratingProcess getGeneratingProcess()
+    {
+        return null;
     }
 
      /**

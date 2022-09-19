@@ -45,6 +45,9 @@ public class GribInputStream extends FilterInputStream
    
    private long markedCountBits;
 
+   /** Counter keeping track of bit offset relative to start of file */
+   private long absoluteBitPosition;
+
 
    /**
     * Constructs a bit input stream from an <tt>InputStream</tt> object.
@@ -67,6 +70,11 @@ public class GribInputStream extends FilterInputStream
    public synchronized void reset() throws IOException
    {
        super.reset();
+       if (countBits < markedCountBits)
+       {
+           Logger.println("Unexpected state countBits (" + countBits + ") < markedCountBits (" + markedCountBits + ")", Logger.WARNING);
+       }
+       absoluteBitPosition -= (countBits - markedCountBits);
        countBits = markedCountBits;
    }
    
@@ -79,6 +87,11 @@ public class GribInputStream extends FilterInputStream
    {
        return (int) Math.ceil((double) countBits / 8);
    }
+
+   public long getAbsoluteBytePosition()
+   {
+       return (long) Math.ceil((double) absoluteBitPosition / 8);
+   }
    
    public void resetBitCounter()
    {
@@ -90,7 +103,7 @@ public class GribInputStream extends FilterInputStream
         if (bitPos != 0)
         {
             countBits += bitPos;
-//            System.out.println("countBits += "+bitPos);
+            absoluteBitPosition += bitPos;
             bitPos = 0;
         }
     }
@@ -183,7 +196,9 @@ public class GribInputStream extends FilterInputStream
           int numReadRetry = this.read(data, numRead, data.length - numRead);
 
           if (numRead + numReadRetry < length)
-             throw new IOException("Unexpected end of input.");
+          {
+              throw new IOException("Unexpected end of input.");
+          }
        }
 
        return data;
@@ -194,6 +209,7 @@ public class GribInputStream extends FilterInputStream
     {
         int value = super.read();
         countBits += 8;
+        absoluteBitPosition += 8;
         return value;
     }
        
@@ -201,16 +217,18 @@ public class GribInputStream extends FilterInputStream
     public int read(byte[] b, int off, int len) throws IOException
     {
         int i = super.read(b, off, len);
-        countBits += (len*8);
+        countBits += (i * 8L);
+        absoluteBitPosition += (i * 8L);
         return i;
     }
     
    @Override
     public long skip(long n) throws IOException
     {
-        super.skip(n);
-        countBits += (n*8);
-        return n;
+        long nBytesSkipped = super.skip(n);
+        countBits += (nBytesSkipped * 8);
+        absoluteBitPosition += (nBytesSkipped * 8);
+        return nBytesSkipped;
     }
    
    /**
@@ -227,6 +245,7 @@ public class GribInputStream extends FilterInputStream
       if (numBits == 0) return 0;
       
       countBits += numBits;
+      absoluteBitPosition += numBits;
 
       int bitsLeft = numBits;
       long result = 0;

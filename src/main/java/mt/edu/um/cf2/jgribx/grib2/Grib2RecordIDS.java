@@ -23,7 +23,42 @@ import mt.edu.um.cf2.jgribx.Logger;
  */
 public class Grib2RecordIDS
 {
+    public static class DataType
+    {
+        private int dataType;
+        private final String acronym;
+        private final String description;
+        public DataType(int dataType)
+        {
+            switch (dataType)
+            {
+                case 0:
+                    acronym = "ANL";
+                    description = "Analysis products";
+                    break;
+                case 1:
+                    acronym = "FCST";
+                    description = "Forecast products";
+                    break;
+                case 2:
+                    acronym = "ANL/FCST";
+                    description = "Analysis and forecast products";
+                    break;
+                case 3:
+                    acronym = "CFCST";
+                    description = "Control forecast products";
+                    break;
+                default:
+                    acronym = "???";
+                    description = "Unsupported type";
+            }
+        }
+
+        public String getAcronym() { return acronym; }
+        public String getDescription() { return description; }
+    }
     protected Calendar referenceTime;
+    private int referenceTimeSignificance;
     private int length;
     private int number;
     private int origCentreId;
@@ -32,7 +67,9 @@ public class Grib2RecordIDS
     private int localTableVersion;
     private int year;
     private int dataProdStatus;
-    private int dataType;
+    private DataType dataType;
+
+
     
     public static Grib2RecordIDS readFromStream(GribInputStream in) throws IOException
     {
@@ -57,7 +94,7 @@ public class Grib2RecordIDS
         ids.localTableVersion = in.readUINT(1);
         
         /* [12] Reference Time Significance */
-        int refTimeSig = in.readUINT(1);
+        ids.referenceTimeSignificance = in.readUINT(1);
         
         /* [13-14] Reference Year */
         int year = in.readUINT(2);
@@ -84,7 +121,7 @@ public class Grib2RecordIDS
         ids.dataProdStatus = in.readUINT(1);
         
         /* Data Type */
-        ids.dataType = in.readUINT(1);
+        ids.dataType = new DataType(in.readUINT(1));
         
         /* Additional Data */
         if (ids.length > 21)
@@ -103,6 +140,8 @@ public class Grib2RecordIDS
     {
         return origCentreId;
     }
+
+    public int getReferenceTimeSignificance() { return referenceTimeSignificance; }
     
     /**
      * Returns the length of the {@link Grib2RecordIDS} instance.
@@ -118,23 +157,7 @@ public class Grib2RecordIDS
     {
         String string = "\nGRIB IDS:\n";
         string += "Weather centre "+origCentreId+"\n";
-        switch (dataType)
-        {
-            case 0:
-                string += "Analysis products";
-                break;
-            case 1:
-                string += "Forecast products";
-                break;
-            case 2:
-                string += "Analysis and forecast products";
-                break;
-            case 3:
-                string += "Control forecast products";
-                break;
-            default:
-                string += "Unsupported type";
-        }
+        string += dataType.getDescription();
         return string;
     }
 }

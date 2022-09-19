@@ -49,6 +49,8 @@ public class GribRecordIS
 
    protected ProductDiscipline discipline;
 
+   private long byteOffset;
+
     /**
      * Constructs a {@link GribRecordIS} object from a buffered input stream.
      *
@@ -61,6 +63,7 @@ public class GribRecordIS
     public static GribRecordIS readFromStream(GribInputStream in) throws NotSupportedException, NoValidGribException, IOException
     {
         GribRecordIS is = new GribRecordIS();
+        is.byteOffset = in.getAbsoluteBytePosition();
         byte[] octets = new byte[16];
         in.read(octets, 0, 8);
         
@@ -96,6 +99,12 @@ public class GribRecordIS
         
         return is;
    }
+
+    /**
+     * Get the byte offset of the start of the section relative to the start of the file
+     * @return The byte offset
+     */
+   public long getByteOffset() { return byteOffset; }
 
     public ProductDiscipline getDiscipline()
     {

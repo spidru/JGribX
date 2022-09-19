@@ -65,6 +65,7 @@ public abstract class GribRecord
     public abstract Calendar getForecastTime();
     public abstract String getLevelCode();
     public abstract String getLevelDescription();
+    public abstract GeneratingProcess getGeneratingProcess();
     
     /**
      * Returns the unique ID for the level code and value combination.
