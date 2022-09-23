@@ -15,6 +15,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 import mt.edu.um.cf2.jgribx.Bytes2Number;
+import mt.edu.um.cf2.jgribx.GeneratingProcess;
 import mt.edu.um.cf2.jgribx.GribInputStream;
 import mt.edu.um.cf2.jgribx.Logger;
 import mt.edu.um.cf2.jgribx.NotSupportedException;
@@ -109,6 +110,8 @@ public class Grib1RecordPDS
      * created the data).
      */
     private int processId;
+
+    private GeneratingProcess.Type genProcessType;
 
     /**
      * rdg - moved the Parameter table information and functionality into a
@@ -348,6 +351,10 @@ public class Grib1RecordPDS
                 month1 - 1, day1, hour1, minute1);
         this.forecastTime2 = new GregorianCalendar(year2 + 100 * (century - 1),
                 month2 - 1, day2, hour2, minute2);
+
+        // Determine generating process type (i.e. analysis, forecast, etc.)
+        if (offset == 0 && offset2 == 0) { genProcessType = GeneratingProcess.Type.ANALYSIS; }
+        else { genProcessType = GeneratingProcess.Type.FORECAST; }
     }
 
     /**
@@ -647,6 +654,11 @@ public class Grib1RecordPDS
                 + "        table: " + this.tableVersion + "\n"
                 + "        grid_id: " + this.gridId + "\n"
                 + "        " + timeStr + " (dd.mm.yyyy hh:mm) \n";
+    }
+
+    public GeneratingProcess.Type getGeneratingProcessType()
+    {
+        return genProcessType;
     }
 
     /**

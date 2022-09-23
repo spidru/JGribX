@@ -353,7 +353,7 @@ public class Grib1Record extends GribRecord
 
     public GeneratingProcess getGeneratingProcess()
     {
-        return null;
+        return new GeneratingProcess(pds.getGeneratingProcessType());
     }
 
      /**
