@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -105,8 +106,9 @@ public class CommandLine {
                 // Reference: https://ftp.cpc.ncep.noaa.gov/wd51we/wgrib/readme
                 if (cmd.hasOption("g"))
                 {
-                    String invFilePath = inputFilePath + ".inv";
-                    Logger.println("Generating inventory in: " + invFilePath, Logger.INFO);
+                    Path path = Paths.get(inputFilePath);
+                    String invFilePath = path.getFileName() + ".inv";
+                    System.out.println("Generating inventory file: " + invFilePath);
                     List<String> lines = new ArrayList<>();
                     for (int iRecord = 0; iRecord < gribFile.getRecordCount(); iRecord++)
                     {
