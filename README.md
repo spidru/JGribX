@@ -18,7 +18,7 @@ Here is a shortlist of the major changes made since JGrib (version 7 beta):
  * skips invalid/unsupported GRIB records (showing the appropriate errors/warnings)
 
 ## Dependencies
-Requires JDK/JRE version 9 or above.
+Requires JDK/JRE version 8 or above.
 
 ## Important Notes
 JGribX is still under active development and therefore contains a large amount of unsupported features and operations. These will be implemented gradually over time. If you would like certain features to be implemented or perhaps have found some issues, please open an issue containing all the relevant information.
