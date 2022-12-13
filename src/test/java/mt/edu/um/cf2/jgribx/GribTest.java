@@ -117,7 +117,7 @@ public class GribTest
                 int i = 0;
                 while ((line = reader.readLine()) != null)
                 {
-		    // Calculate the tolerance based on the maximum data value
+		            // Calculate the tolerance based on the maximum data value
                     double tolerance = 0;
                     double maxValue = GribTest.getMaxValue(obtainedValues);
                     if (maxValue >= 100e3) { tolerance = 0.9; }
@@ -163,16 +163,24 @@ public class GribTest
     }
 
     @Test
+    public void testGrib2LambertConformalGrid()
+    {
+        // TODO Resolve warnings: Grid type 30 is not supported
+        final String FILENAME = "/fh.0001_tl.press_gr.bgrib13";
+    }
+
+    @Test
     public void testGrib2QuasiRegularGrid() throws IOException, NoValidGribException, NotSupportedException
     {
-        /* TODO
-         * - Resolve warnings: Record contains multiple PDS's
-         * - Resolve error: Second surface is not yet supported
+        /*
+         * TODO Resolve warnings: Record contains multiple PDS's
+         * TODO Resolve error: Second surface is not yet supported
          */
         final String FILENAME = "/fh.000_tl.press_ar.octanti";
 
         // Define expected data
         final int EDITION = 2;
+        final int N_RECORDS_EXPECTED = 74;
         final int[] WEATHER_CENTRES = {7};
 
         URL url = GribTest.class.getResource(FILENAME);
@@ -180,6 +188,7 @@ public class GribTest
 
         assertEquals("GRIB edition", EDITION, file.getEdition());
         assertArrayEquals("Weather centres", WEATHER_CENTRES, file.getCentreIDs());
+        assertEquals("Records read successfully", N_RECORDS_EXPECTED, file.getRecordCount());
     }
 
     private static float getMaxValue(float[] values)

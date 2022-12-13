@@ -111,7 +111,11 @@ public abstract class Grib2RecordGDS
         }
         
         /* [6] Grid Definition Source */
-        in.skip(1);
+        int gridDefSource = in.readUINT(1);
+        if (gridDefSource != 0)
+        {
+            throw new NotSupportedException("Unexpected grid definition source: " + gridDefSource);
+        }
 
         /* [7-10] Number of Data Points */
         in.skip(4);
@@ -124,19 +128,24 @@ public abstract class Grib2RecordGDS
 
         /* [13-14] Grid Definition Template Number */
         int gridType = in.readUINT(2);
-        
-        in.reset();     // required since constructors below will read the GDS from the beginning
-        
+
+        /* Reset input stream to start of section
+         * Required since constructors below will read the GDS from the beginning
+         */
+        in.reset();
         switch (gridType)
         {
             case 0:
                 // Latitude/Longitude (also called Equidistant Cylindrical or Plate Caree)
                 gds = new Grib2RecordGDSLatLon(in);
                 break;
+            case 30:
+                // Lambert Conformal
+                gds = new Grib2RecordGdsLambertConformal(in);
+                break;
             default:
-                throw new NotSupportedException("Unsupported grid type: "+gridType);
+                throw new NotSupportedException("Unsupported grid type: " + gridType);
         }
-        
         return gds;
     }
     

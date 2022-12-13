@@ -118,24 +118,6 @@ public class GribInputStream extends FilterInputStream
        byte data[] = read(nBytes);
        return Bytes2Number.bytesToFloat(data, format);
    }
-   
-   /**
-    * Read an unsigned 8 bit value.
-    *
-    * @return unsigned 8 bit value as integer
-    * @throws IOException 
-    */
-   public int readUI8() throws IOException
-   {
-
-      int ui8 = in.read();
-
-      if (ui8 < 0)
-         throw new IOException("End of input.");
-      
-      return ui8;
-   }
-
 
    /**
     * Read specific number of unsigned bytes from the input stream.
