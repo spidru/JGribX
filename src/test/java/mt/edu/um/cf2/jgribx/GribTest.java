@@ -167,7 +167,6 @@ public class GribTest
     {
         /* TODO
          * - Resolve warnings: Record contains multiple PDS's
-         * - Resolve error: Second surface is not yet supported
          */
         final String FILENAME = "/fh.000_tl.press_ar.octanti";
 

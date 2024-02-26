@@ -58,9 +58,6 @@ public class GribExample1
 
         /**
          * type: GRIB2 NCEP GFS
-         * issues:
-         *  - BMS bitmap not yet supported
-         *  - second surface not yet supported
          */
 //        String gribFilename = "test/gfsanl_3_20170512_0000_000.grb2";
         
