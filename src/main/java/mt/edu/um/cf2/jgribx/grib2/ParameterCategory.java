@@ -63,6 +63,7 @@ public abstract class ParameterCategory
     public static class Meteorological extends ParameterCategory
     {
         private static final Map<Integer, String> entries = new HashMap();
+        private static List<ParameterCategory> categories;
 
         static {
             entries.put(0, "TEMPERATURE");
@@ -72,6 +73,13 @@ public abstract class ParameterCategory
             entries.put(6, "CLOUD");
             entries.put(7, "THERMODYNAMIC");
             entries.put(14, "TRACE_GASES");
+
+            categories = new ArrayList<>();
+            for (Integer key : entries.keySet())
+            {
+                Logger.println("Adding Meteorological category: " + key, Logger.DEBUG);
+                categories.add(new ParameterCategory.Meteorological(key));
+            }
         }
 
         public Meteorological(int categoryId)
@@ -86,13 +94,7 @@ public abstract class ParameterCategory
 
         public static List<ParameterCategory> getCategories()
         {
-            List<ParameterCategory> list = new ArrayList<>();
-            for (Integer key : entries.keySet())
-            {
-                Logger.println("Adding Meteorological category: " + key, Logger.DEBUG);
-                list.add(new ParameterCategory.Meteorological(key));
-            }
-            return list;
+            return categories;
         }
     }
 
