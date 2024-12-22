@@ -101,10 +101,18 @@ public abstract class ParameterCategory
     public static class Hydrological extends ParameterCategory
     {
         private static final Map<Integer, String> entries = new HashMap<>();
+        private static List<ParameterCategory> categories;
 
         static {
             entries.put(0, "BASIC");
-//            entries.put(1, "PROBABILITIES");
+            entries.put(1, "PROBABILITIES");
+
+            categories = new ArrayList<>();
+            for (Integer key : entries.keySet())
+            {
+                Logger.println("Adding Hydrological category: " + key, Logger.DEBUG);
+                categories.add(new ParameterCategory.Hydrological(key));
+            }
         }
 
         public Hydrological(int categoryId)
@@ -119,12 +127,7 @@ public abstract class ParameterCategory
 
         public static List<ParameterCategory> getCategories()
         {
-            List<ParameterCategory> list = new ArrayList<>();
-            for (Integer key : entries.keySet())
-            {
-                list.add(new ParameterCategory.Hydrological(key));
-            }
-            return list;
+            return categories;
         }
     }
 
