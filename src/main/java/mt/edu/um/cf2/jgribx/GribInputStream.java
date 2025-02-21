@@ -312,7 +312,7 @@ public class GribInputStream extends FilterInputStream
 
        assert pattern.length > 0 && pattern.length < N_BYTES_PER_CHUNK;
 
-       while ((nAvailableBytes = this.available()) > 0)
+       while ((nAvailableBytes = this.available()) > pattern.length)
        {
            // Limit the number of bytes to be read
            if (nAvailableBytes > N_BYTES_PER_CHUNK)
