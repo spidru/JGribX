@@ -74,8 +74,11 @@ jobs:
       # Download additional GRIB files from Dropbox
       - run:
           name: "Download GRIB files from Dropbox"
+          environment:
+            RES_DIR: src/test/resources
           command: |
-            wget --output-document=src/test/resources/fh.000_tl.press_ar.octanti https://www.dropbox.com/s/u32knq1pjm7cq60/fh.000_tl.press_ar.octanti?dl=1
+            wget --output-document=${RES_DIR}/fh.000_tl.press_ar.octanti "https://www.dropbox.com/s/u32knq1pjm7cq60/fh.000_tl.press_ar.octanti?dl=1"
+            wget --output-document=${RES_DIR}/issue22.grb "https://www.dropbox.com/scl/fi/o9o79d6snz9j8ige91ezh/issue22.grb?rlkey=y9jxro8eqvkt1kd7kil0i1xb7&st=wznfrhvy&dl=1"
 
       # Cache Git LFS files
       - save_cache:

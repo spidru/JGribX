@@ -181,6 +181,32 @@ public class GribTest
         assertArrayEquals("Weather centres", WEATHER_CENTRES, file.getCentreIDs());
     }
 
+    /**
+     * Test the pattern seeking functionality
+     *
+     * issue22.grb contains a single byte after the End Section of the GRIB
+     * record, which caused an infinite loop in commit ec590ad.
+     * @throws IOException
+     * @throws NotSupportedException
+     */
+    @Test(timeout = 1000)
+    public void testGribSeekPattern() throws IOException, NotSupportedException {
+        /* TODO
+         * - Add support for GRIB-1 quasi-regular grids
+         */
+        final String FILENAME = "/issue22.grb";
+        final int EDITION = 1;
+        URL url = GribTest.class.getResource(FILENAME);
+        assertNotNull(url);
+        try {
+            GribFile file = new GribFile(url.openStream());
+            assertEquals("GRIB edition", EDITION, file.getEdition());
+        }
+        catch (NoValidGribException ignored)
+        {
+        }
+    }
+
     private static float getMaxValue(float[] values)
     {
         float max = values[0];
