@@ -124,7 +124,14 @@ public class GribFile
                 {
                     GribRecordIS.seekNext(in);
                 }
-                catch (EOFException ignored) {}
+                catch (EOFException e) {
+                    int nBytes = in.available();
+                    if (nBytes > 0) {
+                        Logger.println("Found " + nBytes + " bytes at end of file while seeking IS: " + e.getMessage(), Logger.INFO);
+                        // Skip any remaining bytes
+                        in.skip(nBytes);
+                    }
+                }
             }
 
             Logger.println("GRIB Record "+count, Logger.INFO);
