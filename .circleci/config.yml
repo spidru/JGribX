@@ -21,12 +21,9 @@ jobs:
       JVM_OPTS: -Xmx3200m
       TERM: dumb
       WGRIB: /home/circleci/repo/wgrib
+      GIT_LFS_SKIP_SMUDGE: 1
 
     steps:
-      - run:
-          name: Disable LFS pulling
-          command: |
-              git lfs uninstall
       - checkout
 
       # Print some diagnostic info
