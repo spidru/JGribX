@@ -65,12 +65,6 @@ jobs:
             - git-lfs-cache-{{ checksum "RESOURCES_MD5" }}
             - git-lfs-cache-
 
-      - run:
-            name: Pull Git LFS files
-            command: |
-                git lfs install
-                git lfs pull
-
       # Download additional GRIB files from Dropbox
       - run:
           name: "Download GRIB files from Dropbox"
