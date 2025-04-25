@@ -25,9 +25,9 @@ jobs:
     steps:
       - checkout
       - run:
-        name: Disable LFS pulling
-        command: |
-            git lfs uninstall
+          name: Disable LFS pulling
+          command: |
+              git lfs uninstall
 
       # Print some diagnostic info
       - run:
