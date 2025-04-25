@@ -23,11 +23,11 @@ jobs:
       WGRIB: /home/circleci/repo/wgrib
 
     steps:
-      - checkout
       - run:
           name: Disable LFS pulling
           command: |
               git lfs uninstall
+      - checkout
 
       # Print some diagnostic info
       - run:
