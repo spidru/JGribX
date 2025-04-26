@@ -51,13 +51,19 @@ jobs:
 
       - run: gradle dependencies
 
-      # Download additional GRIB files from Dropbox
       - run:
-          name: "Download GRIB files from Dropbox"
+          name: "Download GRIB files from Cloudsmith"
           environment:
             RES_DIR: src/test/resources
           command: |
-            curl -1sLf -O "https://dl.cloudsmith.io/${CLOUDSMITH_TOKEN}/jgribx/grib-files/raw/files/issue22.grb"
+            files=(
+                "issue22.grb"
+                "fh.000_tl.press_ar.octanti"
+            )
+            for file in "files[@]"; do
+                echo "Downloading file: ${file}"
+                curl -1sLf -O "https://dl.cloudsmith.io/${CLOUDSMITH_TOKEN}/jgribx/grib-files/raw/files/${file}" --output "${RES_DIR}/${file}"
+            done
 
       - save_cache:
           name: Cache Gradle
