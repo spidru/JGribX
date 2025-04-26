@@ -57,8 +57,10 @@ jobs:
             RES_DIR: src/test/resources
           command: |
             files=(
-                "issue22.grb"
+                "CF2_20150706_092531.grb"
                 "fh.000_tl.press_ar.octanti"
+                "gfsanl_3_20170512_0000_000.grb2"
+                "issue22.grb"
             )
             for file in "${files[@]}"; do
                 echo "Downloading file: ${file}"
