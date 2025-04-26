@@ -1,2 +1,0 @@
-*.grb filter=lfs diff=lfs merge=lfs -text
-*.grb2 filter=lfs diff=lfs merge=lfs -text
