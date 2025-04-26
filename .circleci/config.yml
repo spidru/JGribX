@@ -60,7 +60,7 @@ jobs:
                 "issue22.grb"
                 "fh.000_tl.press_ar.octanti"
             )
-            for file in "files[@]"; do
+            for file in "${files[@]}"; do
                 echo "Downloading file: ${file}"
                 curl -1sLf -O "https://dl.cloudsmith.io/${CLOUDSMITH_TOKEN}/jgribx/grib-files/raw/files/${file}" --output "${RES_DIR}/${file}"
             done
