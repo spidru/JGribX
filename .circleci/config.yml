@@ -66,6 +66,7 @@ jobs:
                 echo "Downloading file: ${file}"
                 curl -1sLf -O "https://dl.cloudsmith.io/${CLOUDSMITH_TOKEN}/jgribx/grib-files/raw/files/${file}" --output "${RES_DIR}/${file}"
             done
+            ls ${RES_DIR}
 
       - save_cache:
           name: Cache Gradle
