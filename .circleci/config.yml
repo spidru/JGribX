@@ -22,6 +22,11 @@ jobs:
       TERM: dumb
       WGRIB: /home/circleci/repo/wgrib
       GIT_LFS_SKIP_SMUDGE: 1
+      RESOURCE_FILENAMES: |
+        "CF2_20150706_092531.grb"
+        "fh.000_tl.press_ar.octanti"
+        "gfsanl_3_20170512_0000_000.grb2"
+        "issue22.grb"
 
     steps:
       - checkout
@@ -32,14 +37,14 @@ jobs:
           command: |
               echo $(cat /etc/os-release)
               echo $(java -version)
-              ls && ls src && ls src/test && ls src/test/resources
+              ls
 
       # Compute checksum of test resources
       - run:
           name: Compute checksum of test resources
           command: |
-              resources_checksum=($(find src/test/resources -type f -exec md5sum {} \; | sort -k 2 | md5sum))
-              echo Checksum of src/test/resources: $resources_checksum
+              resources_checksum=$(echo "${RESOURCE_FILENAMES" | sort | md5sum)
+              echo Checksum of test resources: $resources_checksum
               echo $resources_checksum > RESOURCES_MD5
 
       # Download and cache dependencies
@@ -52,8 +57,9 @@ jobs:
 
       - run: gradle dependencies
 
+      # TODO Add caching for test resources
       - run:
-          name: "Download GRIB files from Cloudsmith"
+          name: "Download test resources from Cloudsmith"
           environment:
             RES_DIR: src/test/resources
           command: |
