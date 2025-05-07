@@ -32,7 +32,7 @@ jobs:
           command: |
               echo $(cat /etc/os-release)
               echo $(java -version)
-              ls
+              ls && ls src && ls src/test && ls src/test/resources
 
       # Compute checksum of test resources
       - run:
