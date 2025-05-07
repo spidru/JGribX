@@ -43,7 +43,7 @@ jobs:
       - run:
           name: Compute checksum of test resources
           command: |
-              resources_checksum=$(echo "${RESOURCE_FILENAMES" | sort | md5sum)
+              resources_checksum=$(echo "${RESOURCE_FILENAMES}" | sort | md5sum)
               echo Checksum of test resources: $resources_checksum
               echo $resources_checksum > RESOURCES_MD5
 
