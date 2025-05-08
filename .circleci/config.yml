@@ -72,7 +72,7 @@ jobs:
             )
             for file in "${files[@]}"; do
                 echo "Downloading file: ${file}"
-                curl -1sLfv "https://dl.cloudsmith.io/${CLOUDSMITH_TOKEN}/jgribx/grib-files/raw/files/${file}" --output "${RES_DIR}/${file}"
+                curl -1sLf "https://dl.cloudsmith.io/${CLOUDSMITH_TOKEN}/jgribx/grib-files/raw/files/${file}" --output "${RES_DIR}/${file}"
             done
             ls ${RES_DIR}
 
