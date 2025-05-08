@@ -63,6 +63,7 @@ jobs:
           environment:
             RES_DIR: src/test/resources
           command: |
+            mdir -p "${RES_DIR}"
             files=(
                 "CF2_20150706_092531.grb"
                 "fh.000_tl.press_ar.octanti"
