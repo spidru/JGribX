@@ -64,17 +64,12 @@ jobs:
             RES_DIR: src/test/resources
           command: |
             mkdir -p "${RES_DIR}"
-            files=(
-                "CF2_20150706_092531.grb"
-                "fh.000_tl.press_ar.octanti"
-                "gfsanl_3_20170512_0000_000.grb2"
-                "issue22.grb"
-            )
+            files=(${RESOURCE_FILENAMES})
             for file in "${files[@]}"; do
                 echo "Downloading file: ${file}"
                 curl --fail --location --silent --show-error --tlsv1 "https://dl.cloudsmith.io/public/jgribx/jgribx/raw/files/${file}" --output "${RES_DIR}/${file}"
             done
-            ls ${RES_DIR}
+            ls -hl ${RES_DIR}
 
       - save_cache:
           name: Cache Gradle
