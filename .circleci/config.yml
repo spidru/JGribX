@@ -23,10 +23,10 @@ jobs:
       WGRIB: /home/circleci/repo/wgrib
       GIT_LFS_SKIP_SMUDGE: 1
       RESOURCE_FILENAMES: >
-        "CF2_20150706_092531.grb"
-        "fh.000_tl.press_ar.octanti"
-        "gfsanl_3_20170512_0000_000.grb2"
-        "issue22.grb"
+        CF2_20150706_092531.grb
+        fh.000_tl.press_ar.octanti
+        gfsanl_3_20170512_0000_000.grb2
+        issue22.grb
 
     steps:
       - checkout
