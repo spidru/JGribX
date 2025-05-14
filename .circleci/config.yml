@@ -64,7 +64,8 @@ jobs:
             RES_DIR: src/test/resources
           command: |
             mkdir -p "${RES_DIR}"
-            files=(${RESOURCE_FILENAMES})
+            echo FILENAMES=[${RESOURCE_FILENAMES}]
+            files=("${RESOURCE_FILENAMES}")
             for file in "${files[@]}"; do
                 echo "Downloading file: ${file}"
                 curl --fail --location --silent --show-error --tlsv1 "https://dl.cloudsmith.io/public/jgribx/jgribx/raw/files/${file}" --output "${RES_DIR}/${file}"
