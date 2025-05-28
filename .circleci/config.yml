@@ -57,7 +57,6 @@ jobs:
 
       - run: gradle dependencies
 
-      # TODO Add caching for test resources
       - run:
           name: "Download test resources from Cloudsmith"
           environment:
