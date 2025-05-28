@@ -21,6 +21,12 @@ jobs:
       JVM_OPTS: -Xmx3200m
       TERM: dumb
       WGRIB: /home/circleci/repo/wgrib
+      GIT_LFS_SKIP_SMUDGE: 1
+      RESOURCE_FILENAMES: >
+        CF2_20150706_092531.grb
+        fh.000_tl.press_ar.octanti
+        gfsanl_3_20170512_0000_000.grb2
+        issue22.grb
 
     steps:
       - checkout
@@ -31,13 +37,14 @@ jobs:
           command: |
               echo $(cat /etc/os-release)
               echo $(java -version)
+              ls
 
       # Compute checksum of test resources
       - run:
           name: Compute checksum of test resources
           command: |
-              resources_checksum=($(find src/test/resources -type f -exec md5sum {} \; | sort -k 2 | md5sum))
-              echo Checksum of src/test/resources: $resources_checksum
+              resources_checksum=$(echo "${RESOURCE_FILENAMES}" | sort | md5sum)
+              echo Checksum of test resources: $resources_checksum
               echo $resources_checksum > RESOURCES_MD5
 
       # Download and cache dependencies
@@ -51,41 +58,18 @@ jobs:
       - run: gradle dependencies
 
       - run:
-            name: Install Git LFS
-            command: |
-                curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
-                sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 648ACFD622F3D138
-                sudo apt-get update
-                sudo apt-get install libcrypt1 || [[ $? -eq 100 ]]
-                sudo apt-get install git-lfs
-
-      - restore_cache:
-          name: Restore Git LFS files from cache
-          keys:
-            - git-lfs-cache-{{ checksum "RESOURCES_MD5" }}
-            - git-lfs-cache-
-
-      - run:
-            name: Pull Git LFS files
-            command: |
-                git lfs install
-                git lfs pull
-
-      # Download additional GRIB files from Dropbox
-      - run:
-          name: "Download GRIB files from Dropbox"
+          name: "Download test resources from Cloudsmith"
           environment:
             RES_DIR: src/test/resources
           command: |
-            wget --output-document=${RES_DIR}/fh.000_tl.press_ar.octanti "https://www.dropbox.com/s/u32knq1pjm7cq60/fh.000_tl.press_ar.octanti?dl=1"
-            wget --output-document=${RES_DIR}/issue22.grb "https://www.dropbox.com/scl/fi/o9o79d6snz9j8ige91ezh/issue22.grb?rlkey=y9jxro8eqvkt1kd7kil0i1xb7&st=wznfrhvy&dl=1"
-
-      # Cache Git LFS files
-      - save_cache:
-            name: Cache Git LFS files
-            key: git-lfs-cache-{{ checksum "RESOURCES_MD5" }}
-            paths:
-              - .git/lfs/objects
+            mkdir -p "${RES_DIR}"
+            echo FILENAMES=[${RESOURCE_FILENAMES}]
+            files=(${RESOURCE_FILENAMES})
+            for file in "${files[@]}"; do
+                echo "Downloading file: ${file}"
+                curl --fail --location --silent --show-error --tlsv1 "https://dl.cloudsmith.io/public/jgribx/jgribx/raw/files/${file}" --output "${RES_DIR}/${file}"
+            done
+            ls -hl ${RES_DIR}
 
       - save_cache:
           name: Cache Gradle

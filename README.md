@@ -2,7 +2,7 @@
 
 [![spidru](https://circleci.com/gh/spidru/JGribX.svg?style=shield)](https://circleci.com/gh/spidru/JGribX)
 
-**NOTE: Since commit 1f3fd1e (19th March 2020), the history of this repository has been rewritten to migrate binary files (.grb and .grb2) to Git LFS. Anyone checking out the repository should clone it again rather than pulling.**
+[![Hosted By: Cloudsmith](https://img.shields.io/badge/OSS%20hosting%20by-cloudsmith-blue?logo=cloudsmith&style=flat-square)](https://cloudsmith.com)
 
 ## Introduction
 JGribX is a GRIB decoder written in Java. It is essentially a fork of [JGrib](http://jgrib.sourceforge.net/), which as far as I know is now no longer being actively developed. JGribX currently supports both GRIB-1 and GRIB-2 files.
