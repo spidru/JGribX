@@ -43,6 +43,9 @@ public class Grib2RecordDS
             case 3:
                 data = unpackComplexPackingAndSpatialDifferencing(in, drs, gds, bms);
                 break;
+    		case 4:
+    			data = unpackDoubleIEEE(in, drs, gds, bms);
+    			break;
             case 40:
                 data = unpackJpeg2000(in, ds.length, drs, gds, bms);
                 break;
@@ -391,6 +394,26 @@ public class Grib2RecordDS
         
         return data;
     }
+    
+    // TODO THIS SHOULD RETURN ARRAY OF DOUBLE !!!
+	private static float[] unpackDoubleIEEE(
+			GribInputStream in, Grib2RecordDRS drs, Grib2RecordGDS gds, Grib2RecordBMS bms
+			) throws IOException, NotSupportedException {
+
+		int nPoints = gds.nDataPoints;
+		float[] values = new float[nPoints];
+
+		if (bms.bitmap != null)	{
+			throw new NotSupportedException("Not yet implemented");
+		} else {
+			
+			Logger.println("Data precission lost (double -> float) in unpackDoubleIEEE", Logger.WARNING);
+			
+			for (int i = 0; i < nPoints; i++) values[i] = (float) in.readDouble(drs.nBits/8);
+		}
+
+		return values;
+	}
     
     private static float[] unpackJpeg2000(GribInputStream in, int dsLength, Grib2RecordDRS drs, Grib2RecordGDS gds,
         Grib2RecordBMS bms) throws IOException, NoValidGribException {

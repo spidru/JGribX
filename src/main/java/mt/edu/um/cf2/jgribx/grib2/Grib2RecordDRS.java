@@ -117,6 +117,33 @@ public class Grib2RecordDRS
                         break;
                 }
                 break;
+            case 4:
+    			/* Grid point data - IEEE floating point data, more at :
+    			 * https://codes.ecmwf.int/grib/format/grib2/templates/5/4/
+    			 * and
+    			 * https://codes.ecmwf.int/grib/format/grib2/ctables/5/7/
+    			 */
+
+    			// [12] Precision
+    			int precision = in.readUINT(1);
+    			drs.missingValue = Float.NaN;
+    			
+    			switch (precision)
+    			{
+    			case 1:
+    				drs.nBits = 32;
+    				break;
+    			case 2:
+    				drs.nBits = 64;
+    				break;
+    			case 3:
+    				drs.nBits = 128;
+    				break;
+    			default:
+    				throw new NotSupportedException("The precision code "+precision+" of floating-point numbers in "
+    						+ drs.packingType +" is not supported");
+    			}
+    			break;
             case 40:
                 /* Grid Point Data - JPEG 2000 code stream format */
                 drs.refValue = in.readFloat(4, FLOAT_IEEE754);

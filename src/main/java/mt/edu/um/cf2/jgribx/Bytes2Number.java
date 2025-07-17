@@ -225,5 +225,14 @@ public class Bytes2Number
       return (float) (sgn * Math.pow(16.0, exp - 6) * mant);
    }
 
+	/**
+	 * Convert an array of bytes into a double point precision.
+	 * @param bytes
+	 * @return a single value as a double precision IEEE754 float
+	 */
+	public static double bytesToDobule(byte[] bytes) {
+		return ByteBuffer.wrap(bytes).order(ByteOrder.BIG_ENDIAN).getDouble();
+	}
+   
 }
 

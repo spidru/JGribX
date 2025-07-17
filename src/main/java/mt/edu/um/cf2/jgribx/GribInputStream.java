@@ -362,5 +362,11 @@ public class GribInputStream extends FilterInputStream
        return iEndPos - iStartPos;
    }
 
+   public double readDouble(int nBytes) throws IOException
+   {
+       byte data[] = read(nBytes);
+       return Bytes2Number.bytesToDobule(data);
+   }
+   
 }
 
